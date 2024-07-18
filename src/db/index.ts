@@ -5,7 +5,7 @@ export async function connect(
   dbName: string
 ): Promise<typeof ConnectionStates> {
   const dbString = `${connString}${dbName}`;
-  const { STATES } = await mongoose.connect(dbString);
+  const { STATES } = await mongoose.connect(dbString, { ssl: true });
 
   return STATES;
 }

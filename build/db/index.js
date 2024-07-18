@@ -7,6 +7,6 @@ exports.connect = connect;
 const mongoose_1 = __importDefault(require("mongoose"));
 async function connect(connString, dbName) {
     const dbString = `${connString}${dbName}`;
-    const { STATES } = await mongoose_1.default.connect(dbString);
+    const { STATES } = await mongoose_1.default.connect(dbString, { ssl: true });
     return STATES;
 }
