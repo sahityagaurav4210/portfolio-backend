@@ -7,4 +7,5 @@ const express_1 = require("express");
 const controllers_1 = __importDefault(require("../controllers"));
 const route = (0, express_1.Router)();
 route.get('/ping', controllers_1.default.home().ping);
+route.get('/shut-down', controllers_1.default.home().shutdown);
 exports.default = route;
