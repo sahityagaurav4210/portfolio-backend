@@ -22,16 +22,23 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Events = void 0;
-const mongoose_1 = __importStar(require("mongoose"));
+exports.hashPwd = hashPwd;
+exports.generateToken = generateToken;
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const jwt = __importStar(require("jsonwebtoken"));
 const constant_1 = require("../constant");
-const eventSchema = new mongoose_1.Schema({
-    eventName: { type: String, required: [true, 'Event name is required'] },
-    firedBy: {
-        type: mongoose_1.default.Schema.ObjectId,
-        ref: constant_1.ModelNames.USERS,
-        required: [true, 'Fired by is required'],
-    },
-}, { timestamps: true });
-exports.Events = (0, mongoose_1.model)(constant_1.ModelNames.EVENTS, eventSchema);
+async function hashPwd(password) {
+    const salt = await bcrypt_1.default.genSalt(10);
+    const hashPwd = await bcrypt_1.default.hash(password, salt);
+    return hashPwd;
+}
+function generateToken(phone, tokenType) {
+    let token;
+    const secret = constant_1.TokenSecrets[tokenType] || '';
+    token = jwt.sign({ phone }, secret, { expiresIn: constant_1.TokenExpiry[tokenType] });
+    return token;
+}

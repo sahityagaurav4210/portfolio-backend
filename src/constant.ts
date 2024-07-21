@@ -1,8 +1,24 @@
 export enum ModelNames {
   EVENTS = 'events',
   USERS = 'users',
+  LOGIN = 'logins',
 }
 
 export enum EventNames {
   SHUT_DOWN = 'shutdown',
+}
+
+export const TokenExpiry = {
+  ACCESS: process.env.ACCESS_TOKEN_EXP,
+  REFRESH: process.env.REF_TOKEN_EXP,
+};
+
+export const TokenSecrets = {
+  ACCESS: process.env.ACCESS_TOKEN_SEC,
+  REFRESH: process.env.REFRESH_TOKEN_SEC,
+};
+
+export enum Tokens {
+  ACCESS = 'ACCESS',
+  REFRESH = 'REFRESH',
 }

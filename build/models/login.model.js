@@ -23,15 +23,27 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Events = void 0;
+exports.Login = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const constant_1 = require("../constant");
-const eventSchema = new mongoose_1.Schema({
-    eventName: { type: String, required: [true, 'Event name is required'] },
-    firedBy: {
+const loginSchema = new mongoose_1.Schema({
+    loggedInUser: {
         type: mongoose_1.default.Schema.ObjectId,
         ref: constant_1.ModelNames.USERS,
-        required: [true, 'Fired by is required'],
+        required: [true, 'Logged in user is required'],
     },
+    signins: {
+        type: [
+            {
+                token: { type: String, required: ['Token is required'] },
+                isLoggedIn: { type: Boolean, default: false },
+                loginAt: { type: Date, required: ['Login At is required'] },
+                logoutAt: { type: Date, default: Date.now() },
+            },
+        ],
+        _id: false,
+        required: [true, 'Sign in is required'],
+    },
+    phone: { type: String, required: [true, 'Phone is required'] },
 }, { timestamps: true });
-exports.Events = (0, mongoose_1.model)(constant_1.ModelNames.EVENTS, eventSchema);
+exports.Login = (0, mongoose_1.model)(constant_1.ModelNames.LOGIN, loginSchema);

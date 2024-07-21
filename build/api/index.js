@@ -25,6 +25,7 @@ var Status;
     Status["VALIDATION"] = "validation";
     Status["CONFLICT"] = "already exists";
     Status["UNDEFINED"] = "not defined";
+    Status["UNAUTHORISED"] = "unauthorised";
 })(Status || (exports.Status = Status = {}));
 class ApiResponse {
     status;
@@ -40,14 +41,26 @@ class ApiResponse {
     get STATUS() {
         return this.status;
     }
+    set STATUS(value) {
+        this.status = value;
+    }
     get MESSAGE() {
         return this.message;
+    }
+    set MESSAGE(value) {
+        this.message = value;
     }
     get DATA() {
         return this.data;
     }
+    set DATA(value) {
+        this.data = value;
+    }
     get ENTRY_BY() {
         return this.entryBy;
+    }
+    set ENTRY_BY(value) {
+        this.entryBy = value;
     }
 }
 exports.ApiResponse = ApiResponse;

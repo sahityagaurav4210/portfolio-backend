@@ -2,8 +2,11 @@ import { Request, Response } from 'express';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { Events } from '../models/events.model';
 import { EventNames } from '../constant';
+import { HandleException } from '../decorators/exception.decorator';
+import { CustomReq } from '../interfaces';
 
 class HomeController {
+  @HandleException()
   public static ping(request: Request, response: Response): Response {
     const reply = new ApiResponse(
       Status.SUCCESS,
@@ -15,10 +18,12 @@ class HomeController {
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
 
-  public static async shutdown(request: Request, response: Response): Promise<void> {
+  @HandleException()
+  public static async shutdown(request: CustomReq, response: Response): Promise<void> {
+    const { authenticatedUser } = request;
     const reply = new ApiResponse(Status.SUCCESS, 'Shutdown was successfull');
 
-    await Events.create({ eventName: EventNames.SHUT_DOWN, firedBy: 'admin' });
+    await Events.create({ eventName: EventNames.SHUT_DOWN, firedBy: authenticatedUser._id });
     response.status(HTTP_STATUS_CODES.OK).json(reply);
     process.exit(0);
   }

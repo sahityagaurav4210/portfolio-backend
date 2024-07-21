@@ -22,6 +22,7 @@ export enum Status {
   VALIDATION = 'validation',
   CONFLICT = 'already exists',
   UNDEFINED = 'not defined',
+  UNAUTHORISED = 'unauthorised',
 }
 
 export class ApiResponse {
@@ -40,15 +41,31 @@ export class ApiResponse {
     return this.status;
   }
 
+  public set STATUS(value: Status) {
+    this.status = value;
+  }
+
   public get MESSAGE() {
     return this.message;
+  }
+
+  public set MESSAGE(value: string) {
+    this.message = value;
   }
 
   public get DATA() {
     return this.data;
   }
 
+  public set DATA(value: any) {
+    this.data = value;
+  }
+
   public get ENTRY_BY() {
     return this.entryBy;
+  }
+
+  public set ENTRY_BY(value: string) {
+    this.entryBy = value;
   }
 }
