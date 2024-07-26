@@ -11,5 +11,6 @@ routes.post(
 );
 
 routes.post('/logout', Middleware.checkIfAuthenticated, Controller.authentication().logout);
+routes.get('/refresh-token', Controller.authentication().refreshToken);
 
 export default routes;

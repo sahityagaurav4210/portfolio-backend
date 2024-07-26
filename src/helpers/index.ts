@@ -16,3 +16,8 @@ export function generateToken(phone: string, tokenType: Tokens): string {
 
   return token;
 }
+
+export function decryptToken(token: string): jwt.JwtPayload | string {
+  const tokenPayload = jwt.verify(token, TokenSecrets.REFRESH || '');
+  return tokenPayload;
+}
