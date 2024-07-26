@@ -40,7 +40,7 @@ class LoginController {
   }
 
   @HandleException()
-  public static async logout(request: CustomReq, response: Response) {
+  public static async logout(request: CustomReq, response: Response): Promise<Response> {
     const { authenticatedUser } = request;
     const { refreshtoken } = request.headers;
     const reply = new ApiResponse();
