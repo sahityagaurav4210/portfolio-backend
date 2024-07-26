@@ -36,10 +36,38 @@ class LoginController {
         }
         reply.STATUS = api_1.Status.SUCCESS;
         reply.MESSAGE = 'Login successfull';
-        reply.DATA = { access_token, phone };
+        reply.DATA = { access_token, refresh_token, phone };
         reply.ENTRY_BY = phone;
         response.cookie('authorization', access_token, { httpOnly: true, secure: true });
         return response.status(api_1.HTTP_STATUS_CODES.OK).json(reply);
+    }
+    static async logout(request, response) {
+        const { authenticatedUser } = request;
+        const { refreshtoken } = request.headers;
+        const reply = new api_1.ApiResponse();
+        const { _id } = authenticatedUser;
+        const user = await login_model_1.Login.findOne({ loggedInUser: _id });
+        if (user) {
+            for (let index = 0; index < user.signins.length; index++) {
+                if (user.signins[index].token === refreshtoken) {
+                    user.signins[index].logoutAt = new Date();
+                    user.signins[index].isLoggedIn = false;
+                    break;
+                }
+            }
+            await user?.save();
+            reply.STATUS = api_1.Status.SUCCESS;
+            reply.MESSAGE = 'Logout successfull';
+            reply.DATA = user;
+            reply.ENTRY_BY = authenticatedUser.phone;
+            return response.status(api_1.HTTP_STATUS_CODES.OK).json(reply);
+        }
+        else {
+            reply.STATUS = api_1.Status.VALIDATION;
+            reply.MESSAGE = 'Invalid user';
+            reply.ENTRY_BY = authenticatedUser.phone;
+            return response.status(api_1.HTTP_STATUS_CODES.OK).json(reply);
+        }
     }
 }
 __decorate([
@@ -48,4 +76,10 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], LoginController, "login", null);
+__decorate([
+    (0, exception_decorator_1.HandleException)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], LoginController, "logout", null);
 exports.default = LoginController;

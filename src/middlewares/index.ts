@@ -4,9 +4,10 @@ import { HandleException } from '../decorators/exception.decorator';
 import * as jwt from 'jsonwebtoken';
 import { User } from '../models/users.model';
 import { Model } from 'mongoose';
-import { ILogins } from '../interfaces/users.interface';
+import { ILogins, IUser } from '../interfaces/users.interface';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { CustomReq } from '../interfaces';
+import { Login } from '../models/login.model';
 
 class Middleware {
   public static authentication() {
@@ -35,19 +36,23 @@ class Middleware {
       authorization,
       process.env.ACCESS_TOKEN_SEC || ''
     );
-    let userRecord: Model<ILogins> | null = null;
 
-    if (typeof tokenPayload !== 'string')
-      userRecord = await User.findOne({ phone: tokenPayload.phone });
+    if (typeof tokenPayload !== 'string') {
+      const [userRecord, loginRecord] = await Promise.all([
+        User.findOne({ phone: tokenPayload.phone }),
+        Login.findOne({ $and: [{ phone: tokenPayload.phone }, { 'signins.isLoggedIn': true }] }),
+      ]);
 
-    if (!userRecord) {
-      reply.STATUS = Status.UNAUTHORISED;
-      reply.MESSAGE = 'Invalid token';
+      if (!userRecord || !loginRecord) {
+        reply.STATUS = Status.UNAUTHORISED;
+        reply.MESSAGE = 'Invalid token';
 
-      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+        return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+      }
+
+      request.authenticatedUser = userRecord;
     }
 
-    request.authenticatedUser = userRecord;
     return next();
   }
 }

@@ -38,7 +38,7 @@ const loginSchema = new mongoose_1.Schema({
                 token: { type: String, required: ['Token is required'] },
                 isLoggedIn: { type: Boolean, default: false },
                 loginAt: { type: Date, required: ['Login At is required'] },
-                logoutAt: { type: Date, default: Date.now() },
+                logoutAt: { type: Date, default: null },
             },
         ],
         _id: false,

@@ -10,4 +10,6 @@ routes.post(
   Controller.authentication().login
 );
 
+routes.post('/logout', Middleware.checkIfAuthenticated, Controller.authentication().logout);
+
 export default routes;
