@@ -8,6 +8,8 @@ import { ILogins, IUser } from '../interfaces/users.interface';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { CustomReq } from '../interfaces';
 import { Login } from '../models/login.model';
+import { decryptXApiToken } from '../helpers';
+import { CLIENT_URL } from '../constant';
 
 class Middleware {
   public static authentication() {
@@ -54,6 +56,26 @@ class Middleware {
     }
 
     return next();
+  }
+
+  @HandleException()
+  public static async checkIfClientAuthenticated(
+    request: CustomReq,
+    response: Response,
+    next: NextFunction
+  ) {
+    const { x_api_key } = request.cookies;
+    const tokenPayload = decryptXApiToken(x_api_key);
+    const reply = new ApiResponse();
+
+    if (typeof tokenPayload !== 'string' && tokenPayload.data === CLIENT_URL) {
+      return next();
+    } else {
+      reply.STATUS = Status.UNAUTHORISED;
+      reply.MESSAGE = 'Unauthorised';
+
+      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    }
   }
 }
 

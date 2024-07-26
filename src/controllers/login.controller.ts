@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { Login } from '../models/login.model';
 import { generateToken } from '../helpers';
 import { Tokens } from '../constant';
@@ -70,32 +70,6 @@ class LoginController {
       reply.ENTRY_BY = authenticatedUser.phone;
 
       return response.status(HTTP_STATUS_CODES.OK).json(reply);
-    }
-  }
-
-  @HandleException()
-  public static async refreshToken(request: Request, response: Response): Promise<Response> {
-    const { refreshtoken } = request.headers;
-    const reply = new ApiResponse();
-
-    const user = await Login.findOne({ 'signins.token': refreshtoken });
-
-    if (user) {
-      const access_token = generateToken(user.phone, Tokens.ACCESS);
-
-      response.cookie('authorization', access_token, { httpOnly: true, secure: true });
-
-      reply.STATUS = Status.SUCCESS;
-      reply.MESSAGE = 'Access token generated';
-      reply.DATA = { access_token };
-      reply.ENTRY_BY = user.phone;
-
-      return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
-    } else {
-      reply.STATUS = Status.UNAUTHORISED;
-      reply.MESSAGE = 'Invalid token';
-
-      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
   }
 }

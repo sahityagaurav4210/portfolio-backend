@@ -2,6 +2,8 @@ import { Router } from 'express';
 import Controller from '../controllers';
 import Middleware from '../middlewares';
 
+import tokenRoutes from './tokens.route';
+
 const routes = Router();
 
 routes.post(
@@ -11,6 +13,7 @@ routes.post(
 );
 
 routes.post('/logout', Middleware.checkIfAuthenticated, Controller.authentication().logout);
-routes.get('/refresh-token', Controller.authentication().refreshToken);
+
+routes.use('/tokens', tokenRoutes);
 
 export default routes;
