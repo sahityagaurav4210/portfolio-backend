@@ -23,6 +23,7 @@ export enum Status {
   CONFLICT = 'already exists',
   UNDEFINED = 'not defined',
   UNAUTHORISED = 'unauthorised',
+  NOT_FOUND = 'not found',
 }
 
 export class ApiResponse {

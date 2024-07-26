@@ -2,6 +2,7 @@ export enum ModelNames {
   EVENTS = 'events',
   USERS = 'users',
   LOGIN = 'logins',
+  PORTFOLIO = 'portfolio',
 }
 
 export enum EventNames {

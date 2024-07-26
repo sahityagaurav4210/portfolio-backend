@@ -1,5 +1,6 @@
 import HomeController from './home.controller';
 import LoginController from './login.controller';
+import PortfolioController from './portfolio.controller';
 import TokenController from './tokens.controller';
 
 class Controller {
@@ -13,6 +14,10 @@ class Controller {
 
   public static tokens() {
     return TokenController;
+  }
+
+  public static portfolio() {
+    return PortfolioController;
   }
 }
 
