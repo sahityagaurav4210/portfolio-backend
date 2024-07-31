@@ -1,3 +1,4 @@
+import ContractController from './contract.controller';
 import HomeController from './home.controller';
 import LoginController from './login.controller';
 import PortfolioController from './portfolio.controller';
@@ -23,6 +24,10 @@ class Controller {
 
   public static user() {
     return UserController;
+  }
+
+  public static contract() {
+    return ContractController;
   }
 }
 

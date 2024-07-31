@@ -8,10 +8,15 @@ import { CustomReq } from '../interfaces';
 import { Login } from '../models/login.model';
 import { decryptXApiToken } from '../helpers';
 import { CLIENT_URL } from '../constant';
+import ContractMiddleware from './contracts.middleware';
 
 class Middleware {
   public static authentication() {
     return LoginMiddleware;
+  }
+
+  public static contract() {
+    return ContractMiddleware;
   }
 
   @HandleException()
