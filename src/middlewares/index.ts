@@ -3,8 +3,6 @@ import LoginMiddleware from './login.middleware';
 import { HandleException } from '../decorators/exception.decorator';
 import * as jwt from 'jsonwebtoken';
 import { User } from '../models/users.model';
-import { Model } from 'mongoose';
-import { ILogins, IUser } from '../interfaces/users.interface';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { CustomReq } from '../interfaces';
 import { Login } from '../models/login.model';

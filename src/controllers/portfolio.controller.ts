@@ -5,6 +5,7 @@ import Portfolio from '../models/portfolio.model';
 import { CustomReq } from '../interfaces';
 import { ModelNames } from '../constant';
 import { Convert } from '../helpers/convertibles.helper';
+import Queries from '../db/queries';
 
 class PortfolioController {
   @HandleException()
@@ -28,44 +29,12 @@ class PortfolioController {
     const reply = new ApiResponse();
     const { authenticatedUser } = request;
 
-    const portfolios = await Portfolio.aggregate([
-      {
-        $lookup: {
-          from: ModelNames.USERS,
-          let: { portfolioUser: '$portfolio_user' },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ['$_id', '$$portfolioUser'],
-                },
-              },
-            },
-            {
-              $project: {
-                password: 0,
-                _id: 0,
-                __v: 0,
-                createdAt: 0,
-                updatedAt: 0,
-              },
-            },
-          ],
-          as: 'portfolio_user',
-        },
-      },
-      {
-        $unwind: {
-          path: '$portfolio_user',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-    ]);
+    const portfolios = await Portfolio.aggregate(Queries.listPortfolio());
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Portfolio list fetched successfully';
     reply.DATA = portfolios;
-    reply.ENTRY_BY = authenticatedUser.phone;
+    reply.ENTRY_BY = authenticatedUser?.phone || request.ip;
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }

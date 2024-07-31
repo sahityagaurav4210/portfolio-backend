@@ -2,6 +2,7 @@ import HomeController from './home.controller';
 import LoginController from './login.controller';
 import PortfolioController from './portfolio.controller';
 import TokenController from './tokens.controller';
+import UserController from './user.controller';
 
 class Controller {
   public static home() {
@@ -18,6 +19,10 @@ class Controller {
 
   public static portfolio() {
     return PortfolioController;
+  }
+
+  public static user() {
+    return UserController;
   }
 }
 
