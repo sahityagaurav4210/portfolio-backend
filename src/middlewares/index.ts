@@ -67,8 +67,11 @@ class Middleware {
     response: Response,
     next: NextFunction
   ) {
-    const { x_api_key } = request.cookies;
-    const tokenPayload = decryptXApiToken(x_api_key);
+    let { x_api_key } = request.headers;
+
+    if (Array.isArray(x_api_key)) x_api_key = x_api_key[0];
+
+    const tokenPayload = decryptXApiToken(x_api_key || '');
     const reply = new ApiResponse();
 
     if (typeof tokenPayload !== 'string' && tokenPayload.data === CLIENT_URL) {
