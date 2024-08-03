@@ -69,8 +69,6 @@ class Middleware {
   ) {
     let { x_api_key } = request.headers;
 
-    console.log(x_api_key);
-
     if (Array.isArray(x_api_key)) x_api_key = x_api_key[0];
 
     const tokenPayload = decryptXApiToken(x_api_key || '');

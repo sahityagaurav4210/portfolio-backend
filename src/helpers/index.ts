@@ -19,7 +19,7 @@ export function generateToken(phone: string, tokenType: Tokens): string {
 
 export function generateXApiToken(data: string): string {
   const secret = TokenSecrets.XAPI || '';
-  const x_api_key = jwt.sign({ data }, secret, { expiresIn: TokenExpiry.XAPI });
+  const x_api_key = jwt.sign({ data }, secret);
 
   return x_api_key;
 }

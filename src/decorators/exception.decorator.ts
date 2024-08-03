@@ -1,4 +1,3 @@
-import { Response } from 'express';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 
 export function HandleException() {
