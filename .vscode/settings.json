@@ -2,6 +2,8 @@
   "editor.wordWrap": "wordWrapColumn",
   "editor.wordWrapColumn": 100,
   "editor.formatOnSave": true,
-  "editor.fontFamily": "'Fira Code','Droid Sans Mono', 'monospace', monospace",
-  "editor.fontSize": 18
+  "editor.fontFamily": "'Courier New','Fira Code','Droid Sans Mono', 'monospace', monospace",
+  "editor.fontSize": 18,
+  "terminal.integrated.fontFamily": "'Courier New'",
+  "terminal.integrated.fontSize": 18
 }

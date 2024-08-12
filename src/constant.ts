@@ -4,10 +4,16 @@ export enum ModelNames {
   LOGIN = 'logins',
   PORTFOLIO = 'portfolio',
   CONTRACT = 'contract',
+  HIRING = 'hire_me',
 }
 
 export enum EventNames {
   SHUT_DOWN = 'shutdown',
+}
+
+export enum HiringType {
+  PART_TIME = 'part time',
+  FULL_TIME = 'full time',
 }
 
 export const TokenExpiry = {

@@ -6,6 +6,7 @@ import portfolioRoutes from './portfolio.route';
 import userRoutes from './user.route';
 import baasRoutes from './baas';
 import contractRoute from './contract.route';
+import hireRoute from './hiring.route';
 
 const route = Router();
 
@@ -15,5 +16,6 @@ route.use('/portfolio', portfolioRoutes);
 route.use('/user', userRoutes);
 route.use('/baas', baasRoutes);
 route.use('/contract', contractRoute);
+route.use('/hiring', hireRoute);
 
 export default route;
