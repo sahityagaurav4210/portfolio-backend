@@ -67,7 +67,7 @@ class Middleware {
     response: Response,
     next: NextFunction
   ) {
-    let x_api_key = request.headers.x_api_key || request.cookies.x_api_key;
+    let x_api_key = request.headers['x-api-key'] || request.cookies.x_api_key;
 
     if (Array.isArray(x_api_key)) x_api_key = x_api_key[0];
 
