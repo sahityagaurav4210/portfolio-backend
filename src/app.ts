@@ -13,7 +13,13 @@ app.set('trust proxy', true);
 app.use(express.json({ limit: '12kb' }));
 app.use(express.urlencoded({ extended: true, limit: '6kb' }));
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
-app.use(cors({ origin: process.env.ACCEPTED_CLIENTS, credentials: true }));
+app.use(
+  cors({
+    origin: '*',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'x_api_key'],
+  })
+);
 app.use(cookieParser());
 
 app.use('/api/v1', route);
