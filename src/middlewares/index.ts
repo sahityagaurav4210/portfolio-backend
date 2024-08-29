@@ -71,8 +71,6 @@ class Middleware {
 
     if (Array.isArray(x_api_key)) x_api_key = x_api_key[0];
 
-    console.log(request.headers);
-
     const tokenPayload = decryptXApiToken(x_api_key || '');
     const reply = new ApiResponse();
 
