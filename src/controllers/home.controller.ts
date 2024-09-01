@@ -33,19 +33,21 @@ class HomeController {
     const reply = new ApiResponse();
     const alphaNumericLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let captchaLen = 5;
-    let degrees = ['rotate45', '-rotate45', 'rotate12', '-rotate12', 'rotate90'];
+    let captcha = '';
+    let degrees = ['rotate-45', '-rotate-45', 'rotate-12', '-rotate-12', 'rotate-90'];
     const captchaArray = [];
 
     for (let index = 0; index < Number(captchaLen); index++) {
+      captcha += alphaNumericLetters[Math.floor(Math.random() * alphaNumericLetters.length)];
       captchaArray.push({
-        letter: alphaNumericLetters[Math.floor(Math.random() * alphaNumericLetters.length)],
+        letter: captcha[index],
         degree: degrees[Math.floor(Math.random() * degrees.length)],
       });
     }
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Captcha generated';
-    reply.DATA = captchaArray;
+    reply.DATA = { captchaArray, captcha };
     reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
