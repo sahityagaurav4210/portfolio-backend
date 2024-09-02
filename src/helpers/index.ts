@@ -1,6 +1,11 @@
 import bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import * as crypto from 'crypto';
 import { TokenExpiry, Tokens, TokenSecrets } from '../constant';
+
+const vector = crypto.randomBytes(16);
+const passphrase = process.env.PASSPHRASE || 'abc';
+const salt = process.env.SALT || 'salt';
 
 export async function hashPwd(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
@@ -32,4 +37,22 @@ export function decryptToken(token: string): jwt.JwtPayload | string {
 export function decryptXApiToken(token: string): jwt.JwtPayload | string {
   const tokenPayload = jwt.verify(token, TokenSecrets.XAPI || '');
   return tokenPayload;
+}
+
+export function encrypt(data: string): string {
+  const key = crypto.scryptSync(passphrase, salt, 32);
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, vector);
+  let encryptedText = cipher.update(data, 'utf-8', 'hex');
+  encryptedText += cipher.final('hex');
+
+  return encryptedText;
+}
+
+export function decrypt(encryptedText: string): string {
+  const key = crypto.scryptSync(passphrase, salt, 32);
+  const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(vector));
+  let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+
+  return decrypted;
 }

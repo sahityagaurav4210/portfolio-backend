@@ -4,6 +4,7 @@ import { Events } from '../models/events.model';
 import { EventNames } from '../constant';
 import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
+import { decrypt, encrypt } from '../helpers';
 
 class HomeController {
   @HandleException()
@@ -47,10 +48,35 @@ class HomeController {
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Captcha generated';
-    reply.DATA = { captchaArray, captcha };
+    reply.DATA = { captchaArray, captcha, token: encrypt(captcha) };
     reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
+  }
+
+  @HandleException()
+  public static async captchaValidate(request: Request, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+    let { captcha, captchaToken } = request.query;
+
+    captchaToken = captchaToken as string;
+    captcha = captcha as string;
+
+    const decryptedCaptcha = decrypt(captchaToken);
+
+    if (decryptedCaptcha !== captcha) {
+      reply.STATUS = Status.UNAUTHORISED;
+      reply.MESSAGE = 'Invalid captcha';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    }
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Captcha verified';
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
 }
 
