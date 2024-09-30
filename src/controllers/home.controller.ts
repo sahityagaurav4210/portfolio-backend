@@ -5,6 +5,7 @@ import { EventNames } from '../constant';
 import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
 import { decrypt, encrypt } from '../helpers';
+import { WebsiteUpdates } from '../models/website_updates';
 
 class HomeController {
   @HandleException()
@@ -74,6 +75,51 @@ class HomeController {
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Captcha verified';
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
+
+  @HandleException()
+  public static async updateWebsite(request: CustomReq, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+    const websiteOwner = request.authenticatedUser._id;
+
+    const updatedWebsiteRecord = await WebsiteUpdates.findOneAndUpdate(
+      { website_owner: websiteOwner },
+      { $set: { updatedAt: new Date(Date.now()), portfolio_url: request.body.portfolio_url } },
+      { runValidators: true, new: true, upsert: true }
+    );
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Website updated successfully';
+    reply.DATA = updatedWebsiteRecord;
+    reply.ENTRY_BY = request.authenticatedUser.email || request.ip || '0.0.0.0';
+
+    return response.status(HTTP_STATUS_CODES.UPDATED).json(reply);
+  }
+
+  @HandleException()
+  public static async getLastModifiedDate(
+    request: CustomReq,
+    response: Response
+  ): Promise<Response> {
+    const reply = new ApiResponse();
+    const { portfolio_url } = request.query;
+
+    if (!portfolio_url) {
+      reply.STATUS = Status.VALIDATION;
+      reply.MESSAGE = 'Portfolio url is mandatory to fill';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+    }
+
+    const websiteRecord = await WebsiteUpdates.findOne({ portfolio_url }).select('updatedAt');
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Website updated successfully';
+    reply.DATA = { lastModifiedAt: websiteRecord?.updatedAt };
     reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);

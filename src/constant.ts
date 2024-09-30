@@ -5,6 +5,7 @@ export enum ModelNames {
   PORTFOLIO = 'portfolio',
   CONTRACT = 'contract',
   HIRING = 'hire_me',
+  WEBSITE_UPDATES = 'website_updates',
 }
 
 export enum EventNames {
