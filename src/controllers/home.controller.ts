@@ -109,7 +109,7 @@ class HomeController {
 
     if (!portfolio_url) {
       reply.STATUS = Status.VALIDATION;
-      reply.MESSAGE = 'Portfolio url is mandatory to fill';
+      reply.MESSAGE = 'Portfolio url is required';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
