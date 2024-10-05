@@ -1,6 +1,6 @@
 import mongoose, { model, Schema } from 'mongoose';
 import { IPortfolio } from '../interfaces/portfolio.interface';
-import { ModelNames } from '../constant';
+import { ModelNames, ProjectType } from '../constant';
 
 const portfolioSchema = new Schema<IPortfolio>(
   {
@@ -40,12 +40,20 @@ const portfolioSchema = new Schema<IPortfolio>(
           },
           code_link: {
             type: String,
-            required: [true, 'Project code link is required'],
             minlength: [5, 'Too short code link'],
           },
           documentation_link: {
             type: String,
             default: null,
+          },
+          project_type: {
+            type: String,
+            required: [true, 'Project type is required'],
+            enum: ProjectType,
+          },
+          disabled: {
+            type: Boolean,
+            default: false,
           },
         },
       ],

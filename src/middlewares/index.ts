@@ -9,6 +9,7 @@ import { Login } from '../models/login.model';
 import { decryptXApiToken } from '../helpers';
 import { CLIENT_URL } from '../constant';
 import ContractMiddleware from './contracts.middleware';
+import PortfolioMiddleware from './portfolio.middleware';
 
 class Middleware {
   public static authentication() {
@@ -19,6 +20,10 @@ class Middleware {
     return ContractMiddleware;
   }
 
+  public static portfolio() {
+    return PortfolioMiddleware;
+  }
+
   @HandleException()
   public static async checkIfAuthenticated(
     request: CustomReq,
@@ -26,9 +31,10 @@ class Middleware {
     next: NextFunction
   ) {
     const { cookies } = request;
+    let { authorization } = request.headers;
     const reply = new ApiResponse();
 
-    const authorization = cookies.authorization;
+    authorization = authorization ? authorization.split('Bearer ')[1] : cookies.authorization;
 
     if (!authorization) {
       reply.STATUS = Status.VALIDATION;

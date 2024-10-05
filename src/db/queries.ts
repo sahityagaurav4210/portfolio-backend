@@ -7,15 +7,9 @@ class Queries {
       {
         $lookup: {
           from: ModelNames.USERS,
-          let: { portfolioUser: '$portfolio_user' },
+          localField: 'portfolio_user',
+          foreignField: '_id',
           pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ['$_id', '$$portfolioUser'],
-                },
-              },
-            },
             {
               $project: {
                 password: 0,

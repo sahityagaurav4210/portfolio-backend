@@ -17,6 +17,11 @@ export enum HiringType {
   FULL_TIME = 'full time',
 }
 
+export enum ProjectType {
+  PERSONAL = 'personal',
+  PROFESSIONAL = 'professional',
+}
+
 export const TokenExpiry = {
   ACCESS: process.env.ACCESS_TOKEN_EXP,
   REFRESH: process.env.REF_TOKEN_EXP,
