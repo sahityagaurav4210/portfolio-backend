@@ -4,9 +4,9 @@ RUN mkdir -p /usr/apps
 WORKDIR /usr/apps
 COPY package.json .
 COPY tsconfig.json .
+COPY ./ .
 RUN npm install
 RUN npm run build
-COPY . .
 ENV NODE_ENV=production
 ENV PORT=12318
 ENV HOST=0.0.0.0
