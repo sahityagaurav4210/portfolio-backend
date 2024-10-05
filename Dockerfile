@@ -3,6 +3,7 @@ FROM node:20
 RUN mkdir -p /usr/apps
 WORKDIR /usr/apps
 COPY package.json .
+COPY tsconfig.json .
 RUN npm install
 RUN npm run build
 COPY . .
