@@ -1,8 +1,10 @@
+import * as https from 'https';
 import bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import { TokenExpiry, Tokens, TokenSecrets } from '../constant';
 import { Convert } from './convertibles.helper';
+import Files from './files.helpers';
 import { ValidationMessages } from './messages.helper';
 
 const vector = crypto.randomBytes(16);
@@ -59,4 +61,22 @@ export function decrypt(encryptedText: string): string {
   return decrypted;
 }
 
-export { Convert, ValidationMessages };
+export async function getCVBlob(url: string): Promise<Buffer> {
+  return new Promise<Buffer>((resolve, reject) => {
+    https.get(url, res => {
+      res.setEncoding('binary');
+      let blob: Array<Buffer> = [];
+
+      res.on('data', chunk => {
+        blob.push(Buffer.from(chunk, 'binary'));
+      });
+
+      res.on('end', () => {
+        if (!blob.length) reject(Buffer.from('No response'));
+        resolve(Buffer.concat(blob));
+      });
+    });
+  });
+}
+
+export { Convert, ValidationMessages, Files };

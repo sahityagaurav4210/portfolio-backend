@@ -21,5 +21,7 @@ ENV X_API_EXP=28d
 ENV X_API_SEC=!!xApi$$2024^^
 ENV PASSPHRASE=33~~XpW!!99
 ENV SALT=990~sALT!!66
+ENV CV_URL=https://bookjn-bucket.s3.ap-south-1.amazonaws.com/GAURAV_NODE_BACKEND_2YOE_CV.pdf
+ENV PHOTO_URL=https://bookjn-bucket.s3.ap-south-1.amazonaws.com/PHOTO.jpg
 EXPOSE 12318
 CMD [ "npm","start" ]
