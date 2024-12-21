@@ -1,5 +1,7 @@
 FROM node:20 AS source
 
+RUN mkdir -p /build
+
 WORKDIR /build
 COPY package.json .
 COPY package-lock.json .
@@ -12,8 +14,10 @@ RUN npm run build
 
 FROM node:22.12.0-alpine3.21 AS build
 
+RUN mkdir -p /apps
+
 COPY --from=source /build/node_modules /apps/node_modules
-COPY --from=source /build/build /apps/apps
+COPY --from=source /build/build /apps/build
 COPY --from=source /build/uploads /apps/uploads
 COPY --from=source /build/captain-definition /apps/captain-definition
 COPY --from=source /build/package.json /apps/package.json
