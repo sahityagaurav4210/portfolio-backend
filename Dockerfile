@@ -1,27 +1,25 @@
-FROM node:20
+FROM node:20 AS source
 
-RUN mkdir -p /usr/apps
-WORKDIR /usr/apps
+WORKDIR /build
 COPY package.json .
+COPY package-lock.json .
 COPY tsconfig.json .
-COPY ./ .
+
 RUN npm install
+
+COPY . .
 RUN npm run build
-ENV NODE_ENV=production
-ENV PORT=12318
-ENV HOST=0.0.0.0
-ENV ACCEPTED_CLIENTS=*
-ENV DATABASE_CONN_STRING=mongodb://root:mongo!2024@srv-captain--mongo:27017/
-ENV DATABASE_NAME=portfolio_backend?authSource=admin&retryWrites=true&w=majority
-ENV ACCESS_TOKEN_EXP=10m
-ENV REF_TOKEN_EXP=5d
-ENV ACCESS_TOKEN_SEC=$2a$10$WZBgT6edISy5dgH9KkyJCOeuq3tSEXj6.PeA7/r5CpT9sbZCMCTYO
-ENV REFRESH_TOKEN_SEC=$2a$10$KvQEpOtCMweq1D2u4HrZ8OC.4GJKHRFcGFPiMTw.xhsxMAo8VVxvu
-ENV X_API_EXP=28d
-ENV X_API_SEC=!!xApi$$2024^^
-ENV PASSPHRASE=33~~XpW!!99
-ENV SALT=990~sALT!!66
-ENV CV_URL=https://bookjn-bucket.s3.ap-south-1.amazonaws.com/GAURAV_NODE_BACKEND_2YOE_CV.pdf
-ENV PHOTO_URL=https://bookjn-bucket.s3.ap-south-1.amazonaws.com/PHOTO.jpg
+
+FROM node:22.12.0-alpine3.21 AS build
+
+COPY --from=source /build/node_modules /apps/node_modules
+COPY --from=source /build/build /apps/apps
+COPY --from=source /build/uploads /apps/uploads
+COPY --from=source /build/captain-definition /apps/captain-definition
+COPY --from=source /build/package.json /apps/package.json
+COPY --from=source /build/package-lock.json /apps/package-lock.json
+
+WORKDIR /apps
+
 EXPOSE 12318
 CMD [ "npm","start" ]
