@@ -1,29 +1,13 @@
-FROM node:20 AS source
+FROM node:20-alpine
 
-RUN mkdir -p /build
-
-WORKDIR /build
+WORKDIR /apps
 COPY package.json .
-COPY package-lock.json .
 COPY tsconfig.json .
 
 RUN npm install
 
 COPY . .
 RUN npm run build
-
-FROM node:22.12.0-alpine3.21 AS build
-
-RUN mkdir -p /apps
-
-COPY --from=source /build/node_modules /apps/node_modules
-COPY --from=source /build/build /apps/build
-COPY --from=source /build/uploads /apps/uploads
-COPY --from=source /build/captain-definition /apps/captain-definition
-COPY --from=source /build/package.json /apps/package.json
-COPY --from=source /build/package-lock.json /apps/package-lock.json
-
-WORKDIR /apps
 
 ARG PORT=12318
 ARG HOST=${HOST}
@@ -51,11 +35,13 @@ ENV REF_TOKEN_EXP=${REF_TOKEN_EXP}
 ENV ACCESS_TOKEN_SEC=${ACCESS_TOKEN_SEC}
 ENV X_API_EXP=${X_API_EXP}
 ENV X_API_SEC=${X_API_SEC}
-ENV PASSPHRASE=${PASSPHRASE}
+ENV PASSPHRASE=${PASSPHRASE} 
 ENV SALT=${SALT}
 ENV CV_URL=${CV_URL}
 ENV PHOTO_URL=${PHOTO_URL}
 
+RUN rm -rf src
+RUN rm -rf Dockerfile .dockerignore .prettierrc .prettierignore .gitignore tsconfig.json
 
 EXPOSE 12318
 CMD [ "npm","start" ]

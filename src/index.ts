@@ -7,7 +7,6 @@ const HOST = process.env.HOST || 'localhost';
 
 (async function () {
   try {
-    console.clear();
     const status = await connect(
       process.env.DATABASE_CONN_STRING || '',
       process.env.DATABASE_NAME || 'portfolio'
