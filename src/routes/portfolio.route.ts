@@ -8,6 +8,7 @@ routes.post(
   '/create',
   Middleware.checkIfAuthenticated,
   Middleware.portfolio().createNewPortfolioValidator,
+  Middleware.portfolio().checkIfPortfolioExists,
   Controller.portfolio().create
 );
 routes.get('/all', Middleware.checkIfAuthenticated, Controller.portfolio().list);

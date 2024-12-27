@@ -1,10 +1,12 @@
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { HandleException } from '../decorators/exception.decorator';
-import { IHome, IPortfolio, IProjects } from '../interfaces/portfolio.interface';
+import { IHome, IPortfolio, IProjects, ISkills } from '../interfaces/portfolio.interface';
 import { ValidationMessages } from '../helpers/';
 import { ProjectType } from '../constant';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
+import { CustomReq } from '../interfaces';
+import Portfolio from '../models/portfolio.model';
 const Patters = require('@book-junction/patterns');
 
 class PortfolioMiddleware {
@@ -83,6 +85,26 @@ class PortfolioMiddleware {
             disabled: Joi.bool()
               .optional()
               .messages(ValidationMessages.portfolio.projectSection.disabled),
+          })
+        )
+        .min(1)
+        .messages(ValidationMessages.types.array),
+      skillSection: Joi.array()
+        .items(
+          Joi.object<ISkills>().keys({
+            name: Joi.string()
+              .min(2)
+              .max(32)
+              .required()
+              .messages(ValidationMessages.portfolio.skillSection.name),
+            experience: Joi.number()
+              .required()
+              .messages(ValidationMessages.portfolio.skillSection.experience),
+            description: Joi.string()
+              .min(5)
+              .max(1000)
+              .required()
+              .messages(ValidationMessages.commons.description),
           })
         )
         .min(1)
@@ -189,6 +211,26 @@ class PortfolioMiddleware {
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.INV_PAYLOAD).json(reply);
+    }
+  }
+
+  @HandleException()
+  public static async checkIfPortfolioExists(
+    request: CustomReq,
+    response: Response,
+    next: NextFunction
+  ) {
+    const { _id } = request.authenticatedUser;
+    const reply = new ApiResponse();
+
+    const portfolio = await Portfolio.findOne({ portfolio_user: _id });
+
+    if (!portfolio) return next();
+    else {
+      reply.STATUS = Status.CONFLICT;
+      reply.MESSAGE = 'Portfolio already exists';
+      reply.ENTRY_BY = request.ip || '';
+      return response.status(HTTP_STATUS_CODES.CONFLICT).json(reply);
     }
   }
 }

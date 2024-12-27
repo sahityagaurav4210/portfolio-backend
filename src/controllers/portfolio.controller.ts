@@ -112,8 +112,9 @@ class PortfolioController {
 
       return response.status(HTTP_STATUS_CODES.UPDATED).json(reply);
     } else {
-      (reply.STATUS = Status.NOT_FOUND), (reply.MESSAGE = 'Resource not found');
-      reply.ENTRY_BY = authenticatedUser.phone;
+      reply.STATUS = Status.NOT_FOUND;
+      reply.MESSAGE = 'Resource not found';
+      reply.ENTRY_BY = authenticatedUser.phone || request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.NOT_FOUND).json(reply);
     }

@@ -53,6 +53,17 @@ const ValidationMessages = {
         'any.required': 'Project status is required.',
       },
     },
+    skillSection: {
+      name: {
+        'string.base': 'Skill name should be a string.',
+        'string.min': 'Too short skill name.',
+        'string.max': 'Too large skill name.',
+        'string.pattern.base': 'Invalid skill name.',
+      },
+      experience: {
+        'number.base': 'Experience should be a number.',
+      },
+    },
   },
   commons: {
     description: {
@@ -64,10 +75,10 @@ const ValidationMessages = {
   },
   types: {
     array: {
-      'array.base': 'Tech stack must be an array!',
-      'array.min': 'Too short tech stack',
-      'array.max': 'Too large tech stack',
-      'any.required': 'Tech stack are required',
+      'array.base': 'Invalid section type.',
+      'array.min': 'Too short section',
+      'array.max': 'Too large section',
+      'any.required': 'This section is required',
     },
   },
 };

@@ -41,6 +41,7 @@ const portfolioSchema = new Schema<IPortfolio>(
           code_link: {
             type: String,
             minlength: [5, 'Too short code link'],
+            default: null,
           },
           documentation_link: {
             type: String,
@@ -58,6 +59,29 @@ const portfolioSchema = new Schema<IPortfolio>(
         },
       ],
       required: [true, 'Project section is required'],
+      _id: false,
+    },
+    skillSection: {
+      type: [
+        {
+          name: {
+            type: String,
+            required: [true, 'Skill name is required'],
+            minlength: [2, 'Too short skill name'],
+          },
+          experience: {
+            type: Number,
+            required: [true, 'Skill experience is required'],
+          },
+          description: {
+            type: String,
+            required: [true, 'Skill description is required'],
+            minlength: [5, 'Too short description'],
+            maxlength: [1000, 'Too large description'],
+          },
+        },
+      ],
+      required: [true, 'Skill section is required'],
       _id: false,
     },
     portfolio_user: {
