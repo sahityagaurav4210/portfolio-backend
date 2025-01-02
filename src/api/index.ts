@@ -24,6 +24,7 @@ export enum Status {
   UNDEFINED = 'not defined',
   UNAUTHORISED = 'unauthorised',
   NOT_FOUND = 'not found',
+  FORBIDDEN = 'forbidden',
 }
 
 export class ApiResponse {

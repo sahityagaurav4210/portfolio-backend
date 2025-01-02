@@ -1,3 +1,4 @@
+import { TokenExpiredError } from 'jsonwebtoken';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 
 export function HandleException() {
@@ -15,7 +16,14 @@ export function HandleException() {
       try {
         return await originalMethod.apply(this, args);
       } catch (error: any) {
-        const reply = new ApiResponse(Status.EXCEPTION, error.message || 'An error occured');
+        const reply = new ApiResponse(Status.EXCEPTION, error.message || 'An error occurred');
+
+        if (error instanceof TokenExpiredError) {
+          reply.STATUS = Status.FORBIDDEN;
+          reply.MESSAGE = 'Token expired';
+
+          return response.status(HTTP_STATUS_CODES.FORBIDDEN).json(reply);
+        }
         return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
       }
     };
