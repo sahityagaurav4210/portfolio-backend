@@ -3,8 +3,9 @@ import { HandleException } from '../decorators/exception.decorator';
 import { generateToken, generateXApiToken } from '../helpers';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { CustomReq } from '../interfaces';
-import { CLIENT_URL, Tokens } from '../constant';
+import { CLIENT_URL, EventNames, Tokens } from '../constant';
 import { Login } from '../models/login.model';
+import { Events } from '../models/events.model';
 
 class TokenController {
   @HandleException()
@@ -18,13 +19,15 @@ class TokenController {
       authenticatedUser.phone
     );
 
+    await Events.create({ eventName: EventNames.CLIENT_ACCESS_TOKEN_GEN, firedBy: authenticatedUser._id });
     response.cookie('x_api_key', x_api_key, { httpOnly: true, secure: true });
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
   }
 
   @HandleException()
-  public static async refreshToken(request: Request, response: Response): Promise<Response> {
+  public static async refreshToken(request: CustomReq, response: Response): Promise<Response> {
     const { refreshtoken } = request.headers;
+    const { authenticatedUser } = request;
     const reply = new ApiResponse();
 
     const user = await Login.findOne({ 'signins.token': refreshtoken });
@@ -32,6 +35,7 @@ class TokenController {
     if (user) {
       const access_token = generateToken(user.phone, Tokens.ACCESS);
 
+      await Events.create({ eventName: EventNames.ACCESS_TOKEN_REFRESHED, firedBy: authenticatedUser._id });
       response.cookie('authorization', access_token, { httpOnly: true, secure: true });
 
       reply.STATUS = Status.SUCCESS;
@@ -43,6 +47,7 @@ class TokenController {
     } else {
       reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Invalid token';
+      reply.ENTRY_BY = request.ip || "0.0.0.0";
 
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
@@ -54,10 +59,12 @@ class TokenController {
     const reply = new ApiResponse();
 
     response.cookie('x_api_key', x_api_key, { httpOnly: true, secure: true });
+    await Events.create({ eventName: EventNames.CLIENT_ACCESS_TOKEN_REGEN, firedBy: request.ip || "0.0.0.0" });
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Client token generated';
     reply.DATA = { token: x_api_key };
+    reply.ENTRY_BY = request.ip || "0.0.0.0"
 
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
   }

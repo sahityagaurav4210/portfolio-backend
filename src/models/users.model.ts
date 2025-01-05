@@ -36,6 +36,7 @@ const userSchema = new Schema<IUser>(
       required: [true, 'Password is required'],
       minlength: [8, 'Password is too short'],
       maxlength: [100, 'Password is too long.'],
+      select: false
     },
     address: {
       type: String,

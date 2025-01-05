@@ -6,8 +6,7 @@ const eventSchema = new Schema<IEvents>(
   {
     eventName: { type: String, required: [true, 'Event name is required'] },
     firedBy: {
-      type: mongoose.Schema.ObjectId,
-      ref: ModelNames.USERS,
+      type: mongoose.Schema.Types.Mixed,
       required: [true, 'Fired by is required'],
     },
   },

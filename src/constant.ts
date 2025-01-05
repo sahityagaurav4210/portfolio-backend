@@ -10,6 +10,13 @@ export enum ModelNames {
 
 export enum EventNames {
   SHUT_DOWN = 'shutdown',
+  CLIENT_ACCESS_TOKEN_GEN = "client access token generated",
+  ACCESS_TOKEN_REFRESHED = "admin access token re-generated",
+  CLIENT_ACCESS_TOKEN_REGEN = "client access token re-generated",
+  SINGLE_PORTFOLIO_FETCHED = "portfolio of :portfolio_user was viewed",
+  ALL_PORTFOLIO_FETCHED = "portfolio list was viewed",
+  PORTFOLIO_EDITED = "portfolio of :portfolioId was edited",
+  PORTFOLIO_CREATED = "a new portfolio was created"
 }
 
 export enum HiringType {

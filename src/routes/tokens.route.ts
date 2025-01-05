@@ -10,7 +10,7 @@ routes.get(
   Controller.tokens().createClientToken
 );
 
-routes.get('/refresh-access-token', Controller.tokens().refreshToken);
+routes.get('/refresh-access-token', Middleware.checkRefToken, Controller.tokens().refreshToken);
 routes.get('/refresh-client-token', Controller.tokens().refreshClientToken);
 
 export default routes;

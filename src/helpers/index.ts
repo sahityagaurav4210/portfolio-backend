@@ -6,6 +6,7 @@ import { TokenExpiry, Tokens, TokenSecrets } from '../constant';
 import { Convert } from './convertibles.helper';
 import Files from './files.helpers';
 import { ValidationMessages } from './messages.helper';
+import { DBType } from '../types';
 
 const vector = crypto.randomBytes(16);
 const passphrase = process.env.PASSPHRASE || 'abc';
@@ -77,6 +78,12 @@ export async function getCVBlob(url: string): Promise<Buffer> {
       });
     });
   });
+}
+
+export async function performParallelTask(tasks: Array<Promise<any>>): Promise<any> {
+  let taskResults = await Promise.allSettled(tasks);
+  taskResults = taskResults.filter(result => result.status === "fulfilled" && result.value);
+  return taskResults;
 }
 
 export { Convert, ValidationMessages, Files };

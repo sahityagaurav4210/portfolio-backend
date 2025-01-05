@@ -6,5 +6,10 @@
   "editor.fontSize": 18,
   "terminal.integrated.fontFamily": "'Courier New'",
   "terminal.integrated.fontSize": 18,
-  "cSpell.words": ["Gaurav", "refreshtoken", "Sahitya"]
+  "cSpell.words": [
+    "Gaurav",
+    "refreshtoken",
+    "Sahitya"
+  ],
+  "javascript.format.semicolons": "insert"
 }

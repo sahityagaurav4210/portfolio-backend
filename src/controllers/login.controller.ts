@@ -5,6 +5,7 @@ import { Tokens } from '../constant';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
+import { modelUpdateObject } from '../config/db_models.config';
 
 class LoginController {
   @HandleException()
@@ -42,21 +43,16 @@ class LoginController {
   @HandleException()
   public static async logout(request: CustomReq, response: Response): Promise<Response> {
     const { authenticatedUser } = request;
-    const { refreshtoken } = request.headers;
+    let { refreshtoken, authorization } = request.headers;
     const reply = new ApiResponse();
 
     const { _id } = authenticatedUser;
-    const user = await Login.findOne({ loggedInUser: _id });
+    authorization = authorization?.split("Bearer ")[1];
+    const { REDIS_CLIENT } = globalThis as Record<string, any>;
+    const user = await Login.findOneAndUpdate({ loggedInUser: _id, "signins.token": refreshtoken }, { $set: { "signins.$.logoutAt": new Date(), "signins.$.isLoggedIn": false } }, modelUpdateObject());
 
     if (user) {
-      for (let index = 0; index < user.signins.length; index++) {
-        if (user.signins[index].token === refreshtoken) {
-          user.signins[index].logoutAt = new Date();
-          user.signins[index].isLoggedIn = false;
-          break;
-        }
-      }
-      await user?.save();
+      await REDIS_CLIENT.del(`portfolio-backend:auth:${authorization}`);
 
       reply.STATUS = Status.SUCCESS;
       reply.MESSAGE = 'Logout successfull';
