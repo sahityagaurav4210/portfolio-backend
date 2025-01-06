@@ -9,4 +9,22 @@ websiteUpdateRoutes.get(
   Controller.home().getLastModifiedDate
 );
 
+websiteUpdateRoutes.get(
+  '/total-website-views',
+  Middleware.checkIfClientAuthenticated,
+  Controller.home().getWebsiteAccess
+);
+
+websiteUpdateRoutes.get(
+  '/today-website-views',
+  Middleware.checkIfClientAuthenticated,
+  Controller.home().getDailyWebsiteViews
+);
+
+websiteUpdateRoutes.post(
+  '/',
+  Middleware.checkIfClientAuthenticated,
+  Controller.home().updateWebsiteAccess
+);
+
 export default websiteUpdateRoutes;

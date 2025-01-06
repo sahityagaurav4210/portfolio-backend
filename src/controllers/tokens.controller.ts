@@ -1,25 +1,34 @@
 import { Request, Response } from 'express';
 import { HandleException } from '../decorators/exception.decorator';
-import { generateToken, generateXApiToken } from '../helpers';
+import { generateToken, generateXApiToken, performParallelTask } from '../helpers';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { CustomReq } from '../interfaces';
 import { CLIENT_URL, EventNames, Tokens } from '../constant';
 import { Login } from '../models/login.model';
 import { Events } from '../models/events.model';
+import { User } from '../models/users.model';
 
 class TokenController {
   @HandleException()
   public static async createClientToken(request: CustomReq, response: Response): Promise<Response> {
     const { authenticatedUser } = request;
-    const x_api_key = generateXApiToken(CLIENT_URL);
+    const { url } = request.body;
+    const x_api_key = generateXApiToken(url);
     const reply = new ApiResponse(
       Status.SUCCESS,
       'Client token generated',
       { token: x_api_key },
-      authenticatedUser.phone
+      authenticatedUser.phone || request.ip || '0.0.0.0'
     );
 
-    await Events.create({ eventName: EventNames.CLIENT_ACCESS_TOKEN_GEN, firedBy: authenticatedUser._id });
+    await performParallelTask([
+      User.findByIdAndUpdate(authenticatedUser._id, { $push: { websites: url } }),
+      Events.create({
+        eventName: EventNames.CLIENT_ACCESS_TOKEN_GEN,
+        firedBy: authenticatedUser._id,
+      }),
+    ]);
+
     response.cookie('x_api_key', x_api_key, { httpOnly: true, secure: true });
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
   }
@@ -35,7 +44,10 @@ class TokenController {
     if (user) {
       const access_token = generateToken(user.phone, Tokens.ACCESS);
 
-      await Events.create({ eventName: EventNames.ACCESS_TOKEN_REFRESHED, firedBy: authenticatedUser._id });
+      await Events.create({
+        eventName: EventNames.ACCESS_TOKEN_REFRESHED,
+        firedBy: authenticatedUser._id,
+      });
       response.cookie('authorization', access_token, { httpOnly: true, secure: true });
 
       reply.STATUS = Status.SUCCESS;
@@ -47,7 +59,7 @@ class TokenController {
     } else {
       reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Invalid token';
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
@@ -55,16 +67,20 @@ class TokenController {
 
   @HandleException()
   public static async refreshClientToken(request: Request, response: Response): Promise<Response> {
-    const x_api_key = generateXApiToken(CLIENT_URL);
+    const { url } = request.body;
+    const x_api_key = generateXApiToken(url);
     const reply = new ApiResponse();
 
     response.cookie('x_api_key', x_api_key, { httpOnly: true, secure: true });
-    await Events.create({ eventName: EventNames.CLIENT_ACCESS_TOKEN_REGEN, firedBy: request.ip || "0.0.0.0" });
+    await Events.create({
+      eventName: EventNames.CLIENT_ACCESS_TOKEN_REGEN,
+      firedBy: request.ip || '0.0.0.0',
+    });
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Client token generated';
     reply.DATA = { token: x_api_key };
-    reply.ENTRY_BY = request.ip || "0.0.0.0"
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
   }

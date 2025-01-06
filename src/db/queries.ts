@@ -1,5 +1,5 @@
 import { PipelineStage } from 'mongoose';
-import { ModelNames } from '../constant';
+import { EventNames, ModelNames } from '../constant';
 
 class Queries {
   static listPortfolio(): Array<PipelineStage> {
@@ -28,6 +28,34 @@ class Queries {
           preserveNullAndEmptyArrays: true,
         },
       },
+    ];
+  }
+
+  static getDailyWebsiteViews(currentDate: Date): Array<PipelineStage> {
+    const todayDate = `${currentDate.getFullYear()}-${
+      currentDate.getMonth() + 1
+    }-${currentDate.getDate()}`;
+    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${
+      currentDate.getDate() + 1
+    }`;
+
+    return [
+      {
+        $match: {
+          eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED,
+          createdAt: {
+            $lte: new Date(nextDate),
+            $gte: new Date(todayDate),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$firedBy',
+          view_count: { $sum: 1 },
+        },
+      },
+      { $project: { _id: 0 } },
     ];
   }
 }

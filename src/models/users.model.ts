@@ -36,13 +36,17 @@ const userSchema = new Schema<IUser>(
       required: [true, 'Password is required'],
       minlength: [8, 'Password is too short'],
       maxlength: [100, 'Password is too long.'],
-      select: false
+      select: false,
     },
     address: {
       type: String,
       default: null,
       minlength: [10, 'Address is too short'],
       maxlength: [100, 'Address is too long'],
+    },
+    websites: {
+      type: [String],
+      default: [],
     },
   },
   { timestamps: true }

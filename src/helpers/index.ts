@@ -82,7 +82,11 @@ export async function getCVBlob(url: string): Promise<Buffer> {
 
 export async function performParallelTask(tasks: Array<Promise<any>>): Promise<any> {
   let taskResults = await Promise.allSettled(tasks);
-  taskResults = taskResults.filter(result => result.status === "fulfilled" && result.value);
+  taskResults = taskResults
+    .filter(result => result.status === 'fulfilled')
+    .map(fulfilledResult => fulfilledResult.value)
+    .filter(Boolean);
+
   return taskResults;
 }
 

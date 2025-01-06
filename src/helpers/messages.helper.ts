@@ -65,6 +65,12 @@ const ValidationMessages = {
       },
     },
   },
+  client_token: {
+    'string.base': 'Client token must be a string.',
+    'string.min': 'Too short client token.',
+    'string.max': 'Too large client token.',
+    'any.required': 'Client token is required',
+  },
   commons: {
     description: {
       'string.base': 'Description must be a string.',

@@ -4,8 +4,9 @@ import { Events } from '../models/events.model';
 import { EventNames } from '../constant';
 import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
-import { decrypt, encrypt } from '../helpers';
+import { decrypt, encrypt, performParallelTask } from '../helpers';
 import { WebsiteUpdates } from '../models/website_updates';
+import Queries from '../db/queries';
 
 class HomeController {
   @HandleException()
@@ -121,6 +122,67 @@ class HomeController {
     reply.MESSAGE = 'Website updated successfully';
     reply.DATA = { lastModifiedAt: websiteRecord?.updatedAt };
     reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
+
+  @HandleException()
+  public static async updateWebsiteAccess(
+    request: CustomReq,
+    response: Response
+  ): Promise<Response> {
+    const reply = new ApiResponse();
+    const { REDIS_CLIENT } = globalThis as Record<string, any>;
+    const cachedWebViewEventKey = 'portfolio-backend:events:website-view-event';
+    const cachedWebViewEvents = JSON.parse(await REDIS_CLIENT.get(cachedWebViewEventKey)) as Array<
+      Record<string, any>
+    >;
+    const payload = [
+      {
+        eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED,
+        firedBy: request.ip || '0.0.0.0',
+      },
+    ];
+
+    if (!cachedWebViewEvents || !cachedWebViewEvents?.length) {
+      await REDIS_CLIENT.set(cachedWebViewEventKey, JSON.stringify(payload));
+    } else {
+      cachedWebViewEvents.push(payload[0]);
+      await REDIS_CLIENT.set(cachedWebViewEventKey, JSON.stringify(cachedWebViewEvents));
+    }
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Event created successfully';
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
+
+  @HandleException()
+  public static async getWebsiteAccess(request: CustomReq, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+    let views = await Events.find({ eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED });
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Events fetched successfully';
+    reply.DATA = { views, view_count: views.length };
+    reply.ENTRY_BY = request.ip || '';
+
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
+
+  @HandleException()
+  public static async getDailyWebsiteViews(
+    request: CustomReq,
+    response: Response
+  ): Promise<Response> {
+    const reply = new ApiResponse();
+    let views = await Events.aggregate(Queries.getDailyWebsiteViews(new Date()));
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Events fetched successfully';
+    reply.DATA = views;
+    reply.ENTRY_BY = request.ip || '';
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }

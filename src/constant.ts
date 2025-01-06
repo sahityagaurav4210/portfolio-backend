@@ -10,18 +10,25 @@ export enum ModelNames {
 
 export enum EventNames {
   SHUT_DOWN = 'shutdown',
-  CLIENT_ACCESS_TOKEN_GEN = "client access token generated",
-  ACCESS_TOKEN_REFRESHED = "admin access token re-generated",
-  CLIENT_ACCESS_TOKEN_REGEN = "client access token re-generated",
-  SINGLE_PORTFOLIO_FETCHED = "portfolio of :portfolio_user was viewed",
-  ALL_PORTFOLIO_FETCHED = "portfolio list was viewed",
-  PORTFOLIO_EDITED = "portfolio of :portfolioId was edited",
-  PORTFOLIO_CREATED = "a new portfolio was created"
+  CLIENT_ACCESS_TOKEN_GEN = 'client access token generated',
+  ACCESS_TOKEN_REFRESHED = 'admin access token re-generated',
+  CLIENT_ACCESS_TOKEN_REGEN = 'client access token re-generated',
+  SINGLE_PORTFOLIO_FETCHED = 'portfolio of :portfolio_user was viewed',
+  ALL_PORTFOLIO_FETCHED = 'portfolio list was viewed',
+  PORTFOLIO_EDITED = 'portfolio of :portfolioId was edited',
+  PORTFOLIO_CREATED = 'a new portfolio was created',
+  PORTFOLIO_WEBSITE_VIEWED = 'portfolio website was viewed',
+  PORTFOLIO_WEBSITE_EVENT_SYNC = 'portfolio website event synced',
+  PORTFOLIO_WEBSITE_EVENT_SYNC_FAILED = 'portfolio website event sync failed',
 }
 
 export enum HiringType {
   PART_TIME = 'part time',
   FULL_TIME = 'full time',
+}
+
+export enum CRON_EXPRESSIONS {
+  EVERY_5_MIN = '*/5 * * * *',
 }
 
 export enum ProjectType {

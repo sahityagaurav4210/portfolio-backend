@@ -10,6 +10,7 @@ import { decryptXApiToken } from '../helpers';
 import { CLIENT_URL } from '../constant';
 import ContractMiddleware from './contracts.middleware';
 import PortfolioMiddleware from './portfolio.middleware';
+import TokenMiddleware from './token.middleware';
 
 class Middleware {
   public static authentication() {
@@ -24,8 +25,16 @@ class Middleware {
     return PortfolioMiddleware;
   }
 
+  public static token() {
+    return TokenMiddleware;
+  }
+
   @HandleException()
-  public static async checkIfAuthenticated(request: CustomReq, response: Response, next: NextFunction) {
+  public static async checkIfAuthenticated(
+    request: CustomReq,
+    response: Response,
+    next: NextFunction
+  ) {
     const { cookies } = request;
     let { authorization } = request.headers;
     const reply = new ApiResponse();
@@ -36,26 +45,27 @@ class Middleware {
     if (!authorization) {
       reply.STATUS = Status.VALIDATION;
       reply.MESSAGE = 'Token is required';
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }
     const cachedAuthKey = `portfolio-backend:auth:${authorization}`;
     const cachedAuthorization = await REDIS_CLIENT.get(cachedAuthKey);
 
-    console.log(cachedAuthorization);
-
     if (cachedAuthorization) {
       request.authenticatedUser = JSON.parse(cachedAuthorization);
       return next();
     }
 
-    const tokenPayload: jwt.JwtPayload | string = jwt.verify(authorization, process.env.ACCESS_TOKEN_SEC || '');
+    const tokenPayload: jwt.JwtPayload | string = jwt.verify(
+      authorization,
+      process.env.ACCESS_TOKEN_SEC || ''
+    );
 
     if (typeof tokenPayload === 'string') {
       reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Invalid token';
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
@@ -69,7 +79,7 @@ class Middleware {
     if (!userRecord || !loginRecord) {
       reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Invalid token';
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
@@ -89,7 +99,7 @@ class Middleware {
     if (!authorization) {
       reply.STATUS = Status.VALIDATION;
       reply.MESSAGE = 'Token is required';
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }
@@ -101,12 +111,15 @@ class Middleware {
       return next();
     }
 
-    const tokenPayload: jwt.JwtPayload | string = jwt.verify(authorization, process.env.REFRESH_TOKEN_SEC || '');
+    const tokenPayload: jwt.JwtPayload | string = jwt.verify(
+      authorization,
+      process.env.REFRESH_TOKEN_SEC || ''
+    );
 
     if (typeof tokenPayload === 'string') {
       reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Invalid token';
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
@@ -117,7 +130,7 @@ class Middleware {
     if (!userRecord) {
       reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Invalid token';
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
@@ -129,19 +142,22 @@ class Middleware {
   }
 
   @HandleException()
-  public static async checkIfClientAuthenticated(request: CustomReq, response: Response, next: NextFunction) {
-    let x_api_key = request.headers['x-api-key'] || request.cookies.x_api_key;
-
-    if (Array.isArray(x_api_key)) x_api_key = x_api_key[0];
-
+  public static async checkIfClientAuthenticated(
+    request: CustomReq,
+    response: Response,
+    next: NextFunction
+  ) {
+    let x_api_key = (request.headers['x-api-key'] || request.cookies.x_api_key) as string;
     const tokenPayload = decryptXApiToken(x_api_key || '');
     const reply = new ApiResponse();
 
-    if (typeof tokenPayload !== 'string' && tokenPayload.data === CLIENT_URL) {
+    if (typeof tokenPayload !== 'string') {
+      request.authenticatedUser = tokenPayload;
       return next();
     } else {
       reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Unauthorised';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }

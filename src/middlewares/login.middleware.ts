@@ -11,19 +11,27 @@ import { ILogins, IUser } from '../interfaces/users.interface';
 
 class LoginMiddleware {
   @HandleException()
-  public static async checkIfCredentialsAreCorrect(request: CustomReq, response: Response, next: NextFunction) {
+  public static async checkIfCredentialsAreCorrect(
+    request: CustomReq,
+    response: Response,
+    next: NextFunction
+  ) {
     const reply = new ApiResponse();
     let { phone, password } = request.body;
-    let [userRecord, loginRecord, sessionRecord] = await performParallelTask([User.findOne({ phone }).select("+password"), Login.findOne({ phone }), Login.findOne({ $and: [{ phone }, { "signins.isLoggedIn": true }] })]);
+    let [userRecord, loginRecord, sessionRecord] = await performParallelTask([
+      User.findOne({ phone }).select('+password'),
+      Login.findOne({ phone }),
+      Login.findOne({ $and: [{ phone }, { 'signins.isLoggedIn': true }] }),
+    ]);
 
     userRecord = userRecord as DBType<IUser>;
     loginRecord = loginRecord as DBType<ILogins>;
     sessionRecord = sessionRecord as DBType<ILogins>;
 
-    if (!loginRecord || !sessionRecord) {
+    if (sessionRecord) {
       reply.STATUS = Status.FORBIDDEN;
       reply.MESSAGE = "There's an active session for this user.";
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.FORBIDDEN).json(reply);
     }
@@ -35,8 +43,8 @@ class LoginMiddleware {
     }
 
     reply.STATUS = Status.UNAUTHORISED;
-    reply.MESSAGE = 'Invalid phone or password';
-    reply.ENTRY_BY = phone;
+    reply.MESSAGE = 'Invalid credentials';
+    reply.ENTRY_BY = phone || request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
   }

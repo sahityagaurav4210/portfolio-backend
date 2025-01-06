@@ -19,3 +19,7 @@ export interface CustomReq extends Request {
 export interface IToken {
   phone?: string;
 }
+
+export interface IClientToken {
+  url: string;
+}
