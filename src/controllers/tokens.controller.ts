@@ -20,6 +20,15 @@ class TokenController {
       { token: x_api_key },
       authenticatedUser.phone || request.ip || '0.0.0.0'
     );
+    const user = await User.findOne({ websites: url });
+
+    if (user) {
+      reply.STATUS = Status.CONFLICT;
+      reply.MESSAGE = 'Client token already generated';
+      reply.ENTRY_BY = authenticatedUser.phone || request.ip || '';
+
+      return response.status(HTTP_STATUS_CODES.CONFLICT).json(reply);
+    }
 
     await performParallelTask([
       User.findByIdAndUpdate(authenticatedUser._id, { $push: { websites: url } }),

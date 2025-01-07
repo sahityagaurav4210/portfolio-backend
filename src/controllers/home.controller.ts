@@ -161,7 +161,11 @@ class HomeController {
   @HandleException()
   public static async getWebsiteAccess(request: CustomReq, response: Response): Promise<Response> {
     const reply = new ApiResponse();
-    let views = await Events.find({ eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED });
+    const eventName = EventNames.PORTFOLIO_WEBSITE_TOTAL_VIEWS_FETCHED;
+    let [views] = await performParallelTask([
+      Events.find({ eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED }),
+      Events.create({ eventName, firedBy: request.ip }),
+    ]);
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Events fetched successfully';
@@ -177,11 +181,15 @@ class HomeController {
     response: Response
   ): Promise<Response> {
     const reply = new ApiResponse();
-    let views = await Events.aggregate(Queries.getDailyWebsiteViews(new Date()));
+    const eventName = EventNames.PORTFOLIO_WEBSITE_VIEW_FETCHED;
+    let [views] = await performParallelTask([
+      Events.aggregate(Queries.getDailyWebsiteViews(new Date())),
+      Events.create({ eventName, firedBy: request.ip }),
+    ]);
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Events fetched successfully';
-    reply.DATA = views;
+    reply.DATA = views[0] || { view_count: 0 };
     reply.ENTRY_BY = request.ip || '';
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);

@@ -4,6 +4,10 @@ import Controller from '../../controllers';
 
 const portfolioBaasRoutes = Router();
 
-portfolioBaasRoutes.get('/all', Middleware.checkIfClientAuthenticated, Controller.portfolio().list);
+portfolioBaasRoutes.get(
+  '/all',
+  Middleware.checkIfClientAuthenticated,
+  Controller.portfolio().clientList
+);
 
 export default portfolioBaasRoutes;

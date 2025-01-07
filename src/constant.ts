@@ -20,6 +20,9 @@ export enum EventNames {
   PORTFOLIO_WEBSITE_VIEWED = 'portfolio website was viewed',
   PORTFOLIO_WEBSITE_EVENT_SYNC = 'portfolio website event synced',
   PORTFOLIO_WEBSITE_EVENT_SYNC_FAILED = 'portfolio website event sync failed',
+  PORTFOLIO_WEBSITE_VIEW_FETCHED = 'portfolio website view fetched',
+  PORTFOLIO_WEBSITE_TOTAL_VIEWS_FETCHED = 'portfolio website total views fetched',
+  PORTFOLIO_FETCHED_BY_CLIENT = 'client viewed his portfolio',
 }
 
 export enum HiringType {

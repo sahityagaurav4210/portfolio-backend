@@ -27,8 +27,6 @@ export default class TokenMiddleware {
     });
     const validationResult = schema.validate(payload);
 
-    console.log(validationResult.error);
-
     if (!validationResult.error) return next();
     else {
       reply.STATUS = Status.VALIDATION;

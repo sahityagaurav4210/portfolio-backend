@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc",
+    "build": "webpack",
     "dev": "nodemon build/index.js",
     "start": "node build/index.js"
   },
@@ -21,12 +21,21 @@
     "@types/mongoose": "^5.11.97",
     "@types/node": "^20.14.11",
     "@types/node-cron": "^3.0.11",
+    "html-loader": "^5.1.0",
+    "json5": "^2.2.3",
     "nodemon": "^3.1.4",
-    "typescript": "^5.5.4"
+    "ts-loader": "^9.5.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.5.4",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.723.0",
     "@book-junction/env-loader": "^1.1.1",
     "@book-junction/patterns": "^1.1.0",
+    "aws-sdk": "^2.1692.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -35,7 +44,9 @@
     "ioredis": "^5.4.2",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
+    "mock-aws-s3": "^4.0.2",
     "mongoose": "^8.5.1",
+    "nock": "^13.5.6",
     "node-cron": "^3.0.3"
   }
 }
