@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import route from '@routes/index';
 
 const app = express();
+const clients = (process.env.ACCEPTED_CLIENTS || 'http://localhost:5173').split(',');
 
 app.set('trust proxy', true);
 app.use(express.json({ limit: '12kb' }));
@@ -13,7 +14,7 @@ app.use(express.urlencoded({ extended: true, limit: '6kb' }));
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 app.use(
   cors({
-    origin: '*',
+    origin: clients,
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Api-Key'],
   })
