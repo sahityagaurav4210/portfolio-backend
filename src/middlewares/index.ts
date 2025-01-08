@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import LoginMiddleware from './login.middleware';
 import { HandleException } from '../decorators/exception.decorator';
 import * as jwt from 'jsonwebtoken';
@@ -7,7 +7,7 @@ import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { CustomReq } from '../interfaces';
 import { Login } from '../models/login.model';
 import { decryptXApiToken } from '../helpers';
-import { CLIENT_URL } from '../constant';
+import { Environments } from '../constant';
 import ContractMiddleware from './contracts.middleware';
 import PortfolioMiddleware from './portfolio.middleware';
 import TokenMiddleware from './token.middleware';
@@ -161,6 +161,29 @@ class Middleware {
 
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
+  }
+
+  @HandleException()
+  public static postmanMiddleware(request: Request, response: Response, next: NextFunction) {
+    const environment = process.env.NODE_ENV || 'development';
+    const headers = request.headers['user-agent'];
+    const reply = new ApiResponse();
+
+    if (environment === Environments.PRODUCTION && headers) {
+      if (headers.startsWith('PostmanRuntime')) {
+        reply.STATUS = Status.FORBIDDEN;
+        reply.MESSAGE = 'Unauthorized request';
+        reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+        return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+      } else return next();
+    } else if (environment === Environments.PRODUCTION && !headers) {
+      reply.STATUS = Status.VALIDATION;
+      reply.MESSAGE = 'Invalid headers';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+    } else next();
   }
 }
 

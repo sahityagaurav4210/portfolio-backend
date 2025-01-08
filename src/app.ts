@@ -1,9 +1,10 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 
 import route from '@routes/index';
+import Middleware from './middlewares';
 
 const app = express();
 const clients = (process.env.ACCEPTED_CLIENTS || 'http://localhost:5173').split(',');
@@ -16,11 +17,11 @@ app.use(
   cors({
     origin: clients,
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Api-Key'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Api-Key', 'User-Agent'],
   })
 );
 app.use(cookieParser());
-
+app.use(Middleware.postmanMiddleware);
 app.use('/api/v1', route);
 
 export default app;

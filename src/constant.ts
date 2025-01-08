@@ -25,6 +25,11 @@ export enum EventNames {
   PORTFOLIO_FETCHED_BY_CLIENT = 'client viewed his portfolio',
 }
 
+export enum Environments {
+  PRODUCTION = 'production',
+  DEVELOPMENT = 'development',
+}
+
 export enum HiringType {
   PART_TIME = 'part time',
   FULL_TIME = 'full time',
