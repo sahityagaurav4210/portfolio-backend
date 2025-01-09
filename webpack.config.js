@@ -21,6 +21,7 @@ module.exports = {
       '@middlewares': path.resolve(__dirname, 'src/middlewares/'),
       '@types': path.resolve(__dirname, 'src/types/'),
       '@api': path.resolve(__dirname, 'src/api/'),
+      '@packages': path.resolve(__dirname, 'src/packages/'),
     },
   },
   module: {

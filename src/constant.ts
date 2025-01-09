@@ -63,3 +63,6 @@ export enum Tokens {
 }
 
 export const CLIENT_URL = 'https://gaurav-sahitya.netlify.app';
+export const GlobalRegex = {
+  USER_AGENT: /^(Portfolio.*WebApp\/v[0-9\.]+)$/gm,
+};

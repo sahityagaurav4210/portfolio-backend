@@ -7,7 +7,7 @@ import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { CustomReq } from '../interfaces';
 import { Login } from '../models/login.model';
 import { decryptXApiToken } from '../helpers';
-import { Environments } from '../constant';
+import { Environments, GlobalRegex } from '../constant';
 import ContractMiddleware from './contracts.middleware';
 import PortfolioMiddleware from './portfolio.middleware';
 import TokenMiddleware from './token.middleware';
@@ -170,8 +170,8 @@ class Middleware {
     const reply = new ApiResponse();
 
     if (environment === Environments.PRODUCTION && headers) {
-      if (headers.startsWith('PostmanRuntime')) {
-        reply.STATUS = Status.FORBIDDEN;
+      if (!GlobalRegex.USER_AGENT.test(headers)) {
+        reply.STATUS = Status.UNAUTHORISED;
         reply.MESSAGE = 'Unauthorized request';
         reply.ENTRY_BY = request.ip || '0.0.0.0';
 
@@ -179,7 +179,7 @@ class Middleware {
       } else return next();
     } else if (environment === Environments.PRODUCTION && !headers) {
       reply.STATUS = Status.VALIDATION;
-      reply.MESSAGE = 'Invalid headers';
+      reply.MESSAGE = 'Invalid request';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);

@@ -23,12 +23,12 @@ const HOST = process.env.HOST || 'localhost';
       const client = connectRedis();
       (globalThis as Record<string, any>).REDIS_CLIENT = client;
 
-      Scheduler.websiteViewEventSyncher();
+      Scheduler.init();
 
       app.listen(PORT, HOST, () => console.log(`Portfolio backend is running on port ${PORT}`));
     } else console.error(`An error connecting with database.`);
   } catch (error) {
-    console.log('=============ERROR OCCURED==============');
+    console.log('=============ERROR OCCURRED==============');
     console.error(error);
   }
 })();
