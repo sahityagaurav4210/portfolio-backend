@@ -1,8 +1,8 @@
-import { syncEvents } from './routines/cron.routines';
+import { saveLogs, syncEvents } from './routines/cron.routines';
 
 class Packages {
   public static get routines() {
-    return { cron: { syncEvents } };
+    return { cron: { syncEvents, saveLogs } };
   }
 }
 

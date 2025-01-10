@@ -6,6 +6,7 @@ export enum ModelNames {
   CONTRACT = 'contract',
   HIRING = 'hire_me',
   WEBSITE_UPDATES = 'website_updates',
+  LOGS = 'logs',
 }
 
 export enum EventNames {
@@ -37,6 +38,7 @@ export enum HiringType {
 
 export enum CRON_EXPRESSIONS {
   EVERY_5_MIN = '*/5 * * * *',
+  EVERY_6_MIN = '*/1 * * * *',
 }
 
 export enum ProjectType {

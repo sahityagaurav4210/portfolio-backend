@@ -6,6 +6,7 @@ import connectRedis from '@config/redis.config';
 import Scheduler from '@config/scheduler.config';
 import { connect } from '@db/index';
 import { createAdmin } from '@db/dumps';
+import { init } from '@config/logs.config';
 
 const PORT = parseInt(process.env.PORT || '') || 8000;
 const HOST = process.env.HOST || 'localhost';
@@ -21,7 +22,10 @@ const HOST = process.env.HOST || 'localhost';
       (globalThis as Record<string, any>).AWS_S3 = S3;
       await createAdmin();
       const client = connectRedis();
+      const logger = init();
+
       (globalThis as Record<string, any>).REDIS_CLIENT = client;
+      (globalThis as Record<string, any>).logger = logger;
 
       Scheduler.init();
 

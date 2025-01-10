@@ -22,6 +22,7 @@ module.exports = {
       '@types': path.resolve(__dirname, 'src/types/'),
       '@api': path.resolve(__dirname, 'src/api/'),
       '@packages': path.resolve(__dirname, 'src/packages/'),
+      '@interfaces': path.resolve(__dirname, 'src/interfaces/'),
     },
   },
   module: {

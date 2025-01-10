@@ -5,7 +5,7 @@ class Files {
     if (fs.existsSync(url))
       return new Promise((resolve, reject) => {
         fs.unlink(url, error => {
-          if (error) reject(error);
+          if (error) reject(error.message);
           resolve('File deleted');
         });
       });
@@ -18,6 +18,23 @@ class Files {
         resolve('File created');
       });
     });
+  }
+
+  public static async readFile(path: string): Promise<Buffer> {
+    return new Promise<Buffer>((resolve, reject) => {
+      fs.readFile(path, (error, data) => {
+        if (error) {
+          console.log(error.message);
+          reject(error.message);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  }
+
+  public static exists(path: string): boolean {
+    return fs.existsSync(path);
   }
 }
 

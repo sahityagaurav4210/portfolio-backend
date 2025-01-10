@@ -7,6 +7,7 @@ class ContractController {
   @HandleException()
   public static async create(request: Request, response: Response): Promise<Response> {
     const reply = new ApiResponse();
+    const { logger } = globalThis as Record<string, any>;
     const payload = { ...request.body, ipAddress: request.ip || '0.0.0.0' };
 
     const contractRecord = await Contract.create(payload);

@@ -11,6 +11,7 @@ COPY . .
 RUN npm run build
 
 RUN rm -rf src tsconfig.json
+RUN mkdir logs
 
 EXPOSE 12318
 CMD [ "npm","start" ]
