@@ -7,6 +7,8 @@ const params = {
 export async function getObject(path: string): Promise<Record<string, any>> {
   const command = new GetObjectCommand({ ...params, Key: path });
   const { AWS_S3 } = globalThis as Record<string, any>;
+  const { logger } = globalThis as Record<string, any>;
+
   try {
     const data = await AWS_S3.send(command);
     const stream = data.Body;
@@ -20,8 +22,8 @@ export async function getObject(path: string): Promise<Record<string, any>> {
         resolve(JSON.parse(fileContents));
       });
     });
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    logger.error({ message: error.message || "An error occurred in getObject aws helper function" });
     return {};
   }
 }
@@ -29,6 +31,7 @@ export async function getObject(path: string): Promise<Record<string, any>> {
 export async function getObjectAsBlob(path: string): Promise<Buffer> {
   const command = new GetObjectCommand({ ...params, Key: path });
   const { AWS_S3 } = globalThis as Record<string, any>;
+  const { logger } = globalThis as Record<string, any>;
   try {
     const data = await AWS_S3.send(command);
     const stream = data.Body;
@@ -42,8 +45,8 @@ export async function getObjectAsBlob(path: string): Promise<Buffer> {
         resolve(fileContents);
       });
     });
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    logger.error({ message: error.message || "An error occurred in getObjectAsBlob aws helper function" });
     return Buffer.from(JSON.stringify({}), 'binary');
   }
 }

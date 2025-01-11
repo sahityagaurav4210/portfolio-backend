@@ -28,7 +28,7 @@ class FilesController {
   @HandleException()
   public static async downloadPhoto(request: Request, response: Response) {
     const reply = new ApiResponse();
-    const photoUrl = 'WEB_PHOTO.png';
+    const photoUrl = process.env.PHOTO_URL || "";
     const blob = await getObjectAsBlob(photoUrl);
 
     if (blob.length === 2) {
@@ -39,7 +39,7 @@ class FilesController {
       return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
     }
 
-    return response.writeHead(HTTP_STATUS_CODES.OK, { 'content-type': 'image/png' }).end(blob);
+    return response.writeHead(HTTP_STATUS_CODES.OK, { 'content-type': 'image/jpeg' }).end(blob);
   }
 }
 
