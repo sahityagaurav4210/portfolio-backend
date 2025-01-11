@@ -166,8 +166,11 @@ class Middleware {
   @HandleException()
   public static postmanMiddleware(request: Request, response: Response, next: NextFunction) {
     const environment = process.env.NODE_ENV || 'development';
-    const headers = request.headers['user-agent'];
+    const headers = request.headers['x-user-id'] as string;
+    const { logger } = globalThis as Record<string, any>;
     const reply = new ApiResponse();
+
+    logger.info({ message: `A request made with ${headers} header` });
 
     if (environment === Environments.PRODUCTION && headers) {
       if (!GlobalRegex.USER_AGENT.test(headers)) {
