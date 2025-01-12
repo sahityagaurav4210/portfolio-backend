@@ -7,6 +7,7 @@ import Scheduler from '@config/scheduler.config';
 import { connect } from '@db/index';
 import { createAdmin } from '@db/dumps';
 import { init } from '@config/logs.config';
+import { getAppDetails } from '@config/app.config';
 
 const PORT = parseInt(process.env.PORT || '') || 8000;
 const HOST = process.env.HOST || 'localhost';
@@ -29,7 +30,7 @@ const HOST = process.env.HOST || 'localhost';
 
       Scheduler.init();
 
-      app.listen(PORT, HOST, () => console.log(`Portfolio backend is running on port ${PORT}`));
+      app.listen(PORT, HOST, () => console.table(getAppDetails(PORT, HOST, process.env.NODE_ENV || "")));
     } else console.error(`An error connecting with database.`);
   } catch (error) {
     console.log('=============ERROR OCCURRED==============');

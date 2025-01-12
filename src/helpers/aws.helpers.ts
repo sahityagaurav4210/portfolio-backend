@@ -46,6 +46,7 @@ export async function getObjectAsBlob(path: string): Promise<Buffer> {
       });
     });
   } catch (error: any) {
+    console.log(error.message);
     logger.error({ message: error.message || "An error occurred in getObjectAsBlob aws helper function" });
     return Buffer.from(JSON.stringify({}), 'binary');
   }
