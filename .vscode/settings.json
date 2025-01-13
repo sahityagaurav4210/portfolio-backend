@@ -1,11 +1,18 @@
 {
   "editor.wordWrap": "wordWrapColumn",
-  "editor.wordWrapColumn": 100,
+  "editor.wordWrapColumn": 95,
   "editor.formatOnSave": true,
   "editor.fontFamily": "'Courier New','Fira Code','Droid Sans Mono', 'monospace', monospace",
   "editor.fontSize": 18,
   "terminal.integrated.fontFamily": "'Courier New'",
   "terminal.integrated.fontSize": 18,
-  "cSpell.words": ["Gaurav", "refreshtoken", "REGEN", "Sahitya", "Syncher"],
-  "javascript.format.semicolons": "insert"
+  "cSpell.words": [
+    "Gaurav",
+    "refreshtoken",
+    "REGEN",
+    "Sahitya",
+    "Syncher"
+  ],
+  "javascript.format.semicolons": "insert",
+  "editor.tabSize": 2
 }

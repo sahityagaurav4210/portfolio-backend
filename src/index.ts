@@ -1,5 +1,8 @@
 import 'dotenv/config';
 
+import cluster from 'cluster';
+import * as os from 'os';
+
 import S3 from '@config/aws.config';
 import app from './app';
 import connectRedis from '@config/redis.config';
@@ -13,27 +16,45 @@ const PORT = parseInt(process.env.PORT || '') || 8000;
 const HOST = process.env.HOST || 'localhost';
 
 (async function () {
-  try {
-    const status = await connect(
-      process.env.DATABASE_CONN_STRING || '',
-      process.env.DATABASE_NAME || 'portfolio'
-    );
+  const numCPUs = os.availableParallelism();
+  let counter = 0;
+  if (cluster.isPrimary) {
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork({ WORKER_COUNT: counter, ...process.env });
+      ++counter;
+    }
 
-    if (status.connected) {
-      (globalThis as Record<string, any>).AWS_S3 = S3;
-      await createAdmin();
-      const client = connectRedis();
-      const logger = init();
+    cluster.on('exit', (worker, code, signal) => {
+      console.log(`[Master] Worker [pid:${worker.process.pid}] [code: ${code}] [signal: ${signal}] died. Restarting...`);
+      cluster.fork({ WORKER_COUNT: counter, ...process.env });
+    });
+  }
+  else {
+    try {
+      const worker = Number(process.env.WORKER_COUNT || 0);
+      const status = await connect(
+        process.env.DATABASE_CONN_STRING || '',
+        process.env.DATABASE_NAME || 'portfolio'
+      );
 
-      (globalThis as Record<string, any>).REDIS_CLIENT = client;
-      (globalThis as Record<string, any>).logger = logger;
+      if (status.connected) {
+        (globalThis as Record<string, any>).AWS_S3 = S3;
+        await createAdmin();
+        const client = connectRedis();
+        const logger = init();
 
-      Scheduler.init();
+        (globalThis as Record<string, any>).REDIS_CLIENT = client;
+        (globalThis as Record<string, any>).logger = logger;
 
-      app.listen(PORT, HOST, () => console.table(getAppDetails(PORT, HOST, process.env.NODE_ENV || "")));
-    } else console.error(`An error connecting with database.`);
-  } catch (error) {
-    console.log('=============ERROR OCCURRED==============');
-    console.error(error);
+        Scheduler.init();
+        app.listen(PORT, HOST);
+
+        if (worker === (numCPUs - 1))
+          console.table(getAppDetails(PORT, HOST, process.env.NODE_ENV || "", numCPUs))
+      } else console.error(`An error connecting with database.`);
+    } catch (error) {
+      console.log('=============ERROR OCCURRED==============');
+      console.error(error);
+    }
   }
 })();
