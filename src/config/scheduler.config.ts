@@ -4,9 +4,10 @@ import Packages from '@packages/index';
 
 export default class Scheduler {
   public static init() {
-    const { syncEvents, saveLogs } = Packages.routines.cron;
+    const { syncEvents, saveLogs, invalidateCachedAWSObjects } = Packages.routines.cron;
 
     cron.schedule(CRON_EXPRESSIONS.EVERY_5_MIN, syncEvents);
     cron.schedule(CRON_EXPRESSIONS.EVERY_6_MIN, saveLogs);
+    cron.schedule(CRON_EXPRESSIONS.EVERY_59_MIN, invalidateCachedAWSObjects);
   }
 }

@@ -18,7 +18,6 @@ const HOST = process.env.HOST || 'localhost';
 (async function () {
   const numCPUs = os.availableParallelism();
   let counter = 0;
-  console.log(numCPUs, "<========numCPUs");
 
   if (cluster.isPrimary) {
     for (let i = 0; i < numCPUs; i++) {

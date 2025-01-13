@@ -1,8 +1,8 @@
-import { saveLogs, syncEvents } from './routines/cron.routines';
+import { invalidateCachedAWSObjects, saveLogs, syncEvents } from './routines/cron.routines';
 
 class Packages {
   public static get routines() {
-    return { cron: { syncEvents, saveLogs } };
+    return { cron: { syncEvents, saveLogs, invalidateCachedAWSObjects } };
   }
 }
 

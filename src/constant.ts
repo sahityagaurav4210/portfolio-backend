@@ -39,6 +39,7 @@ export enum HiringType {
 export enum CRON_EXPRESSIONS {
   EVERY_5_MIN = '*/5 * * * *',
   EVERY_6_MIN = '*/6 * * * *',
+  EVERY_59_MIN = '*/59 * * * *'
 }
 
 export enum ProjectType {

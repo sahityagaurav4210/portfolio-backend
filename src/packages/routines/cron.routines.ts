@@ -31,6 +31,7 @@ export async function syncEvents(): Promise<void> {
 }
 
 export async function saveLogs(): Promise<void> {
+  const { logger } = globalThis as Record<string, any>;
   const infoLogPath = path.resolve(__dirname, '../', 'logs/info.log');
   const errorLogPath = path.resolve(__dirname, '../', 'logs/error.log');
 
@@ -50,4 +51,15 @@ export async function saveLogs(): Promise<void> {
 
   await Files.createFile(infoLogPath, Buffer.from(''));
   await Files.createFile(errorLogPath, Buffer.from(''));
+  logger.info({ message: '[CRON II]: SAVE LOGS SYNCED' });
+}
+
+export async function invalidateCachedAWSObjects() {
+  const { logger } = globalThis as Record<string, any>;
+  const cvPath = path.resolve(__dirname, '../', 'uploads/CV.pdf');
+  const photoPath = path.resolve(__dirname, '../', 'uploads/Photo.jpg');
+
+  if (Files.exists(cvPath)) await Files.delete(cvPath);
+  if (Files.exists(photoPath)) await Files.delete(photoPath);
+  logger.info({ message: '[CRON III]: INVALIDATE CACHED AWS OBJECTS SYNCED' });
 }

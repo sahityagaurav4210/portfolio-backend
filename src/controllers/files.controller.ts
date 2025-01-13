@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { Request, Response } from 'express';
 import { HandleException } from '../decorators/exception.decorator';
-import { Files, getCVBlob } from '../helpers';
+import { Files } from '../helpers';
 import { getObjectAsBlob } from '@helpers/aws.helpers';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '@api/index';
 
@@ -10,7 +10,14 @@ class FilesController {
   public static async downloadCV(request: Request, response: Response) {
     const reply = new ApiResponse();
     const cv_url = process.env.CV_URL || '';
-    const blob = await getObjectAsBlob(cv_url);
+    let blob: Buffer;
+    const cvFilePath = path.resolve(__dirname, "../", "uploads/CV.pdf");
+
+    if (Files.exists(cvFilePath)) blob = await Files.readFile(cvFilePath).catch(_ => Buffer.from(JSON.stringify({})));
+    else {
+      blob = await getObjectAsBlob(cv_url);
+      await Files.createFile(cvFilePath, blob).catch(_ => Buffer.from(JSON.stringify({})));
+    }
 
     if (blob.length === 2) {
       reply.STATUS = Status.ERROR;
@@ -19,7 +26,6 @@ class FilesController {
 
       return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
     }
-
     return response
       .writeHead(HTTP_STATUS_CODES.OK, { 'content-type': 'application/pdf' })
       .end(blob);
@@ -29,7 +35,14 @@ class FilesController {
   public static async downloadPhoto(request: Request, response: Response) {
     const reply = new ApiResponse();
     const photoUrl = process.env.PHOTO_URL || "";
-    const blob = await getObjectAsBlob(photoUrl);
+    const photoPath = path.resolve(__dirname, "../", "uploads/Photo.jpg");
+    let blob: Buffer;
+
+    if (Files.exists(photoPath)) blob = await Files.readFile(photoPath).catch(_ => Buffer.from(JSON.stringify({})))
+    else {
+      blob = await getObjectAsBlob(photoUrl);
+      await Files.createFile(photoPath, blob).catch(_ => Buffer.from(JSON.stringify({})));
+    }
 
     if (blob.length === 2) {
       reply.STATUS = Status.ERROR;
