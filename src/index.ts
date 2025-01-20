@@ -19,6 +19,19 @@ const HOST = process.env.HOST || 'localhost';
   const numCPUs = os.availableParallelism();
   let counter = 0;
 
+  const status = await connect(
+    process.env.DATABASE_CONN_STRING || '',
+    process.env.DATABASE_NAME || 'portfolio'
+  );
+
+  if (status.connected) {
+    await createAdmin();
+  }
+  else {
+    console.log("Could not connect to database...");
+    process.exit(-1);
+  }
+
   if (cluster.isPrimary) {
     for (let i = 0; i < numCPUs; i++) {
       cluster.fork({ WORKER_COUNT: counter, ...process.env });
@@ -33,26 +46,18 @@ const HOST = process.env.HOST || 'localhost';
   else {
     try {
       const worker = Number(process.env.WORKER_COUNT || 0);
-      const status = await connect(
-        process.env.DATABASE_CONN_STRING || '',
-        process.env.DATABASE_NAME || 'portfolio'
-      );
+      (globalThis as Record<string, any>).AWS_S3 = S3;
+      const client = connectRedis();
+      const logger = init();
 
-      if (status.connected) {
-        (globalThis as Record<string, any>).AWS_S3 = S3;
-        await createAdmin();
-        const client = connectRedis();
-        const logger = init();
+      (globalThis as Record<string, any>).REDIS_CLIENT = client;
+      (globalThis as Record<string, any>).logger = logger;
 
-        (globalThis as Record<string, any>).REDIS_CLIENT = client;
-        (globalThis as Record<string, any>).logger = logger;
+      Scheduler.init();
+      app.listen(PORT, HOST);
 
-        Scheduler.init();
-        app.listen(PORT, HOST);
-
-        if (worker === (numCPUs - 1))
-          console.table(getAppDetails(PORT, HOST, process.env.NODE_ENV || "", numCPUs))
-      } else console.error(`An error connecting with database.`);
+      if (worker === (numCPUs - 1))
+        console.table(getAppDetails(PORT, HOST, process.env.NODE_ENV || "", numCPUs))
     } catch (error) {
       console.log('=============ERROR OCCURRED==============');
       console.error(error);
