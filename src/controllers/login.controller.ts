@@ -6,6 +6,7 @@ import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
 import { modelUpdateObject } from '../config/db_models.config';
+import connectRedis from '@config/redis.config';
 
 class LoginController {
   @HandleException()
@@ -47,9 +48,13 @@ class LoginController {
     const reply = new ApiResponse();
 
     const { _id } = authenticatedUser;
-    authorization = authorization?.split("Bearer ")[1];
-    const { REDIS_CLIENT } = globalThis as Record<string, any>;
-    const user = await Login.findOneAndUpdate({ loggedInUser: _id, "signins.token": refreshtoken }, { $set: { "signins.$.logoutAt": new Date(), "signins.$.isLoggedIn": false } }, modelUpdateObject());
+    authorization = authorization?.split('Bearer ')[1];
+    const REDIS_CLIENT = connectRedis();
+    const user = await Login.findOneAndUpdate(
+      { loggedInUser: _id, 'signins.token': refreshtoken },
+      { $set: { 'signins.$.logoutAt': new Date(), 'signins.$.isLoggedIn': false } },
+      modelUpdateObject()
+    );
 
     if (user) {
       await REDIS_CLIENT.del(`portfolio-backend:auth:${authorization}`);

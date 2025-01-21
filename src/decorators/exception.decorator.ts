@@ -1,10 +1,11 @@
 import { TokenExpiredError } from 'jsonwebtoken';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
+import { init } from '../config/logs.config';
 
+const logger = init();
 export function HandleException() {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     let originalMethod = descriptor.value;
-    const { logger } = globalThis as Record<string, any>;
 
     descriptor.value = async function (...args: any[]) {
       const response = args.find(
@@ -18,8 +19,10 @@ export function HandleException() {
         return await originalMethod.apply(this, args);
       } catch (error: any) {
         const reply = new ApiResponse(Status.EXCEPTION, error?.message || 'An error occurred');
+        logger.error({
+          message: error?.message || 'An error occurred in handle exception decorator',
+        });
 
-        logger.error({ message: error?.message || "An error occurred in handle exception decorator" })
         if (error instanceof TokenExpiredError) {
           reply.STATUS = Status.FORBIDDEN;
           reply.MESSAGE = 'Token expired';

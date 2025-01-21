@@ -26,6 +26,7 @@ class TokenController {
       reply.STATUS = Status.CONFLICT;
       reply.MESSAGE = 'Client token already generated';
       reply.ENTRY_BY = authenticatedUser.phone || request.ip || '';
+      reply.DATA = null;
 
       return response.status(HTTP_STATUS_CODES.CONFLICT).json(reply);
     }

@@ -10,6 +10,7 @@ import { Events } from '../models/events.model';
 import { modelUpdateObject } from '../config/db_models.config';
 import { performParallelTask } from '../helpers';
 import { User } from '../models/users.model';
+import connectRedis from '@config/redis.config';
 
 class PortfolioController {
   @HandleException()
@@ -75,7 +76,7 @@ class PortfolioController {
     const { data } = request.authenticatedUser;
     const user = await User.findOne({ websites: data });
     const cachedPortfolioKey = `portfolio-backend:portfolios:${user?._id}`;
-    const { REDIS_CLIENT } = globalThis as Record<string, any>;
+    const REDIS_CLIENT = connectRedis();
     const cachedPortfolioExp = (Number(process.env.CACHED_PORTFOLIO_EXPIRY) || 0.25) * 60;
     const cachedPortfolio = await REDIS_CLIENT.get(cachedPortfolioKey);
 
@@ -109,7 +110,7 @@ class PortfolioController {
     const reply = new ApiResponse();
     const { portfolio_user } = request.params;
     const { authenticatedUser } = request;
-    const { REDIS_CLIENT } = globalThis as Record<string, any>;
+    const REDIS_CLIENT = connectRedis();
 
     const eventName = EventNames.SINGLE_PORTFOLIO_FETCHED.replace(
       ':portfolio_user',

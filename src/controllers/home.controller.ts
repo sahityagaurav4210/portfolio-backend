@@ -7,6 +7,7 @@ import { CustomReq } from '../interfaces';
 import { decrypt, encrypt, performParallelTask } from '../helpers';
 import { WebsiteUpdates } from '../models/website_updates';
 import Queries from '../db/queries';
+import connectRedis from '@config/redis.config';
 
 class HomeController {
   @HandleException()
@@ -132,11 +133,11 @@ class HomeController {
     response: Response
   ): Promise<Response> {
     const reply = new ApiResponse();
-    const { REDIS_CLIENT } = globalThis as Record<string, any>;
+    const REDIS_CLIENT = connectRedis();
     const cachedWebViewEventKey = 'portfolio-backend:events:website-view-event';
-    const cachedWebViewEvents = JSON.parse(await REDIS_CLIENT.get(cachedWebViewEventKey)) as Array<
-      Record<string, any>
-    >;
+    const cachedWebViewEvents = JSON.parse(
+      (await REDIS_CLIENT.get(cachedWebViewEventKey)) || JSON.stringify({})
+    ) as Array<Record<string, any>>;
     const payload = [
       {
         eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED,

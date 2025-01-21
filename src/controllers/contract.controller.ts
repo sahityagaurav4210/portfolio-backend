@@ -2,12 +2,13 @@ import { Request, Response } from 'express';
 import { HandleException } from '../decorators/exception.decorator';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import Contract from '../models/contract.model';
+import { init } from '@config/logs.config';
 
 class ContractController {
   @HandleException()
   public static async create(request: Request, response: Response): Promise<Response> {
     const reply = new ApiResponse();
-    const { logger } = globalThis as Record<string, any>;
+    const logger = init();
     const payload = { ...request.body, ipAddress: request.ip || '0.0.0.0' };
 
     const contractRecord = await Contract.create(payload);
@@ -18,6 +19,7 @@ class ContractController {
       reply.DATA = contractRecord;
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
+      logger.info({ message: `A new contract created by ${request.ip || '0.0.0.0'}` });
       return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
     } else {
       reply.STATUS = Status.ERROR;

@@ -3,10 +3,12 @@ import { EventNames } from '../../constant';
 import path from 'node:path';
 import Files from '@helpers/files.helpers';
 import { Logs } from '@models/logger.model';
+import connectRedis from '@config/redis.config';
+import { init } from '@config/logs.config';
 
 export async function syncEvents(): Promise<void> {
-  const { REDIS_CLIENT } = globalThis as Record<string, any>;
-  const { logger } = globalThis as Record<string, any>;
+  const REDIS_CLIENT = connectRedis();
+  const logger = init();
   const cachedWebViewEventKey = 'portfolio-backend:events:website-view-event';
 
   try {
@@ -31,7 +33,7 @@ export async function syncEvents(): Promise<void> {
 }
 
 export async function saveLogs(): Promise<void> {
-  const { logger } = globalThis as Record<string, any>;
+  const logger = init();
   const infoLogPath = path.resolve(__dirname, '../', 'logs/info.log');
   const errorLogPath = path.resolve(__dirname, '../', 'logs/error.log');
 
@@ -55,7 +57,7 @@ export async function saveLogs(): Promise<void> {
 }
 
 export async function invalidateCachedAWSObjects() {
-  const { logger } = globalThis as Record<string, any>;
+  const logger = init();
   const cvPath = path.resolve(__dirname, '../', 'uploads/CV.pdf');
   const photoPath = path.resolve(__dirname, '../', 'uploads/Photo.jpg');
 

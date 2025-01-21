@@ -11,6 +11,8 @@ import { Environments, GlobalRegex } from '../constant';
 import ContractMiddleware from './contracts.middleware';
 import PortfolioMiddleware from './portfolio.middleware';
 import TokenMiddleware from './token.middleware';
+import connectRedis from '@config/redis.config';
+import { init } from '@config/logs.config';
 
 class Middleware {
   public static authentication() {
@@ -38,7 +40,9 @@ class Middleware {
     const { cookies } = request;
     let { authorization } = request.headers;
     const reply = new ApiResponse();
-    const { REDIS_CLIENT } = globalThis as Record<string, any>;
+    const REDIS_CLIENT = connectRedis();
+    const logger = init();
+    logger.info({ message: 'hello ji' });
 
     authorization = authorization ? authorization.split('Bearer ')[1] : cookies.authorization;
 
@@ -94,7 +98,7 @@ class Middleware {
   public static async checkRefToken(request: CustomReq, response: Response, next: NextFunction) {
     const reply = new ApiResponse();
     const authorization = request.headers.refreshtoken as string;
-    const { REDIS_CLIENT } = globalThis as Record<string, any>;
+    const REDIS_CLIENT = connectRedis();
 
     if (!authorization) {
       reply.STATUS = Status.VALIDATION;
@@ -167,7 +171,7 @@ class Middleware {
   public static postmanMiddleware(request: Request, response: Response, next: NextFunction) {
     const environment = process.env.NODE_ENV || 'development';
     const headers = request.headers['x-user-id'] as string;
-    const { logger } = globalThis as Record<string, any>;
+    const logger = init();
     const reply = new ApiResponse();
 
     logger.info({ message: `A request made with ${headers} header` });
