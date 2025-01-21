@@ -34,11 +34,11 @@ export async function getObject(path: string): Promise<Record<string, any>> {
 
 export async function getObjectAsBlob(path: string): Promise<Buffer> {
   const command = new GetObjectCommand({ ...params, Key: path });
-  const { AWS_S3 } = globalThis as Record<string, any>;
+  const AWS_S3 = S3();
   const logger = init();
   try {
     const data = await AWS_S3.send(command);
-    const stream = data.Body;
+    const stream = data.Body as Record<string, any>;
     const chunks: Uint8Array[] = [];
 
     return new Promise<Buffer>((resolve, reject) => {
@@ -50,7 +50,6 @@ export async function getObjectAsBlob(path: string): Promise<Buffer> {
       });
     });
   } catch (error: any) {
-    console.log(error.message);
     logger.error({
       message: error.message || 'An error occurred in getObjectAsBlob aws helper function',
     });
