@@ -45,7 +45,7 @@ class TokenController {
 
   @HandleException()
   public static async refreshToken(request: CustomReq, response: Response): Promise<Response> {
-    const { refreshtoken } = request.headers;
+    const refreshtoken = request.headers['x-ref-token'];
     const { authenticatedUser } = request;
     const reply = new ApiResponse();
 

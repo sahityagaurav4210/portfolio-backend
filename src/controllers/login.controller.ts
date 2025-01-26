@@ -34,17 +34,19 @@ class LoginController {
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Login successfull';
-    reply.DATA = { access_token, refresh_token, phone };
+    reply.DATA = { access_token, refresh_token, phone, name: userRecord.name };
     reply.ENTRY_BY = phone;
 
     response.cookie('authorization', access_token, { httpOnly: true, secure: true });
+    response.cookie('token', refresh_token, { httpOnly: true, secure: true });
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
 
   @HandleException()
   public static async logout(request: CustomReq, response: Response): Promise<Response> {
     const { authenticatedUser } = request;
-    let { refreshtoken, authorization } = request.headers;
+    let { authorization } = request.headers;
+    let refreshtoken = request.headers["x-ref-token"]
     const reply = new ApiResponse();
 
     const { _id } = authenticatedUser;
@@ -61,7 +63,7 @@ class LoginController {
 
       reply.STATUS = Status.SUCCESS;
       reply.MESSAGE = 'Logout successfull';
-      reply.DATA = user;
+      reply.DATA = { user };
       reply.ENTRY_BY = authenticatedUser.phone;
 
       return response.status(HTTP_STATUS_CODES.OK).json(reply);
@@ -70,7 +72,7 @@ class LoginController {
       reply.MESSAGE = 'Invalid user';
       reply.ENTRY_BY = authenticatedUser.phone;
 
-      return response.status(HTTP_STATUS_CODES.OK).json(reply);
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }
   }
 }

@@ -8,6 +8,7 @@ import { CustomReq } from '../interfaces';
 import { performParallelTask } from '../helpers';
 import { DBType } from '../types';
 import { ILogins, IUser } from '../interfaces/users.interface';
+import { modelUpdateObject } from '@config/db_models.config';
 
 class LoginMiddleware {
   @HandleException()
@@ -18,10 +19,11 @@ class LoginMiddleware {
   ) {
     const reply = new ApiResponse();
     let { phone, password } = request.body;
+    const token = request.cookies.token || request.headers['x-token'];
     let [userRecord, loginRecord, sessionRecord] = await performParallelTask([
       User.findOne({ phone }).select('+password'),
       Login.findOne({ phone }),
-      Login.findOne({ $and: [{ phone }, { 'signins.isLoggedIn': true }] }),
+      Login.findOne({ $and: [{ phone }, { 'signins.isLoggedIn': true }, { 'signins.token': token }] }),
     ]);
 
     userRecord = userRecord as DBType<IUser>;
@@ -29,11 +31,11 @@ class LoginMiddleware {
     sessionRecord = sessionRecord as DBType<ILogins>;
 
     if (sessionRecord) {
-      reply.STATUS = Status.FORBIDDEN;
-      reply.MESSAGE = "There's an active session for this user.";
-      reply.ENTRY_BY = request.ip || '0.0.0.0';
-
-      return response.status(HTTP_STATUS_CODES.FORBIDDEN).json(reply);
+      await Login.findOneAndUpdate(
+        { _id: loginRecord._id, 'signins.token': token },
+        { $set: { 'signins.$.logoutAt': new Date(), 'signins.$.isLoggedIn': false } },
+        modelUpdateObject()
+      )
     }
 
     if (userRecord && (await bcrypt.compare(password, userRecord.password))) {
