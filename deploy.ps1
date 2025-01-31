@@ -51,11 +51,8 @@ else {
     Set-Content -Path $credentialPath -Value $data -Encoding UTF8
     return;
   }
-
-  if ($loginStatus -ne "Login Succeeded") {
-    $dockerUsername = Read-Host "Enter your docker username"
-  }
-
+  
+  $dockerUsername = Read-Host "Enter your docker username"
   $uri = Read-Host "Enter your caprover host"
   $hashedPwd = Read-Host "Enter your caprover password" -AsSecureString
   $appName = Read-Host "Enter your app name" 
