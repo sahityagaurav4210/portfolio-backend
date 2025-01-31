@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "dev": "nodemon build/index.js",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "dev": "concurrently \"webpack --watch\" \"nodemon build/index.js\""
   },
   "keywords": [],
   "author": "",

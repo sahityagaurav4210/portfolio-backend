@@ -2,11 +2,10 @@ import * as https from 'https';
 import bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
-import { TokenExpiry, Tokens, TokenSecrets } from '../constant';
+import { TokenExpiry, TokenSecrets } from '../constant';
 import { Convert } from './convertibles.helper';
 import Files from './files.helpers';
 import { ValidationMessages } from './messages.helper';
-import { DBType } from '../types';
 
 const vector = crypto.randomBytes(16);
 const passphrase = process.env.PASSPHRASE || 'abc';
@@ -18,7 +17,7 @@ export async function hashPwd(password: string): Promise<string> {
   return hashPwd;
 }
 
-export function generateToken(phone: string, tokenType: Tokens): string {
+export function generateToken(phone: string, tokenType: keyof typeof TokenSecrets): string {
   let token: string;
   const secret = TokenSecrets[tokenType] || '';
 
