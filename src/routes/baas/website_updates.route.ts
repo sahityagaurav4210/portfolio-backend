@@ -27,9 +27,7 @@ websiteUpdateRoutes.get(
   Controller.home().getTodayViewsDetails
 );
 
-websiteUpdateRoutes.post(
-  '/',
-  Middleware.checkIfClientAuthenticated,
+websiteUpdateRoutes.post('/', Middleware.checkIfAuthenticated,
   Controller.home().updateWebsiteAccess
 );
 
