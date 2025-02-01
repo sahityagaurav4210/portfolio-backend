@@ -23,7 +23,7 @@ websiteUpdateRoutes.get(
 
 websiteUpdateRoutes.get(
   '/today-views-details',
-  Middleware.checkIfClientAuthenticated,
+  Middleware.checkIfAuthenticated,
   Controller.home().getTodayViewsDetails
 );
 

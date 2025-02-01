@@ -206,13 +206,13 @@ class HomeController {
     const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate() + 1
       }`;
     const viewDetails = await Events.find({
-      $match: {
-        eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED,
+      $and: [{ eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED },
+      {
         createdAt: {
           $lte: new Date(nextDate),
           $gte: new Date(todayDate),
-        },
-      },
+        }
+      },],
     });
 
     reply.STATUS = Status.SUCCESS;
