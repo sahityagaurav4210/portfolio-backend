@@ -32,12 +32,10 @@ class Queries {
   }
 
   static getDailyWebsiteViews(currentDate: Date): Array<PipelineStage> {
-    const todayDate = `${currentDate.getFullYear()}-${
-      currentDate.getMonth() + 1
-    }-${currentDate.getDate()}`;
-    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${
-      currentDate.getDate() + 1
-    }`;
+    const todayDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1
+      }-${currentDate.getDate()}`;
+    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate() + 1
+      }`;
 
     return [
       {
@@ -51,7 +49,7 @@ class Queries {
       },
       {
         $group: {
-          _id: '$firedBy',
+          _id: null,
           view_count: { $sum: 1 },
         },
       },
