@@ -42,6 +42,8 @@ export function decryptXApiToken(token: string): jwt.JwtPayload | string {
 
 export function encrypt(data: string): string {
   const { passphrase, salt, vector } = getGlobalCryptoConfigs();
+  console.log(vector, "<<<<<<<<<<=====vector");
+
   const key = crypto.scryptSync(passphrase, salt, 32);
   const cipher = crypto.createCipheriv('aes-256-cbc', key, vector);
   let encryptedText = cipher.update(data, 'utf-8', 'hex');
@@ -52,6 +54,7 @@ export function encrypt(data: string): string {
 
 export function decrypt(encryptedText: string): string {
   const { passphrase, salt, vector } = getGlobalCryptoConfigs();
+  console.log(vector, "<<<<<<<<<<=====vector");
   const key = crypto.scryptSync(passphrase, salt, 32);
   const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(vector));
   let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
