@@ -21,6 +21,12 @@ websiteUpdateRoutes.get(
   Controller.home().getDailyWebsiteViews
 );
 
+websiteUpdateRoutes.get(
+  '/today-views-details',
+  Middleware.checkIfClientAuthenticated,
+  Controller.home().getTodayViewsDetails
+);
+
 websiteUpdateRoutes.post(
   '/',
   Middleware.checkIfClientAuthenticated,

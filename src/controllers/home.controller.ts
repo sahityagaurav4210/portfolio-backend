@@ -195,6 +195,33 @@ class HomeController {
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
+
+  @HandleException()
+  public static async getTodayViewsDetails(request: Request, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+
+    const currentDate = new Date();
+    const todayDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1
+      }-${currentDate.getDate()}`;
+    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate() + 1
+      }`;
+    const viewDetails = await Events.find({
+      $match: {
+        eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED,
+        createdAt: {
+          $lte: new Date(nextDate),
+          $gte: new Date(todayDate),
+        },
+      },
+    });
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = "Details fetched successfully";
+    reply.DATA = viewDetails;
+    reply.ENTRY_BY = request.ip || "0.0.0.0";
+
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
 }
 
 export default HomeController;
