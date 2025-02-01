@@ -18,7 +18,7 @@ export function HandleException() {
       try {
         return await originalMethod.apply(this, args);
       } catch (error: any) {
-        const reply = new ApiResponse(Status.EXCEPTION, error?.message || 'An error occurred');
+        const reply = new ApiResponse(Status.EXCEPTION, 'Something went wrong');
         logger.error({
           message: error?.message || 'An error occurred in handle exception decorator',
         });

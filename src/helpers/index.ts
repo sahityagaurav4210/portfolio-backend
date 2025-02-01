@@ -8,8 +8,6 @@ import Files from './files.helpers';
 import { ValidationMessages } from './messages.helper';
 import { getGlobalCryptoConfigs } from '@config/crypto.config';
 
-const vector = crypto.randomBytes(16);
-
 export async function hashPwd(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
   const hashPwd = await bcrypt.hash(password, salt);
@@ -43,7 +41,7 @@ export function decryptXApiToken(token: string): jwt.JwtPayload | string {
 }
 
 export function encrypt(data: string): string {
-  const { passphrase, salt } = getGlobalCryptoConfigs();
+  const { passphrase, salt, vector } = getGlobalCryptoConfigs();
   const key = crypto.scryptSync(passphrase, salt, 32);
   const cipher = crypto.createCipheriv('aes-256-cbc', key, vector);
   let encryptedText = cipher.update(data, 'utf-8', 'hex');
@@ -53,7 +51,7 @@ export function encrypt(data: string): string {
 }
 
 export function decrypt(encryptedText: string): string {
-  const { passphrase, salt } = getGlobalCryptoConfigs();
+  const { passphrase, salt, vector } = getGlobalCryptoConfigs();
   const key = crypto.scryptSync(passphrase, salt, 32);
   const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(vector));
   let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
