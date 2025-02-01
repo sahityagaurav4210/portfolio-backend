@@ -6,7 +6,7 @@ import { TokenExpiry, TokenSecrets } from '../constant';
 import { Convert } from './convertibles.helper';
 import Files from './files.helpers';
 import { ValidationMessages } from './messages.helper';
-import { getGlobalCryptoConfigs } from '@config/crypto.config';
+import Crypto from '@config/crypto.config';
 
 export async function hashPwd(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
@@ -40,9 +40,10 @@ export function decryptXApiToken(token: string): jwt.JwtPayload | string {
   return tokenPayload;
 }
 
-export function encrypt(data: string): string {
-  const { passphrase, salt, vector } = getGlobalCryptoConfigs();
-  console.log(vector, "<<<<<<<<<<=====vector");
+export async function encrypt(data: string): Promise<string> {
+  const passphrase = process.env.PASSPHRASE as string;
+  const salt = process.env.SALT as string;
+  const { vector } = await Crypto.getGlobalCryptoConfigs();
 
   const key = crypto.scryptSync(passphrase, salt, 32);
   const cipher = crypto.createCipheriv('aes-256-cbc', key, vector);
@@ -52,9 +53,11 @@ export function encrypt(data: string): string {
   return encryptedText;
 }
 
-export function decrypt(encryptedText: string): string {
-  const { passphrase, salt, vector } = getGlobalCryptoConfigs();
-  console.log(vector, "<<<<<<<<<<=====vector");
+export async function decrypt(encryptedText: string): Promise<string> {
+  const passphrase = process.env.PASSPHRASE as string;
+  const salt = process.env.SALT as string;
+  const { vector } = await Crypto.getGlobalCryptoConfigs();
+
   const key = crypto.scryptSync(passphrase, salt, 32);
   const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(vector));
   let decrypted = decipher.update(encryptedText, 'hex', 'utf8');

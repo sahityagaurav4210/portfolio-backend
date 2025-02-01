@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { getGlobalCryptoConfigs } from '@config/crypto.config';
+import Crypto from '@config/crypto.config';
 
 import cluster from 'cluster';
 import * as os from 'os';
@@ -25,7 +25,7 @@ const HOST = process.env.HOST || 'localhost';
   if (status.connected) {
     await createAdmin();
     Scheduler.init();
-    getGlobalCryptoConfigs();
+    await Crypto.getGlobalCryptoConfigs();
   } else {
     console.log('Could not connect to database...');
     process.exit(-1);

@@ -7,6 +7,7 @@ export enum ModelNames {
   HIRING = 'hire_me',
   WEBSITE_UPDATES = 'website_updates',
   LOGS = 'logs',
+  CRYPTO = 'crypto'
 }
 
 export enum EventNames {

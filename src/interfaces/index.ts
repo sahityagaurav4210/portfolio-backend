@@ -23,3 +23,7 @@ export interface IToken {
 export interface IClientToken {
   url: string;
 }
+
+export interface ICrypto extends IDbId, ITimestamp {
+  vector: Buffer
+}

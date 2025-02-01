@@ -51,7 +51,7 @@ class HomeController {
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Captcha generated';
-    reply.DATA = { captchaArray, captcha, token: encrypt(captcha) };
+    reply.DATA = { captchaArray, captcha, token: await encrypt(captcha) };
     reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
@@ -65,7 +65,7 @@ class HomeController {
     captchaToken = captchaToken as string;
     captcha = captcha as string;
 
-    const decryptedCaptcha = decrypt(captchaToken);
+    const decryptedCaptcha = await decrypt(captchaToken);
 
     if (decryptedCaptcha !== captcha) {
       reply.STATUS = Status.UNAUTHORISED;

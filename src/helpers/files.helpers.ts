@@ -24,7 +24,6 @@ class Files {
     return new Promise<Buffer>((resolve, reject) => {
       fs.readFile(path, (error, data) => {
         if (error) {
-          console.log(error.message);
           reject(error.message);
         } else {
           resolve(data);

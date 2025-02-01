@@ -1,14 +1,19 @@
+import CryptoModel from '@models/crypto.model';
 import * as crypto from 'crypto';
 
-let passphrase = "", salt = "", vector: Buffer;
 
-export function getGlobalCryptoConfigs() {
-  if (!passphrase)
-    passphrase = process.env.PASSPHRASE || 'abc';
-  if (!salt)
-    salt = process.env.SALT || 'salt';
-  if (!vector)
-    vector = crypto.randomBytes(16);
+class Crypto {
+  private static vector: Buffer;
 
-  return { passphrase, salt, vector }
+  public static async getGlobalCryptoConfigs() {
+    const vectorRecord = await CryptoModel.findOne();
+
+    if (!vectorRecord) {
+      this.vector = crypto.randomBytes(16);
+      await CryptoModel.create({ vector: this.vector });
+    }
+    else this.vector = vectorRecord.vector;
+    return { vector: this.vector }
+  }
 }
+export default Crypto;
