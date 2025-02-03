@@ -177,6 +177,26 @@ class HomeController {
   }
 
   @HandleException()
+  public static async getMonthlyWebViews(
+    request: CustomReq,
+    response: Response
+  ): Promise<Response> {
+    const reply = new ApiResponse();
+    const eventName = EventNames.PORTFOLIO_WEBSITE_MONTHLY_VIEWS_FETCHED;
+    let [views] = await performParallelTask([
+      Events.aggregate(Queries.getMonthlyWebsiteViews(new Date())),
+      Events.create({ eventName, firedBy: request.ip }),
+    ]);
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Events fetched successfully';
+    reply.DATA = views[0] || { view_count: 0 };
+    reply.ENTRY_BY = request.ip || '';
+
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
+
+  @HandleException()
   public static async getDailyWebsiteViews(
     request: CustomReq,
     response: Response
@@ -197,28 +217,35 @@ class HomeController {
   }
 
   @HandleException()
-  public static async getTodayViewsDetails(request: Request, response: Response): Promise<Response> {
+  public static async getTodayViewsDetails(
+    request: Request,
+    response: Response
+  ): Promise<Response> {
     const reply = new ApiResponse();
 
     const currentDate = new Date();
-    const todayDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1
-      }-${currentDate.getDate()}`;
-    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate() + 1
-      }`;
+    const todayDate = `${currentDate.getFullYear()}-${
+      currentDate.getMonth() + 1
+    }-${currentDate.getDate()}`;
+    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${
+      currentDate.getDate() + 1
+    }`;
     const viewDetails = await Events.find({
-      $and: [{ eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED },
-      {
-        createdAt: {
-          $lte: new Date(nextDate),
-          $gte: new Date(todayDate),
-        }
-      },],
+      $and: [
+        { eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED },
+        {
+          createdAt: {
+            $lte: new Date(nextDate),
+            $gte: new Date(todayDate),
+          },
+        },
+      ],
     });
 
     reply.STATUS = Status.SUCCESS;
-    reply.MESSAGE = "Details fetched successfully";
+    reply.MESSAGE = 'Details fetched successfully';
     reply.DATA = viewDetails;
-    reply.ENTRY_BY = request.ip || "0.0.0.0";
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }

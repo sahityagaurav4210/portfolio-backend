@@ -32,10 +32,36 @@ class Queries {
   }
 
   static getDailyWebsiteViews(currentDate: Date): Array<PipelineStage> {
-    const todayDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1
-      }-${currentDate.getDate()}`;
-    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate() + 1
-      }`;
+    const todayDate = `${currentDate.getFullYear()}-${
+      currentDate.getMonth() + 1
+    }-${currentDate.getDate()}`;
+    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${
+      currentDate.getDate() + 1
+    }`;
+
+    return [
+      {
+        $match: {
+          eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED,
+          createdAt: {
+            $lte: new Date(nextDate),
+            $gte: new Date(todayDate),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          view_count: { $sum: 1 },
+        },
+      },
+      { $project: { _id: 0 } },
+    ];
+  }
+
+  static getMonthlyWebsiteViews(currentDate: Date): Array<PipelineStage> {
+    const todayDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-1`;
+    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 2}-1`;
 
     return [
       {

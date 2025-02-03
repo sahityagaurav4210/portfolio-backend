@@ -16,9 +16,21 @@ route.get(
 );
 
 route.get(
+  '/today-views-details',
+  Middleware.checkIfAuthenticated,
+  Controller.home().getTodayViewsDetails
+);
+
+route.get(
   '/total-website-views',
   Middleware.checkIfAuthenticated,
   Controller.home().getWebsiteAccess
+);
+
+route.get(
+  '/monthly-website-views',
+  Middleware.checkIfAuthenticated,
+  Controller.home().getMonthlyWebViews
 );
 
 route.post('/update-website', Middleware.checkIfAuthenticated, Controller.home().updateWebsite);

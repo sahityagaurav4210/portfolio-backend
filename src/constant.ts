@@ -7,7 +7,7 @@ export enum ModelNames {
   HIRING = 'hire_me',
   WEBSITE_UPDATES = 'website_updates',
   LOGS = 'logs',
-  CRYPTO = 'crypto'
+  CRYPTO = 'crypto',
 }
 
 export enum EventNames {
@@ -25,6 +25,7 @@ export enum EventNames {
   PORTFOLIO_WEBSITE_VIEW_FETCHED = 'portfolio website view fetched',
   PORTFOLIO_WEBSITE_TOTAL_VIEWS_FETCHED = 'portfolio website total views fetched',
   PORTFOLIO_FETCHED_BY_CLIENT = 'client viewed his portfolio',
+  PORTFOLIO_WEBSITE_MONTHLY_VIEWS_FETCHED = 'portfolio website monthly views fetched',
 }
 
 export enum Environments {
@@ -40,7 +41,7 @@ export enum HiringType {
 export enum CRON_EXPRESSIONS {
   EVERY_5_MIN = '*/5 * * * *',
   EVERY_6_MIN = '*/6 * * * *',
-  EVERY_59_MIN = '*/59 * * * *'
+  EVERY_59_MIN = '*/59 * * * *',
 }
 
 export enum ProjectType {

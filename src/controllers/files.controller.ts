@@ -11,9 +11,10 @@ class FilesController {
     const reply = new ApiResponse();
     const cv_url = process.env.CV_URL || '';
     let blob: Buffer;
-    const cvFilePath = path.resolve(__dirname, "../", "uploads/CV.pdf");
+    const cvFilePath = path.resolve(__dirname, '../', 'uploads/CV.pdf');
 
-    if (Files.exists(cvFilePath)) blob = await Files.readFile(cvFilePath).catch(_ => Buffer.from(JSON.stringify({})));
+    if (Files.exists(cvFilePath))
+      blob = await Files.readFile(cvFilePath).catch(_ => Buffer.from(JSON.stringify({})));
     else {
       blob = await getObjectAsBlob(cv_url);
       await Files.createFile(cvFilePath, blob).catch(_ => Buffer.from(JSON.stringify({})));
@@ -34,11 +35,12 @@ class FilesController {
   @HandleException()
   public static async downloadPhoto(request: Request, response: Response) {
     const reply = new ApiResponse();
-    const photoUrl = process.env.PHOTO_URL || "";
-    const photoPath = path.resolve(__dirname, "../", "uploads/Photo.jpg");
+    const photoUrl = process.env.PHOTO_URL || '';
+    const photoPath = path.resolve(__dirname, '../', 'uploads/Photo.jpg');
     let blob: Buffer;
 
-    if (Files.exists(photoPath)) blob = await Files.readFile(photoPath).catch(_ => Buffer.from(JSON.stringify({})))
+    if (Files.exists(photoPath))
+      blob = await Files.readFile(photoPath).catch(_ => Buffer.from(JSON.stringify({})));
     else {
       blob = await getObjectAsBlob(photoUrl);
       await Files.createFile(photoPath, blob).catch(_ => Buffer.from(JSON.stringify({})));
