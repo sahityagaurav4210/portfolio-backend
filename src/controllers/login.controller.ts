@@ -17,10 +17,10 @@ class LoginController {
 
     const access_token = generateToken(phone, Tokens.ACCESS);
     const refresh_token = generateToken(phone, Tokens.REFRESH);
-    const signins = { token: refresh_token, isLoggedIn: true, loginAt: new Date() };
+    const sessions = { token: refresh_token, isLoggedIn: true, loginAt: new Date(), access_token };
 
     if (loginRecord) {
-      loginRecord.signins.push(signins);
+      loginRecord.sessions.push(sessions);
       loginRecord.updatedAt = new Date();
 
       await loginRecord.save();
@@ -28,7 +28,7 @@ class LoginController {
       loginRecord = await Login.create({
         phone,
         loggedInUser: userRecord,
-        signins: [signins],
+        sessions: [sessions],
       });
     }
 
@@ -53,8 +53,8 @@ class LoginController {
     authorization = authorization?.split('Bearer ')[1];
     const REDIS_CLIENT = connectRedis();
     const user = await Login.findOneAndUpdate(
-      { loggedInUser: _id, 'signins.token': refreshtoken },
-      { $set: { 'signins.$.logoutAt': new Date(), 'signins.$.isLoggedIn': false } },
+      { loggedInUser: _id, 'sessions.token': refreshtoken },
+      { $set: { 'sessions.$.logoutAt': new Date(), 'sessions.$.isLoggedIn': false } },
       modelUpdateObject()
     );
 

@@ -41,9 +41,6 @@ class Middleware {
     let { authorization } = request.headers;
     const reply = new ApiResponse();
     const REDIS_CLIENT = connectRedis();
-    const logger = init();
-    logger.info({ message: 'hello ji' });
-
     authorization = authorization ? authorization.split('Bearer ')[1] : cookies.authorization;
 
     if (!authorization) {
@@ -76,8 +73,8 @@ class Middleware {
 
     const timeout = (Number(process.env.REDIS_CACHED_AUTH_EXP) || 10) * 60;
     const [userRecord, loginRecord] = await Promise.all([
-      User.findOne({ phone: tokenPayload.phone }),
-      Login.findOne({ $and: [{ phone: tokenPayload.phone }, { 'signins.isLoggedIn': true }] }),
+      User.findOne({ phone: tokenPayload.phone }).lean(true),
+      Login.findOne({ $and: [{ phone: tokenPayload.phone }, { 'sessions.isLoggedIn': true }, { 'sessions.access_token': authorization }] }).lean(true),
     ]);
 
     if (!userRecord || !loginRecord) {
@@ -129,7 +126,7 @@ class Middleware {
     }
 
     const timeout = (Number(process.env.REDIS_CACHED_AUTH_EXP) || 10) * 60;
-    const userRecord = await User.findOne({ phone: tokenPayload.phone });
+    const userRecord = await User.findOne({ phone: tokenPayload.phone }).lean(true);
 
     if (!userRecord) {
       reply.STATUS = Status.UNAUTHORISED;

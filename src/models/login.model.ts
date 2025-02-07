@@ -9,9 +9,10 @@ const loginSchema = new Schema<ILogins>(
       ref: ModelNames.USERS,
       required: [true, 'Logged in user is required'],
     },
-    signins: {
+    sessions: {
       type: [
         {
+          access_token: { type: String, default: null },
           token: { type: String, required: ['Token is required'] },
           isLoggedIn: { type: Boolean, default: false },
           loginAt: { type: Date, required: ['Login At is required'] },

@@ -33,7 +33,7 @@ class ContractController {
   @HandleException()
   public static async list(request: Request, response: Response): Promise<Response> {
     const reply = new ApiResponse();
-    const contracts = await Contract.find({});
+    const contracts = await Contract.find({}).lean(true);
 
     if (contracts.length) {
       reply.STATUS = Status.SUCCESS;

@@ -49,15 +49,16 @@ class TokenController {
     const { authenticatedUser } = request;
     const reply = new ApiResponse();
 
-    const user = await Login.findOne({ 'signins.token': refreshtoken });
+    const user = await Login.findOne({ 'sessions.token': refreshtoken });
 
     if (user) {
       const access_token = generateToken(user.phone, Tokens.ACCESS);
 
-      await Events.create({
+      await performParallelTask([Login.findOneAndUpdate({ 'sessions.token': refreshtoken }, { 'sessions.$.access_token': access_token }, { runValidators: true }), Events.create({
         eventName: EventNames.ACCESS_TOKEN_REFRESHED,
         firedBy: authenticatedUser._id,
-      });
+      })]);
+
       response.cookie('authorization', access_token, { httpOnly: true, secure: true });
 
       reply.STATUS = Status.SUCCESS;

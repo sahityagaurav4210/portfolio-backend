@@ -23,7 +23,7 @@ class LoginMiddleware {
     let [userRecord, loginRecord, sessionRecord] = await performParallelTask([
       User.findOne({ phone }).select('+password'),
       Login.findOne({ phone }),
-      Login.findOne({ $and: [{ phone }, { 'signins.isLoggedIn': true }, { 'signins.token': token }] }),
+      Login.findOne({ $and: [{ phone }, { 'sessions.isLoggedIn': true }, { 'sessions.token': token }] }),
     ]);
 
     userRecord = userRecord as DBType<IUser>;
@@ -32,8 +32,8 @@ class LoginMiddleware {
 
     if (sessionRecord) {
       await Login.findOneAndUpdate(
-        { _id: loginRecord._id, 'signins.token': token },
-        { $set: { 'signins.$.logoutAt': new Date(), 'signins.$.isLoggedIn': false } },
+        { _id: loginRecord._id, 'sessions.token': token },
+        { $set: { 'sessions.$.logoutAt': new Date(), 'sessions.$.isLoggedIn': false } },
         modelUpdateObject()
       )
     }

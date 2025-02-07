@@ -177,17 +177,17 @@ class PortfolioMiddleware {
               .max(50)
               .optional()
               .messages(ValidationMessages.types.array),
-            live_link: Joi.string()
+            live_link: Joi.string().uri().allow(null)
               .min(5)
               .max(100)
               .optional()
               .messages(ValidationMessages.portfolio.projectSection.live_link),
-            documentation_link: Joi.string()
+            documentation_link: Joi.string().uri().allow(null)
               .min(5)
               .max(100)
               .optional()
               .messages(ValidationMessages.portfolio.projectSection.documentation_link),
-            code_link: Joi.string()
+            code_link: Joi.string().uri().allow(null)
               .min(5)
               .max(100)
               .optional()

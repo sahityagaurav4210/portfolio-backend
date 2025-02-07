@@ -6,6 +6,7 @@ interface Signin {
   isLoggedIn?: boolean;
   loginAt: Date;
   logoutAt?: Date;
+  access_token?: string;
 }
 
 export interface IUser extends ITimestamp, IDbId {
@@ -19,6 +20,6 @@ export interface IUser extends ITimestamp, IDbId {
 
 export interface ILogins extends ITimestamp, IDbId {
   loggedInUser: OID;
-  signins: Signin[];
+  sessions: Signin[];
   phone: string;
 }

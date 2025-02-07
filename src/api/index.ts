@@ -37,7 +37,7 @@ export class ApiResponse {
     private message = '',
     private data = null,
     private entryBy = '127.0.0.1'
-  ) {}
+  ) { }
 
   public get STATUS() {
     return this.status;

@@ -22,7 +22,7 @@ class HiringController {
   public static async list(request: Request, response: Response): Promise<Response> {
     const reply = new ApiResponse();
 
-    const hiringRecords = await Hiring.find({});
+    const hiringRecords = await Hiring.find({}).lean();
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Forms fetched successfully';
