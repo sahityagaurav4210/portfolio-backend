@@ -28,7 +28,7 @@ class PortfolioController {
     if (portfolio.status === 'fulfilled') {
       reply.STATUS = Status.SUCCESS;
       reply.MESSAGE = 'Portfolio created successfully';
-      reply.DATA = portfolio;
+      reply.DATA = portfolio.value;
       code = HTTP_STATUS_CODES.CREATED;
     } else {
       reply.STATUS = Status.ERROR;
