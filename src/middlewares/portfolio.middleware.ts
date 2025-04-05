@@ -199,6 +199,26 @@ class PortfolioMiddleware {
         )
         .min(1)
         .messages(ValidationMessages.types.array),
+      skillSection: Joi.array()
+        .items(
+          Joi.object<ISkills>().keys({
+            name: Joi.string()
+              .min(2)
+              .max(32)
+              .required()
+              .messages(ValidationMessages.portfolio.skillSection.name),
+            experience: Joi.number()
+              .required()
+              .messages(ValidationMessages.portfolio.skillSection.experience),
+            description: Joi.string()
+              .min(5)
+              .max(1000)
+              .required()
+              .messages(ValidationMessages.commons.description),
+          })
+        )
+        .min(1)
+        .messages(ValidationMessages.types.array),
     });
 
     const validationResult = schema.validate(payload);
