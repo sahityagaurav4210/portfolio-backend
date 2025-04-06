@@ -7,7 +7,7 @@ import * as os from 'os';
 import app from './app';
 import Scheduler from '@config/scheduler.config';
 import { connect } from '@db/index';
-import { createAdmin } from '@db/dumps';
+import { createAdmin, updateWebsites } from '@db/dumps';
 import { getAppDetails } from '@config/app.config';
 
 const PORT = parseInt(process.env.PORT || '') || 8000;
@@ -24,6 +24,7 @@ const HOST = process.env.HOST || 'localhost';
 
   if (status.connected) {
     await createAdmin();
+    await updateWebsites();
     Scheduler.init();
     await Crypto.getGlobalCryptoConfigs();
   } else {

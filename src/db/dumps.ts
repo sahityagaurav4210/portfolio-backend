@@ -9,3 +9,11 @@ export async function createAdmin() {
     await User.create(Admins);
   }
 }
+
+export async function updateWebsites() {
+  const existingAdmins = await User.findOne({ phone: process.env.USER_PHONE });
+
+  if (!existingAdmins?.websites?.length) {
+    existingAdmins?.websites?.push('https://www.sgaurav.me')
+  }
+}
