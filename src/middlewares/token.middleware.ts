@@ -16,7 +16,7 @@ export default class TokenMiddleware {
         .uri({
           domain: {
             tlds: {
-              allow: ['in', 'com', 'xyz', 'ca', 'us', 'uk', 'app', 'online', 'dev', 'shop'],
+              allow: ['in', 'com', 'xyz', 'ca', 'us', 'uk', 'app', 'online', 'dev', 'shop', 'me'],
             },
           },
         })
