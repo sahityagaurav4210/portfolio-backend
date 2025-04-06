@@ -14,7 +14,6 @@ const portfolioSchema = new Schema<IPortfolio>(
         },
       },
       _id: false,
-      required: [true, 'Home section is required'],
     },
     projectSection: {
       type: [
@@ -58,7 +57,6 @@ const portfolioSchema = new Schema<IPortfolio>(
           },
         },
       ],
-      required: [true, 'Project section is required'],
       _id: false,
     },
     skillSection: {
@@ -79,9 +77,14 @@ const portfolioSchema = new Schema<IPortfolio>(
             minlength: [5, 'Too short description'],
             maxlength: [1000, 'Too large description'],
           },
+          url: {
+            type: String,
+            default: null,
+            minlength: [5, 'Too short url'],
+            maxlength: [200, 'Too large url'],
+          },
         },
       ],
-      required: [true, 'Skill section is required'],
       _id: false,
     },
     portfolio_user: {

@@ -105,6 +105,7 @@ class PortfolioMiddleware {
               .max(1000)
               .required()
               .messages(ValidationMessages.commons.description),
+            url: Joi.string().uri().optional().min(5).max(200).messages(ValidationMessages.portfolio.skillSection.url)
           })
         )
         .min(1)
@@ -215,6 +216,7 @@ class PortfolioMiddleware {
               .max(1000)
               .required()
               .messages(ValidationMessages.commons.description),
+            url: Joi.string().uri().optional().min(5).max(200).messages(ValidationMessages.portfolio.skillSection.url)
           })
         )
         .min(1)

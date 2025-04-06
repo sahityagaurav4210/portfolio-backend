@@ -63,6 +63,12 @@ const ValidationMessages = {
       experience: {
         'number.base': 'Experience should be a number.',
       },
+      url: {
+        'string.base': 'Skill url should be a string.',
+        'string.min': 'Too short skill name.',
+        'string.max': 'Too large skill name.',
+        'string.pattern.base': 'Invalid skill name.',
+      },
     },
   },
   client_token: {

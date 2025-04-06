@@ -23,7 +23,8 @@ class PortfolioController {
     [portfolio] = await Promise.allSettled([
       Portfolio.create(request.body),
       Events.create({ eventName: EventNames.PORTFOLIO_CREATED, firedBy: authenticatedUser._id }),
-    ]);
+    ])
+
 
     if (portfolio.status === 'fulfilled') {
       reply.STATUS = Status.SUCCESS;

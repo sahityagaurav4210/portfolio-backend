@@ -22,6 +22,7 @@ export interface ISkills {
   name: string;
   experience: string;
   description: string;
+  url?: string;
 }
 
 export interface IPortfolio extends ITimestamp, IDbId {
