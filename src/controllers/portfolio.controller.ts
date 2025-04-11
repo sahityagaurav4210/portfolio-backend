@@ -76,36 +76,20 @@ class PortfolioController {
     const reply = new ApiResponse();
     const { data } = request.authenticatedUser;
     const user = await User.findOne({ websites: data });
-    const cachedPortfolioKey = `portfolio-backend:portfolios:${user?._id}`;
-    const REDIS_CLIENT = connectRedis();
-    const cachedPortfolioExp = (Number(process.env.CACHED_PORTFOLIO_EXPIRY) || 0.25) * 60;
-    const cachedPortfolio = await REDIS_CLIENT.get(cachedPortfolioKey);
 
-    if (cachedPortfolio) {
-      await Events.create({
-        eventName: EventNames.PORTFOLIO_FETCHED_BY_CLIENT,
-        firedBy: request.ip,
-      });
-
-      reply.STATUS = Status.SUCCESS;
-      reply.DATA = JSON.parse(cachedPortfolio);
-      reply.MESSAGE = 'Portfolio list fetched successfully';
-      return response.status(HTTP_STATUS_CODES.OK).json(reply);
-    }
-
-    const [portfolio] = await performParallelTask([
+    const [portfolio] = await Promise.all([
       Portfolio.findOne({ portfolio_user: user?._id }),
       Events.create({ eventName: EventNames.PORTFOLIO_FETCHED_BY_CLIENT, firedBy: request.ip }),
     ]);
-    await REDIS_CLIENT.setex(cachedPortfolioKey, cachedPortfolioExp, JSON.stringify(portfolio));
 
     reply.STATUS = Status.SUCCESS;
-    reply.MESSAGE = 'Portfolio fetched successfully';
+    reply.MESSAGE = 'Portfolio list fetched successfully';
     reply.DATA = portfolio || {};
     reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
+
   @HandleException()
   public static async get(request: CustomReq, response: Response): Promise<Response> {
     const reply = new ApiResponse();
