@@ -32,28 +32,7 @@ const HOST = process.env.HOST || 'localhost';
     process.exit(-1);
   }
 
-  if (cluster.isPrimary) {
-    for (let i = 0; i < numCPUs; i++) {
-      cluster.fork({ WORKER_COUNT: counter, ...process.env });
-      ++counter;
-    }
+  app.listen(PORT, HOST);
+  console.table(getAppDetails(PORT, HOST, process.env.NODE_ENV || ''));
 
-    cluster.on('exit', (worker, code, signal) => {
-      console.log(
-        `[Master] Worker [pid:${worker.process.pid}] [code: ${code}] [signal: ${signal}] died. Restarting...`
-      );
-      cluster.fork({ WORKER_COUNT: counter, ...process.env });
-    });
-  } else {
-    try {
-      const worker = Number(process.env.WORKER_COUNT || 0);
-      app.listen(PORT, HOST);
-
-      if (worker === numCPUs - 1)
-        console.table(getAppDetails(PORT, HOST, process.env.NODE_ENV || '', numCPUs));
-    } catch (error) {
-      console.log('=============ERROR OCCURRED==============');
-      console.error(error);
-    }
-  }
 })();
