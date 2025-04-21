@@ -1,4 +1,4 @@
-. ../helper.ps1
+Import-Module ../helper.psm1
 
 $credentialPath = "../credentials.json"
 $dockerUsername = ""

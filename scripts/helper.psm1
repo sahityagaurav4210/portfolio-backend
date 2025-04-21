@@ -11,3 +11,5 @@ function Convert-SecureStringToPlainText {
       [System.Runtime.InteropServices.Marshal]::ZeroFreeGlobalAllocUnicode($ptr)
   }
 }
+
+Export-ModuleMember -Function Convert-SecureStringToPlainText
