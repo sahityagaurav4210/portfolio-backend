@@ -1,8 +1,10 @@
-$credentialPath = "credentials.json"
+. ../helper.ps1
+
+$credentialPath = "../credentials.json"
 $dockerUsername = ""
 $branch = ""
 
-$loginStatus = docker login | grep "Login Succeeded"
+$loginStatus = docker login | findstr "Login Succeeded"
 
 if ($loginStatus -ne "Login Succeeded") {
   $branch = Read-Host "Enter the branch name"
@@ -34,9 +36,7 @@ else {
     $uri = Read-Host "Enter your caprover host"
     $hashedPwd = Read-Host "Enter your caprover password" -AsSecureString
     $appName = Read-Host "Enter your app name" 
-    $plainPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-      [Runtime.InteropServices.Marshal]::SecureStringToBSTR($hashedPwd)
-    )
+    $plainPwd = Convert-SecureStringToPlainText -SecureString $hashedPwd
 
     caprover deploy -h "$uri" -p "$plainPwd" --appName "$appName" --branch "$branch" 
 
@@ -59,12 +59,16 @@ else {
   $imgName = Read-Host "Enter your docker image name (without docker username)"
 
   docker build -t "$dockerUsername/$imgName" .
+
+  if ($LASTEXITCODE -ne 0) {
+    Write-Output "Build failed, exiting....."
+    exit 0;
+  }
+
   docker push "$dockerUsername/$imgName"
   
   Write-Output "Deploying the app, please wait..."
-  $plainPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-    [Runtime.InteropServices.Marshal]::SecureStringToBSTR($hashedPwd)
-  )
+  $plainPwd = $plainPwd = Convert-SecureStringToPlainText -SecureString $hashedPwd
   
   caprover deploy -h "$uri" -p "$plainPwd" -i "$dockerUsername/$imgName" --appName "$appName"
 
