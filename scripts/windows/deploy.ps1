@@ -1,6 +1,7 @@
-Import-Module ../helper.psm1
+Import-Module "$PSScriptRoot\..\helper.psm1"
 
-$credentialPath = "../credentials.json"
+
+$credentialPath = "$PSScriptRoot\..\..\credentials.json"
 $dockerUsername = ""
 $branch = ""
 
