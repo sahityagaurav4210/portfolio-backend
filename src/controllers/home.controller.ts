@@ -224,12 +224,10 @@ class HomeController {
     const reply = new ApiResponse();
 
     const currentDate = new Date();
-    const todayDate = `${currentDate.getFullYear()}-${
-      currentDate.getMonth() + 1
-    }-${currentDate.getDate()}`;
-    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${
-      currentDate.getDate() + 1
-    }`;
+    const todayDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1
+      }-${currentDate.getDate()}`;
+    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate() + 1
+      }`;
     const viewDetails = await Events.find({
       $and: [
         { eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED },
@@ -239,6 +237,24 @@ class HomeController {
             $gte: new Date(todayDate),
           },
         },
+        {
+          $group: {
+            _id: "$firedBy",
+            events: { $push: "$$ROOT" }
+          }
+        },
+        {
+          $addFields: {
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            view_count: { $sum: "$count" }
+          }
+        },
+        { $project: { _id: 0 } }
       ],
     });
 
