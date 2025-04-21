@@ -164,13 +164,13 @@ class HomeController {
     const reply = new ApiResponse();
     const eventName = EventNames.PORTFOLIO_WEBSITE_TOTAL_VIEWS_FETCHED;
     let [views] = await performParallelTask([
-      Events.find({ eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED }),
+      Events.aggregate(Queries.getTotalViews()),
       Events.create({ eventName, firedBy: request.ip }),
     ]);
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Events fetched successfully';
-    reply.DATA = { views, view_count: views.length };
+    reply.DATA = views[0] || {};
     reply.ENTRY_BY = request.ip || '';
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
@@ -237,24 +237,6 @@ class HomeController {
             $gte: new Date(todayDate),
           },
         },
-        {
-          $group: {
-            _id: "$firedBy",
-            events: { $push: "$$ROOT" }
-          }
-        },
-        {
-          $addFields: {
-            count: { $sum: 1 }
-          }
-        },
-        {
-          $group: {
-            _id: null,
-            view_count: { $sum: "$count" }
-          }
-        },
-        { $project: { _id: 0 } }
       ],
     });
 

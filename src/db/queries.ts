@@ -102,6 +102,34 @@ class Queries {
       { $project: { _id: 0 } }
     ];
   }
+
+  static getTotalViews(): Array<PipelineStage> {
+    return [
+      {
+        $match: {
+          eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED,
+        },
+      },
+      {
+        $group: {
+          _id: "$firedBy",
+          events: { $push: "$$ROOT" }
+        }
+      },
+      {
+        $addFields: {
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          view_count: { $sum: "$count" }
+        }
+      },
+      { $project: { _id: 0 } }
+    ];
+  }
 }
 
 export default Queries;
