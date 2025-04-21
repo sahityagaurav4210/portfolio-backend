@@ -7,7 +7,7 @@
     "start": "node build/index.js",
     "dev": "concurrently \"webpack --watch\" \"nodemon build/index.js\"",
     "deploy:linux": "pwsh scripts/linux/deploy.ps1",
-    "deploy:win": "scripts/windows/deploy.ps1"
+    "deploy:win": "pwsh /windows/deploy.ps1"
   },
   "keywords": [],
   "author": "",
