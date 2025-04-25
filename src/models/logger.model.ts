@@ -10,4 +10,4 @@ const logSchema = new Schema<ILogs>(
   { timestamps: true }
 );
 
-export const Logs = model(ModelNames.LOGS, logSchema);
+export const Logs = model(ModelNames.LOGS, logSchema, ModelNames.LOGS);

@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 
 import route from '@routes/index';
 import Middleware from './middlewares';
+import Controller from './controllers';
 
 const app = express();
 const clients = (process.env.ACCEPTED_CLIENTS || 'http://localhost:5173').split(',');
@@ -23,5 +24,11 @@ app.use(
 app.use(cookieParser());
 app.use(Middleware.postmanMiddleware);
 app.use('/api/v1', route);
+
+app.get('*', Controller.home().notFound);
+app.post('*', Controller.home().notFound);
+app.put('*', Controller.home().notFound);
+app.patch('*', Controller.home().notFound);
+app.delete('*', Controller.home().notFound);
 
 export default app;

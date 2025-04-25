@@ -1,5 +1,8 @@
 import { getObject } from '@helpers/aws.helpers';
 import { User } from '../models/users.model';
+import { PageStatus } from '@models/page_status.model';
+
+import PageStatusData from './data/page_status.data.json';
 
 export async function createAdmin() {
   const existingAdmins = await User.find({});
@@ -16,5 +19,12 @@ export async function updateWebsites() {
   if (!existingAdmins?.websites?.length) {
     existingAdmins?.websites?.push('https://www.sgaurav.me');
     await existingAdmins?.save();
+  }
+}
+
+export async function updatePageStatus() {
+  const pageStatusRecords = await PageStatus.findOne().lean();
+  if (!pageStatusRecords) {
+    await PageStatus.insertMany(PageStatusData);
   }
 }

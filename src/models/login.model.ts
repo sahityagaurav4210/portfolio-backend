@@ -27,4 +27,4 @@ const loginSchema = new Schema<ILogins>(
   { timestamps: true }
 );
 
-export const Login = model(ModelNames.LOGIN, loginSchema);
+export const Login = model(ModelNames.LOGIN, loginSchema, ModelNames.LOGIN);

@@ -8,6 +8,7 @@ import { decrypt, encrypt, performParallelTask } from '../helpers';
 import { WebsiteUpdates } from '../models/website_updates';
 import Queries from '../db/queries';
 import connectRedis from '@config/redis.config';
+import { PageStatus } from '@models/page_status.model';
 
 class HomeController {
   @HandleException()
@@ -80,6 +81,30 @@ class HomeController {
     reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
+
+  @HandleException()
+  public static async listPageStatus(request: Request, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+    const pageStatusRecords = await PageStatus.find({}, { url: 1, status: 1 }).lean();
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = "Page status fetched successfully";
+    reply.DATA = pageStatusRecords;
+    reply.ENTRY_BY = request.ip || "0.0.0.0";
+
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
+
+  @HandleException()
+  public static notFound(request: Request, response: Response): Response {
+    const reply = new ApiResponse();
+
+    reply.STATUS = Status.NOT_FOUND;
+    reply.MESSAGE = "This route does not exists";
+    reply.ENTRY_BY = request.ip || "0.0.0.0";
+
+    return response.status(HTTP_STATUS_CODES.NOT_FOUND).json(reply);
   }
 
   @HandleException()

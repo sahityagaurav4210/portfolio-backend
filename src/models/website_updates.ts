@@ -16,4 +16,4 @@ const websiteUpdatesSchema = new Schema<IWebsiteUpdates>(
   { timestamps: true }
 );
 
-export const WebsiteUpdates = model(ModelNames.WEBSITE_UPDATES, websiteUpdatesSchema);
+export const WebsiteUpdates = model(ModelNames.WEBSITE_UPDATES, websiteUpdatesSchema, ModelNames.WEBSITE_UPDATES);

@@ -1,0 +1,46 @@
+[
+  {
+    "url": "/",
+    "status": true
+  },
+  {
+    "url": "/forgot-pwd",
+    "status": false
+  },
+  {
+    "url": "/hirings",
+    "status": true
+  },
+  {
+    "url": "/login",
+    "status": true
+  },
+  {
+    "url": "/logout",
+    "status": true
+  },
+  {
+    "url": "/today-views-details",
+    "status": true
+  },
+  {
+    "url": "/contacts",
+    "status": true
+  },
+  {
+    "url": "/skills",
+    "status": true
+  },
+  {
+    "url": "/under-development",
+    "status": true
+  },
+  {
+    "url": "/error",
+    "status": true
+  },
+  {
+    "url": "/404",
+    "status": true
+  }
+]

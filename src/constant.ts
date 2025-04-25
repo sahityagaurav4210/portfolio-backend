@@ -2,12 +2,13 @@ export enum ModelNames {
   EVENTS = 'events',
   USERS = 'users',
   LOGIN = 'logins',
-  PORTFOLIO = 'portfolio',
-  CONTRACT = 'contract',
-  HIRING = 'hire_me',
+  PORTFOLIO = 'portfolios',
+  CONTRACT = 'contracts',
+  HIRING = 'hirings',
   WEBSITE_UPDATES = 'website_updates',
   LOGS = 'logs',
-  CRYPTO = 'crypto',
+  CRYPTO = 'cryptos',
+  PAGE_STATUS = 'page_status'
 }
 
 export enum EventNames {

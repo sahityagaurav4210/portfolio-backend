@@ -36,5 +36,5 @@ const contractSchema = new Schema<IContract>(
   { timestamps: true }
 );
 
-const Contract = model(ModelNames.CONTRACT, contractSchema);
+const Contract = model(ModelNames.CONTRACT, contractSchema, ModelNames.CONTRACT);
 export default Contract;

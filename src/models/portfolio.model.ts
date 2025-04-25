@@ -96,6 +96,6 @@ const portfolioSchema = new Schema<IPortfolio>(
   { timestamps: true }
 );
 
-const Portfolio = model(ModelNames.PORTFOLIO, portfolioSchema);
+const Portfolio = model(ModelNames.PORTFOLIO, portfolioSchema, ModelNames.PORTFOLIO);
 
 export default Portfolio;

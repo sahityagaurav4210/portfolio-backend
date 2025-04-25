@@ -62,4 +62,4 @@ const hiringSchema = new Schema<IHiring>(
   { timestamps: true }
 );
 
-export const Hiring = model(ModelNames.HIRING, hiringSchema);
+export const Hiring = model(ModelNames.HIRING, hiringSchema, ModelNames.HIRING);
