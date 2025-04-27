@@ -7,7 +7,8 @@ const pageStatusSchema = new Schema<IPageStatus>({
     type: String,
     required: true,
     trim: true,
-    lowercase: true
+    lowercase: true,
+    index: true
   },
   status: { type: Boolean, default: true }
 }, { timestamps: true });

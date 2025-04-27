@@ -86,7 +86,9 @@ class HomeController {
   @HandleException()
   public static async listPageStatus(request: Request, response: Response): Promise<Response> {
     const reply = new ApiResponse();
-    const pageStatusRecords = await PageStatus.find({}, { url: 1, status: 1 }).lean();
+    const url = request.query.url;
+    const query = url ? { url } : {};
+    const pageStatusRecords = await PageStatus.find(query, { url: 1, status: 1 }, { lean: true });
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = "Page status fetched successfully";
