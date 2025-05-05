@@ -34,7 +34,7 @@ class LoginController {
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Login successfull';
-    reply.DATA = { access_token, refresh_token, phone, name: userRecord.name, _id: userRecord._id };
+    reply.DATA = { access_token, refresh_token, phone, name: userRecord.name, _id: userRecord._id, email: userRecord.email };
     reply.ENTRY_BY = phone;
 
     response.cookie('authorization', access_token, { httpOnly: true, secure: true });

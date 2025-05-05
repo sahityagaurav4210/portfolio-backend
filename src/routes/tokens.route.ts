@@ -15,6 +15,7 @@ routes.get('/refresh-access-token', Middleware.checkRefToken, Controller.tokens(
 routes.post(
   '/refresh-client-token',
   Middleware.token().createNewToken,
+  Middleware.checkIfAuthenticated,
   Controller.tokens().refreshClientToken
 );
 

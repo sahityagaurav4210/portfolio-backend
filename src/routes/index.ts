@@ -7,6 +7,7 @@ import userRoutes from './user.route';
 import baasRoutes from './baas';
 import contractRoute from './contract.route';
 import hireRoute from './hiring.route';
+import fileRoutes from './files.route';
 
 const route = Router();
 
@@ -17,5 +18,6 @@ route.use('/user', userRoutes);
 route.use('/baas', baasRoutes);
 route.use('/contract', contractRoute);
 route.use('/hiring', hireRoute);
+route.use("/files", fileRoutes);
 
 export default route;

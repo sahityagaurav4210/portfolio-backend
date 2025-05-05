@@ -48,6 +48,10 @@ const userSchema = new Schema<IUser>(
       type: [String],
       default: [],
     },
+    tokens: {
+      type: [String],
+      default: []
+    }
   },
   { timestamps: true }
 );

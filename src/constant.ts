@@ -8,7 +8,8 @@ export enum ModelNames {
   WEBSITE_UPDATES = 'website_updates',
   LOGS = 'logs',
   CRYPTO = 'cryptos',
-  PAGE_STATUS = 'page_status'
+  PAGE_STATUS = 'page_status',
+  FILES = 'user_files'
 }
 
 export enum EventNames {

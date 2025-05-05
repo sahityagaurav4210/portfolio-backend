@@ -32,7 +32,7 @@ class TokenController {
     }
 
     await performParallelTask([
-      User.findByIdAndUpdate(authenticatedUser._id, { $push: { websites: url } }),
+      User.findByIdAndUpdate(authenticatedUser._id, { $push: { websites: url, tokens: x_api_key } }),
       Events.create({
         eventName: EventNames.CLIENT_ACCESS_TOKEN_GEN,
         firedBy: authenticatedUser._id,
@@ -77,16 +77,30 @@ class TokenController {
   }
 
   @HandleException()
-  public static async refreshClientToken(request: Request, response: Response): Promise<Response> {
+  public static async refreshClientToken(request: CustomReq, response: Response): Promise<Response> {
+    const { authenticatedUser } = request;
     const { url } = request.body;
     const x_api_key = generateXApiToken(url);
     const reply = new ApiResponse();
 
+    const user = await User.findOne({ websites: url });
+
+    if (!user) {
+      reply.STATUS = Status.NOT_FOUND;
+      reply.MESSAGE = 'Invalid website';
+      reply.ENTRY_BY = authenticatedUser.phone || request.ip || '';
+
+      return response.status(HTTP_STATUS_CODES.CONFLICT).json(reply);
+    }
+
     response.cookie('x_api_key', x_api_key, { httpOnly: true, secure: true });
-    await Events.create({
-      eventName: EventNames.CLIENT_ACCESS_TOKEN_REGEN,
-      firedBy: request.ip || '0.0.0.0',
-    });
+    await performParallelTask([
+      User.findByIdAndUpdate(authenticatedUser._id, { $push: { tokens: x_api_key } }),
+      Events.create({
+        eventName: EventNames.CLIENT_ACCESS_TOKEN_REGEN,
+        firedBy: request.ip || '0.0.0.0',
+      })
+    ]);
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Client token generated';
