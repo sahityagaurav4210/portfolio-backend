@@ -7,6 +7,7 @@ import { Convert } from './convertibles.helper';
 import Files from './files.helpers';
 import { ValidationMessages } from './messages.helper';
 import Crypto from '@config/crypto.config';
+import Packages from '@packages/index';
 
 export async function hashPwd(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
@@ -92,6 +93,13 @@ export async function performParallelTask(tasks: Array<Promise<any>>): Promise<a
     .filter(Boolean);
 
   return taskResults;
+}
+
+export function parseQsAsBoolean(input: string): boolean {
+  const { BooleanPipe } = Packages.pipes;
+  const booleanPipe = new BooleanPipe();
+
+  return booleanPipe.Convert(input);
 }
 
 export { Convert, ValidationMessages, Files };

@@ -27,3 +27,7 @@ export interface IClientToken {
 export interface ICrypto extends IDbId, ITimestamp {
   vector: Buffer
 }
+
+export interface IPipe<T> {
+  Convert(input: string): T;
+}
