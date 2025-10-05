@@ -3,6 +3,8 @@ import { CustomReq } from '../interfaces';
 import { User } from '../models/users.model';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { HandleException } from '../decorators/exception.decorator';
+import bcrypt from 'bcrypt';
+import { checkPwd, hashPwd } from '@helpers/index';
 
 class UserController {
   @HandleException()
@@ -30,6 +32,39 @@ class UserController {
 
       return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
     }
+  }
+
+  @HandleException()
+  public static async changePwd(request: CustomReq, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+    const { oldPwd, newPwd } = request.body;
+    const { _id, phone } = request.authenticatedUser || {};
+    const identity = phone || request.ip || "0.0.0.0";
+
+    const hashedNewPwd = await hashPwd(newPwd);
+    const user = await User.findById(_id);
+
+    if (!user) {
+      reply.STATUS = Status.NOT_FOUND;
+      reply.MESSAGE = "Invalid user";
+      reply.ENTRY_BY = identity;
+
+      return response.status(HTTP_STATUS_CODES.NOT_FOUND).json(reply);
+    }
+
+    if (!checkPwd(oldPwd, user.password)) {
+      reply.STATUS = Status.UNAUTHORISED;
+      reply.MESSAGE = "Invalid password";
+      reply.ENTRY_BY = identity;
+
+      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    }
+
+    user.password = hashedNewPwd;
+    user.updatedAt = new Date();
+
+    await user.save();
+    return response.status(HTTP_STATUS_CODES.NO_CONTENT).json();
   }
 
   @HandleException()

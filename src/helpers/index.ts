@@ -15,6 +15,10 @@ export async function hashPwd(password: string): Promise<string> {
   return hashPwd;
 }
 
+export async function checkPwd(plainPwd: string, hashedPwd: string): Promise<boolean> {
+  return await bcrypt.compare(plainPwd, hashedPwd);
+}
+
 export function generateToken(phone: string, tokenType: keyof typeof TokenSecrets): string {
   let token: string;
   const secret = TokenSecrets[tokenType] || '';
