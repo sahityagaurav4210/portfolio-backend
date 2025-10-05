@@ -13,7 +13,7 @@ class TokenController {
   public static async createClientToken(request: CustomReq, response: Response): Promise<Response> {
     const { authenticatedUser } = request;
     const { url } = request.body;
-    const x_api_key = generateXApiToken(url);
+    const x_api_key = generateXApiToken(url, authenticatedUser._id);
     const reply = new ApiResponse(
       Status.SUCCESS,
       'Client token generated',
@@ -80,7 +80,7 @@ class TokenController {
   public static async refreshClientToken(request: CustomReq, response: Response): Promise<Response> {
     const { authenticatedUser } = request;
     const { url } = request.body;
-    const x_api_key = generateXApiToken(url);
+    const x_api_key = generateXApiToken(url, authenticatedUser._id);
     const reply = new ApiResponse();
 
     const user = await User.findOne({ websites: url });

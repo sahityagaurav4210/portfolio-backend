@@ -9,7 +9,8 @@ export enum ModelNames {
   LOGS = 'logs',
   CRYPTO = 'cryptos',
   PAGE_STATUS = 'page_status',
-  FILES = 'user_files'
+  FILES = 'user_files',
+  SKILLS = "skills"
 }
 
 export enum EventNames {

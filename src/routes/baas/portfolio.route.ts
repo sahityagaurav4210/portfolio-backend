@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import Middleware from '../../middlewares';
 import Controller from '../../controllers';
+import clientSkillRoutes from './skills.route';
 
 const portfolioBaasRoutes = Router();
 
@@ -9,5 +10,7 @@ portfolioBaasRoutes.get(
   Middleware.checkIfClientAuthenticated,
   Controller.portfolio().clientList
 );
+
+portfolioBaasRoutes.use("/skills", clientSkillRoutes);
 
 export default portfolioBaasRoutes;

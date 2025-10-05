@@ -59,34 +59,34 @@ const portfolioSchema = new Schema<IPortfolio>(
       ],
       _id: false,
     },
-    skillSection: {
-      type: [
-        {
-          name: {
-            type: String,
-            required: [true, 'Skill name is required'],
-            minlength: [2, 'Too short skill name'],
-          },
-          experience: {
-            type: Number,
-            required: [true, 'Skill experience is required'],
-          },
-          description: {
-            type: String,
-            required: [true, 'Skill description is required'],
-            minlength: [5, 'Too short description'],
-            maxlength: [1000, 'Too large description'],
-          },
-          url: {
-            type: String,
-            default: null,
-            minlength: [5, 'Too short url'],
-            maxlength: [200, 'Too large url'],
-          },
-        },
-      ],
-      _id: false,
-    },
+    // skillSection: {
+    //   type: [
+    //     {
+    //       name: {
+    //         type: String,
+    //         required: [true, 'Skill name is required'],
+    //         minlength: [2, 'Too short skill name'],
+    //       },
+    //       experience: {
+    //         type: Number,
+    //         required: [true, 'Skill experience is required'],
+    //       },
+    //       description: {
+    //         type: String,
+    //         required: [true, 'Skill description is required'],
+    //         minlength: [5, 'Too short description'],
+    //         maxlength: [1000, 'Too large description'],
+    //       },
+    //       url: {
+    //         type: String,
+    //         default: null,
+    //         minlength: [5, 'Too short url'],
+    //         maxlength: [200, 'Too large url'],
+    //       },
+    //     },
+    //   ],
+    //   _id: false,
+    // },
     portfolio_user: {
       type: mongoose.Schema.ObjectId,
       ref: ModelNames.USERS,

@@ -1,10 +1,10 @@
 {
   "editor.wordWrap": "wordWrapColumn",
-  "editor.wordWrapColumn": 95,
+  "editor.wordWrapColumn": 135,
   "editor.formatOnSave": true,
-  "editor.fontFamily": "'Courier New','Fira Code','Droid Sans Mono', 'monospace', monospace",
-  "editor.fontSize": 18,
-  "terminal.integrated.fontFamily": "'Courier New'",
+  "editor.fontFamily": "'Fira Code','Droid Sans Mono', 'monospace', monospace",
+  "editor.fontSize": 16,
+  "terminal.integrated.fontFamily": "'Fira Code'",
   "terminal.integrated.fontSize": 18,
   "cSpell.words": [
     "Gaurav",

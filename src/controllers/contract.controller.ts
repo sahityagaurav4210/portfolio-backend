@@ -26,6 +26,7 @@ class ContractController {
       reply.MESSAGE = 'Something went wrong, please try again after sometime';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
+      logger.info({ message: `Failed to create a contract, identity ${request.ip || '0.0.0.0'}` });
       return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
     }
   }

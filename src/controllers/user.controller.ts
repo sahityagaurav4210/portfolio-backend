@@ -8,9 +8,10 @@ class UserController {
   @HandleException()
   public static async editProfile(request: CustomReq, response: Response): Promise<Response> {
     const { authenticatedUser } = request;
+    const { password, ...payload } = request.body;
     const reply = new ApiResponse();
 
-    const updatedUserRecord = await User.findByIdAndUpdate(authenticatedUser?._id, request.body, {
+    const updatedUserRecord = await User.findByIdAndUpdate(authenticatedUser?._id, { $set: { ...payload, updatedAt: new Date() } }, {
       new: true,
       runValidators: true,
     });
@@ -36,7 +37,7 @@ class UserController {
     const { authenticatedUser } = request;
     const reply = new ApiResponse();
 
-    const profile = await User.findById(authenticatedUser?._id);
+    const profile = await User.findById(authenticatedUser?._id, { createdAt: 0, updatedAt: 0, __v: 0 }, { lean: true });
 
     if (profile) {
       reply.STATUS = Status.SUCCESS;
@@ -44,7 +45,7 @@ class UserController {
       reply.DATA = profile;
       reply.ENTRY_BY = authenticatedUser.phone || request.ip || '0.0.0.0';
 
-      return response.status(HTTP_STATUS_CODES.UPDATED).json(reply);
+      return response.status(HTTP_STATUS_CODES.OK).json(reply);
     } else {
       reply.STATUS = Status.ERROR;
       reply.MESSAGE = 'An error occurred, please try again after sometime';

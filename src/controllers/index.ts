@@ -3,6 +3,7 @@ import HiringController from './hiring.controller';
 import HomeController from './home.controller';
 import LoginController from './login.controller';
 import PortfolioController from './portfolio.controller';
+import SkillController from './skills.controller';
 import TokenController from './tokens.controller';
 import UserController from './user.controller';
 
@@ -33,6 +34,10 @@ class Controller {
 
   public static hiring() {
     return HiringController;
+  }
+
+  public static skills() {
+    return SkillController;
   }
 }
 

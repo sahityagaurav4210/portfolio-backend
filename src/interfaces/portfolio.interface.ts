@@ -18,16 +18,16 @@ export interface IProjects {
   disabled?: boolean;
 }
 
-export interface ISkills {
+export interface ISkills extends ITimestamp, IDbId {
   name: string;
   experience: string;
   description: string;
   url?: string;
+  user: OID;
 }
 
 export interface IPortfolio extends ITimestamp, IDbId {
   homeSection: IHome;
   projectSection: IProjects[];
-  skillSection: ISkills[];
   portfolio_user: OID;
 }

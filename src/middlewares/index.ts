@@ -13,6 +13,7 @@ import PortfolioMiddleware from './portfolio.middleware';
 import TokenMiddleware from './token.middleware';
 import connectRedis from '@config/redis.config';
 import { init } from '@config/logs.config';
+import SkillMiddleware from './skills.middleware';
 
 class Middleware {
   public static authentication() {
@@ -29,6 +30,10 @@ class Middleware {
 
   public static token() {
     return TokenMiddleware;
+  }
+
+  public static skills() {
+    return SkillMiddleware;
   }
 
   @HandleException()

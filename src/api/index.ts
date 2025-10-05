@@ -13,6 +13,7 @@ export enum HTTP_STATUS_CODES {
   INV_PAYLOAD = 422,
   SERVER_ERR = 500,
   UNAVAILABLE = 503,
+  NO_CONTENT = 204
 }
 
 export enum Status {
