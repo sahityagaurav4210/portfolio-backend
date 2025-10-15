@@ -41,8 +41,7 @@ class UserController {
     const { _id, phone } = request.authenticatedUser || {};
     const identity = phone || request.ip || "0.0.0.0";
 
-    const hashedNewPwd = await hashPwd(newPwd);
-    const user = await User.findById(_id);
+    const user = await User.findById(_id, { password: 1 });
 
     if (!user) {
       reply.STATUS = Status.NOT_FOUND;
@@ -60,7 +59,7 @@ class UserController {
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
 
-    user.password = hashedNewPwd;
+    user.password = newPwd;
     user.updatedAt = new Date();
 
     await user.save();
