@@ -1,7 +1,6 @@
 import Seeders from "@db/seeders";
 import { connect } from "./db";
 import Scheduler from "@config/scheduler.config";
-import Crypto from "@config/crypto.config";
 
 export default async function run() {
   const status = await connect(
@@ -14,7 +13,6 @@ export default async function run() {
 
     await seeders.run();
     Scheduler.init();
-    await Crypto.getGlobalCryptoConfigs();
   } else {
     console.log("==============ERROR CONNECTING TO DB================");
     process.exit(-1);

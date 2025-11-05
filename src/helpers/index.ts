@@ -48,10 +48,10 @@ export function decryptXApiToken(token: string): jwt.JwtPayload | string {
 export async function encrypt(data: string): Promise<string> {
   const passphrase = process.env.PASSPHRASE as string;
   const salt = process.env.SALT as string;
-  const { vector } = await Crypto.getGlobalCryptoConfigs();
+  const vector = await Crypto.getGlobalCryptoConfigs();
 
   const key = crypto.scryptSync(passphrase, salt, 32) as unknown as crypto.CipherKey;
-  const cipher = crypto.createCipheriv('aes-256-cbc', key, vector.toString("hex"));
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, vector as NodeJS.ArrayBufferView);
   let encryptedText = cipher.update(data, 'utf-8', 'hex');
   encryptedText += cipher.final('hex');
 
@@ -61,7 +61,7 @@ export async function encrypt(data: string): Promise<string> {
 export async function decrypt(encryptedText: string): Promise<string> {
   const passphrase = process.env.PASSPHRASE as string;
   const salt = process.env.SALT as string;
-  const { vector } = await Crypto.getGlobalCryptoConfigs();
+  const vector = await Crypto.getGlobalCryptoConfigs();
 
   const key = crypto.scryptSync(passphrase, salt, 32) as unknown as crypto.CipherKey;
   const decipher = crypto.createDecipheriv('aes-256-cbc', key, new Uint8Array(vector));
