@@ -1,11 +1,6 @@
-import mongoose, { ConnectionStates } from 'mongoose';
+import mongoose from 'mongoose';
 
-export async function connect(
-  connString: string,
-  dbName: string
-): Promise<typeof ConnectionStates> {
+export async function connect(connString: string, dbName: string): Promise<void> {
   const dbString = `${connString}${dbName}`;
-  const { STATES } = await mongoose.connect(dbString, { connectTimeoutMS: 10000, serverSelectionTimeoutMS: 10000 });
-
-  return STATES;
+  await mongoose.connect(dbString, { connectTimeoutMS: 10000, serverSelectionTimeoutMS: 10000 });
 }

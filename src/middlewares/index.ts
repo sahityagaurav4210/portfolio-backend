@@ -194,6 +194,22 @@ class Middleware {
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     } else next();
   }
+
+  @HandleException()
+  public static captchaValidateValidator(request: Request, response: Response, next: NextFunction) {
+    const { captcha } = request.query;
+    const reply = new ApiResponse();
+
+    if (!captcha) {
+      reply.STATUS = Status.UNDEFINED;
+      reply.MESSAGE = "Please provide a valid captcha";
+      reply.ENTRY_BY = request.ip || "0.0.0.0";
+
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+    }
+
+    next();
+  }
 }
 
 export default Middleware;

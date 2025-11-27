@@ -25,9 +25,13 @@ export interface IClientToken {
 }
 
 export interface ICrypto extends IDbId, ITimestamp {
-  vector: Buffer
+  vector: Buffer;
 }
 
 export interface IPipe<T> {
   Convert(input: string): T;
+}
+
+export interface ICaptchaValidate {
+  captcha: string;
 }

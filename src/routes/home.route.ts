@@ -7,7 +7,7 @@ const route = Router();
 route.get('/ping', Controller.home().ping);
 route.get('/shut-down', Middleware.checkIfAuthenticated, Controller.home().shutdown);
 route.get('/captcha', Controller.home().captcha);
-route.get('/captcha-validate', Controller.home().captchaValidate);
+route.get('/captcha-validate', Middleware.captchaValidateValidator, Controller.home().captchaValidate);
 route.get('/page-status', Controller.home().listPageStatus);
 
 route.get(
