@@ -11,6 +11,7 @@ import connectRedis from '@config/redis.config';
 import { PageStatus } from '@models/page_status.model';
 import * as crypto from "node:crypto";
 import { init } from '@config/logs.config';
+import Home from '@models/home.model';
 
 class HomeController {
   @HandleException()
@@ -290,6 +291,44 @@ class HomeController {
     reply.DATA = viewDetails;
     reply.ENTRY_BY = request.ip || '0.0.0.0';
 
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
+
+  @HandleException()
+  public static async addUserHomeSection(request: CustomReq, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+    const logger = init();
+
+    const { _id: user, phone } = request.authenticatedUser;
+    let { ...payload } = request.body;
+    payload = { ...payload, user };
+
+    logger.info({ message: `Started inserting the home section of user - ${user}.` });
+    await Home.updateOne({ user }, { $set: { ...payload, updatedAt: new Date() }, $setOnInsert: { createdAt: new Date() } }, { runValidators: true, upsert: true, setDefaultsOnInsert: true });
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = "Home section added successfully";
+    reply.DATA = payload;
+    reply.ENTRY_BY = request.ip || phone || "0.0.0.0";
+
+    logger.info({ message: `Successfully upserted the home section of user - ${user}` });
+    return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
+  }
+
+  @HandleException()
+  public static async getUserHomeSection(request: CustomReq, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+    const logger = init();
+
+    const { _id: user, phone } = request.authenticatedUser;
+    const homeSection = await Home.findOne({ user }, { createdAt: 0, updatedAt: 0 }, { lean: true });
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = "Home section fetched successfully";
+    reply.DATA = homeSection;
+    reply.ENTRY_BY = request.ip || phone || "0.0.0.0";
+
+    logger.info({ message: `Home section of user - ${user} has been successfully fetched by a request bearing identity - ${request.ip}` });
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
 }

@@ -35,5 +35,7 @@ route.get(
 );
 
 route.post('/update-website', Middleware.checkIfAuthenticated, Controller.home().updateWebsite);
+route.post('/home/add', Middleware.home().addUserHomeMiddleware, Middleware.checkIfAuthenticated, Controller.home().addUserHomeSection);
+route.get('/home/get', Middleware.checkIfAuthenticated, Controller.home().getUserHomeSection);
 
 export default route;

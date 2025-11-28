@@ -10,7 +10,8 @@ export enum ModelNames {
   CRYPTO = 'cryptos',
   PAGE_STATUS = 'page_status',
   FILES = 'user_files',
-  SKILLS = "skills"
+  SKILLS = "skills",
+  HOME = "home"
 }
 
 export enum EventNames {

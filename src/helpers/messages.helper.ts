@@ -13,6 +13,43 @@ const ValidationMessages = {
         'string.max': 'Too large description.',
       },
     },
+    homeSection: {
+      displayName: {
+        'string.base': 'Display name must be a string.',
+        'string.pattern.base': 'Invalid display name',
+        'any.required': 'Display name is required',
+      },
+      url: {
+        'string.base': 'Profile url must be a string.',
+        'string.pattern.base': 'Invalid url',
+      },
+      specialization: {
+        'string.base': 'Specialization must be a string.'
+      },
+      about: {
+        'string.base': 'About must be a string.',
+        'string.min': 'Your description is too short.',
+        'string.max': 'Your description is too long.',
+        'any.required': 'Your description is required',
+      },
+      projectsDelivered: {
+        'number.base': "Projects delivered count must be a number.",
+        'number.min': 'Your projects delivered count is too short.'
+      },
+      experience: {
+        'number.base': "Experience must be a number.",
+      },
+      codingQuestionSolved: {
+        'number.base': "Coding question solved count must be a number."
+      },
+      activeGithubContributions: {
+        'number.base': "Active github contributions must be a number."
+      },
+      designation: {
+        'string.base': 'Designation must be a string.',
+        'any.required': 'Designation is required',
+      },
+    },
     projectSection: {
       name: {
         'string.base': 'Project name should be a string.',
@@ -84,6 +121,14 @@ const ValidationMessages = {
       'string.min': 'Too short description.',
       'string.max': 'Too large description.',
     },
+    optional: {
+      string: (feildName: string) => ({
+        'string.base': `${feildName} must be a string`
+      }),
+      number: (feildName: string) => ({
+        'number.base': `${feildName} must be a number.`
+      }),
+    }
   },
   types: {
     array: {
@@ -92,6 +137,9 @@ const ValidationMessages = {
       'array.max': 'Too large section',
       'any.required': 'This section is required',
     },
+    string: {
+      'string.base': "Item must be a string."
+    }
   },
 };
 

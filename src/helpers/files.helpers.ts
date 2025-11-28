@@ -13,7 +13,7 @@ class Files {
 
   public static async createFile(path: string, data: Buffer) {
     return new Promise((resolve, reject) => {
-      fs.writeFile(path, data, error => {
+      fs.writeFile(path, data as Uint8Array, error => {
         if (error) reject(error);
         resolve('File created');
       });

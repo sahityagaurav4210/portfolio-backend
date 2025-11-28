@@ -14,6 +14,7 @@ import TokenMiddleware from './token.middleware';
 import connectRedis from '@config/redis.config';
 import { init } from '@config/logs.config';
 import SkillMiddleware from './skills.middleware';
+import HomeMiddleWare from './home.middleware';
 
 class Middleware {
   public static authentication() {
@@ -34,6 +35,10 @@ class Middleware {
 
   public static skills() {
     return SkillMiddleware;
+  }
+
+  public static home() {
+    return HomeMiddleWare;
   }
 
   @HandleException()
