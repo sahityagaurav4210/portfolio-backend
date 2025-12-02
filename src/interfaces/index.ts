@@ -34,4 +34,5 @@ export interface IPipe<T> {
 
 export interface ICaptchaValidate {
   captcha: string;
+  captchaId: number;
 }

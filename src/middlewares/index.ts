@@ -15,6 +15,7 @@ import connectRedis from '@config/redis.config';
 import { init } from '@config/logs.config';
 import SkillMiddleware from './skills.middleware';
 import HomeMiddleWare from './home.middleware';
+import HiringMiddleware from './hiring.middleware';
 
 class Middleware {
   public static authentication() {
@@ -39,6 +40,10 @@ class Middleware {
 
   public static home() {
     return HomeMiddleWare;
+  }
+
+  public static hiring() {
+    return HiringMiddleware;
   }
 
   @HandleException()
@@ -202,10 +207,26 @@ class Middleware {
 
   @HandleException()
   public static captchaValidateValidator(request: Request, response: Response, next: NextFunction) {
-    const { captcha } = request.query;
+    const { captcha, captchaId } = request.query;
     const reply = new ApiResponse();
 
-    if (!captcha) {
+    if (!captcha || !captchaId) {
+      reply.STATUS = Status.UNDEFINED;
+      reply.MESSAGE = "Please provide a valid captcha";
+      reply.ENTRY_BY = request.ip || "0.0.0.0";
+
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+    }
+
+    next();
+  }
+
+  @HandleException()
+  public static refreshCaptchaValidator(request: Request, response: Response, next: NextFunction) {
+    const { captchaId } = request.query;
+    const reply = new ApiResponse();
+
+    if (!captchaId) {
       reply.STATUS = Status.UNDEFINED;
       reply.MESSAGE = "Please provide a valid captcha";
       reply.ENTRY_BY = request.ip || "0.0.0.0";

@@ -19,14 +19,14 @@ class ContractController {
       reply.DATA = contractRecord;
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
-      logger.info({ message: `A new contract created by ${request.ip || '0.0.0.0'}` });
+      logger.info({ message: `A new contact created by ${request.ip || '0.0.0.0'}` });
       return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
     } else {
       reply.STATUS = Status.ERROR;
       reply.MESSAGE = 'Something went wrong, please try again after sometime';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
-      logger.info({ message: `Failed to create a contract, identity ${request.ip || '0.0.0.0'}` });
+      logger.info({ message: `Failed to create a contact, identity ${request.ip || '0.0.0.0'}` });
       return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
     }
   }

@@ -9,11 +9,19 @@ import { WebsiteUpdates } from '../models/website_updates';
 import Queries from '../db/queries';
 import connectRedis from '@config/redis.config';
 import { PageStatus } from '@models/page_status.model';
-import * as crypto from "node:crypto";
 import { init } from '@config/logs.config';
 import Home from '@models/home.model';
+import sharp from 'sharp';
 
+import * as svgCaptcha from "svg-captcha";
+import { ICaptchaPayload } from '@interfaces/captcha.interface';
+import { getCaptchaImgConfig } from '@config/captcha.config';
 class HomeController {
+  private static async convertSvgIntoPng(svgData: string): Promise<Buffer> {
+    const buffer = await sharp(Buffer.from(svgData)).resize(200, 50).png().toBuffer();
+    return buffer;
+  }
+
   @HandleException()
   public static ping(request: Request, response: Response): Response {
     const reply = new ApiResponse(
@@ -40,24 +48,73 @@ class HomeController {
   public static async captcha(request: Request, response: Response): Promise<Response> {
     const reply = new ApiResponse();
     const REDIS_CLIENT = connectRedis();
-    const alphaNumericLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$%@!(^)';
     let captchaLen = Number(process.env.CAPTCHA_LEN) || 6;
-    let captcha = '';
+    const svgMetadata = svgCaptcha.create(getCaptchaImgConfig(captchaLen));
+    let captcha = svgMetadata.text;
     const keyName = "portfolio_backend:captcha";
+    const timeout = Number(process.env.CAPTCHA_TIMEOUT) * 60;
     const logger = init();
 
-    for (let index = 0; index < Number(captchaLen); index++) {
-      captcha += alphaNumericLetters[crypto.randomInt(0, alphaNumericLetters.length)];
-    }
-
+    const captchaId = Date.now();
     const token = await encrypt(captcha);
-    await REDIS_CLIENT.setex(`${keyName}:${captcha}`, 300, token);
+    const payload = { token, data: svgMetadata.data, verified: false };
+    await REDIS_CLIENT.setex(`${keyName}:${captchaId}`, timeout, JSON.stringify(payload));
 
-    logger.info({ message: `Captcha - ${captcha} has been generated at ${new Date().toISOString()} by ${request.ip || "0.0.0.0"}`, instant: Date.now() });
+    logger.info({ message: `Captcha - ${captcha} has been generated at ${new Date().toISOString()} by ${request.ip || "0.0.0.0"}` });
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Captcha generated';
-    reply.DATA = { captcha };
+    reply.DATA = { url: `/captcha/${captchaId}`, captchaId };
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+    return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
+  }
+
+  @HandleException()
+  public static async getCaptchaImg(request: Request, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+    const REDIS_CLIENT = connectRedis();
+    const { captchaId } = request.params;
+    const keyName = `portfolio_backend:captcha:${captchaId}`;
+
+    const stringifiedPayload = await REDIS_CLIENT.get(keyName);
+
+    if (!stringifiedPayload) {
+      reply.STATUS = Status.VALIDATION;
+      reply.MESSAGE = 'Invalid captcha details!!!';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+    }
+
+    const payload = JSON.parse(stringifiedPayload);
+    return response.send(await HomeController.convertSvgIntoPng(payload.data));
+  }
+
+  @HandleException()
+  public static async refreshCaptcha(request: Request, response: Response): Promise<Response> {
+    const reply = new ApiResponse();
+    const REDIS_CLIENT = connectRedis();
+    const { captchaId } = request.query as unknown as Record<string, any>;
+    let captchaLen = Number(process.env.CAPTCHA_LEN) || 6;
+    const timeout = Number(process.env.CAPTCHA_TIMEOUT) * 60;
+    const svgMetadata = svgCaptcha.create(getCaptchaImgConfig(captchaLen));
+    let captcha = svgMetadata.text;
+    const keyName = "portfolio_backend:captcha";
+    const logger = init();
+
+    await REDIS_CLIENT.del(`${keyName}:${captchaId}`);
+    logger.info({ message: `Captcha - ${captcha} with captcha id - ${captchaId} has been deleted successfully at ${new Date().toISOString()} by ${request.ip || "0.0.0.0"}` });
+
+    const token = await encrypt(captcha);
+    const payload = { token, data: svgMetadata.data, verified: false };
+    await REDIS_CLIENT.setex(`${keyName}:${captchaId}`, timeout, JSON.stringify(payload));
+
+    logger.info({ message: `Captcha - ${captcha} has been re-generated at ${new Date().toISOString()} by ${request.ip || "0.0.0.0"}` });
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Captcha generated';
+    reply.DATA = { url: `/captcha/${captchaId}`, captchaId };
     reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
@@ -66,34 +123,36 @@ class HomeController {
   @HandleException()
   public static async captchaValidate(request: Request, response: Response): Promise<Response> {
     const reply = new ApiResponse();
-    let { captcha } = request.query as unknown as ICaptchaValidate;
+    let { captcha, captchaId } = request.query as unknown as ICaptchaValidate;
     const REDIS_CLIENT = connectRedis();
     const logger = init();
-    const keyName = `portfolio_backend:captcha:${captcha}`;
-    const token = await REDIS_CLIENT.get(keyName);
+    const keyName = `portfolio_backend:captcha:${captchaId}`;
+    const timeout = Number(process.env.CAPTCHA_TIMEOUT) * 60;
+    const stringifiedPayload = await REDIS_CLIENT.get(keyName);
 
-    if (!token) {
+    if (!stringifiedPayload) {
       reply.STATUS = Status.UNAUTHORISED;
-      reply.MESSAGE = 'Invalid captcha';
+      reply.MESSAGE = 'Invalid captcha details';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
-      logger.info({ message: `The token of captcha ${captcha} is missing, please check the typos in captcha provided.`, instant: Date.now() });
+      logger.info({ message: `There's something went wrong with payload of provided captchaId - ${captchaId}.` });
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
 
-    const decryptedCaptcha = await decrypt(token);
+    const payload = JSON.parse(stringifiedPayload) as ICaptchaPayload;
+    const decryptedCaptcha = await decrypt(payload.token);
 
     if (decryptedCaptcha !== captcha) {
       reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Invalid captcha';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
-      logger.info({ message: `Provided captcha does not match with the one which has been generated by the system, please check the typos in captcha provided.`, instant: Date.now() });
+      logger.info({ message: `Provided captcha does not match with the one which has been generated by the system, please check the typos in captcha provided.` });
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
 
-    await REDIS_CLIENT.del(keyName);
-    logger.info({ message: `Captcha - ${captcha} has been successfully verified by the system.`, instant: Date.now() });
+    await REDIS_CLIENT.setex(keyName, timeout, JSON.stringify({ ...payload, verified: true }));
+    logger.info({ message: `Captcha - ${captcha} has been successfully verified by the system.` });
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Captcha verified';
