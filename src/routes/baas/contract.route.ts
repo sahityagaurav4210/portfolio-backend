@@ -6,10 +6,13 @@ const contractRoute = Router();
 
 contractRoute.post(
   '/create',
+  Middleware.contract().addNewContactValidator,
+  Middleware.hiring().validateHiringFormCaptcha,
   Middleware.checkIfClientAuthenticated,
   Middleware.contract().checkIfContractAlreadyExists,
   Controller.contract().create
 );
+
 contractRoute.get('/all', Middleware.checkIfClientAuthenticated, Controller.contract().list);
 
 export default contractRoute;

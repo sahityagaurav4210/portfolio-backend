@@ -108,6 +108,84 @@ const ValidationMessages = {
       },
     },
   },
+  hiring: {
+    client_name: {
+      'string.base': "Client name must be a string.",
+      'string.pattern.base': 'Invalid client name.',
+      'any.required': 'Client name is required.',
+      'string.min': 'Client name is too short.'
+    },
+    client_email: {
+      'string.base': "Client email must be a string.",
+      'string.pattern.base': 'Invalid client email.',
+      'any.required': 'Client email is required.',
+      'string.min': 'Client email is too short.'
+    },
+    client_project_name: {
+      'string.base': "Client's project name must be a string.",
+      'string.pattern.base': 'Invalid client project name.',
+      'any.required': 'Client project name is required.',
+      'string.min': 'Client project name is too short.'
+    },
+    tenure: {
+      'number.base': 'Tenure must be a number.',
+      'number.min': 'Your tenure is too short.',
+      'number.max': 'Your tenure is too long.'
+    },
+    hiring_type: {
+      'string.base': "Hiring type must be a string.",
+      'any.required': 'Hiring type is required.',
+      'string.valid': 'Invalid hiring type.'
+    },
+    budget: {
+      'string.base': 'Budget must be a string.',
+      'string.min': 'Your budget is too short.',
+      'string.max': 'Your budget is too long.',
+      'any.required': 'Budget is required.'
+    },
+    message: {
+      'string.base': "Message must be a string.",
+      'any.required': 'Message is required.',
+    },
+    project_desc: {
+      'string.base': "Project description must be a string.",
+      'any.required': 'Project description is required.'
+    },
+    terms: {
+      'boolean.base': "Invalid term value.",
+      'any.required': 'Term is required.'
+    },
+    captchaId: {
+      'number.base': 'Invalid captcha id format.',
+      'any.required': 'Captcha Id is required.'
+    }
+  },
+  contact: {
+    first_name: {
+      'string.base': 'First name must be a string.',
+      'any.required': 'First name is required.',
+      'string.min': 'First name is too short.'
+    },
+    last_name: {
+      'string.base': 'Last name must be a string.',
+      'string.min': 'Last name is too short.'
+    },
+    email: {
+      'string.base': 'Email must be a string.',
+      'any.required': 'Email is required.',
+      'string.min': 'Email is too short.',
+      'string.pattern.base': 'Invalid email.'
+    },
+    message: {
+      'string.base': 'Message must be a string.',
+      'any.required': 'Message is required.',
+      'string.min': 'Message is too short.'
+    },
+    captchaId: {
+      'number.base': 'Captcha Id must be a number.',
+      'any.required': 'Captcha Id is required.',
+    }
+  },
   client_token: {
     'string.base': 'Client token must be a string.',
     'string.min': 'Too short client token.',

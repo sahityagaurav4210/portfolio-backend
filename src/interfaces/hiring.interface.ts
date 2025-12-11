@@ -10,4 +10,7 @@ export interface IHiring extends IDbId, ITimestamp {
   hiring_type: HiringType;
   message: string;
   ipAddress: string;
+  project_desc: string;
+  terms: boolean;
+  captchaId: string;
 }
