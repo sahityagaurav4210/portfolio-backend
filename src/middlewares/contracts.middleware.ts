@@ -6,8 +6,10 @@ import { init } from '@config/logs.config';
 import Joi from 'joi';
 import { IContract } from '@interfaces/contract.interface';
 import { ValidationMessages } from '@helpers/messages.helper';
+import Queries from '@db/queries';
 
 const Patterns = require("@book-junction/patterns");
+
 class ContractMiddleware {
   @HandleException()
   public static async checkIfContractAlreadyExists(request: Request, response: Response, next: NextFunction) {
@@ -16,7 +18,7 @@ class ContractMiddleware {
     const { email } = request.body;
 
     logger.info({ message: `Started validating the existance of contact for email ${email}.` });
-    const contract = await Contract.findOne({ email });
+    const contract = await Contract.aggregate(Queries.checkExistingContact(email));
 
     if (!contract) return next();
     else {

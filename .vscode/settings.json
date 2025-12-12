@@ -1,6 +1,6 @@
 {
   "editor.wordWrap": "wordWrapColumn",
-  "editor.wordWrapColumn": 135,
+  "editor.wordWrapColumn": 115,
   "editor.formatOnSave": true,
   "editor.fontFamily": "'Fira Code','Droid Sans Mono', 'monospace', monospace",
   "editor.fontSize": 16,
@@ -15,5 +15,5 @@
   ],
   "javascript.format.semicolons": "insert",
   "editor.tabSize": 2,
-  "typescript.format.semicolons": "insert"
+  "typescript.format.semicolons": "insert",
 }
