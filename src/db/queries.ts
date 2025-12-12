@@ -130,6 +130,31 @@ class Queries {
       { $project: { _id: 0 } }
     ];
   }
+
+  static checkExistingContact(email: string): Array<PipelineStage> {
+    const currentMillis = Date.now();
+    const yesterdayMillis = currentMillis - 24 * 60 * 60 * 1000;
+
+    return [
+      {
+        $match: {
+          email,
+          $and: [
+            {
+              createdAt: {
+                $gte: new Date(yesterdayMillis)
+              }
+            },
+            {
+              createdAt: {
+                $lte: new Date(currentMillis)
+              }
+            }
+          ]
+        }
+      }
+    ];
+  }
 }
 
 export default Queries;
