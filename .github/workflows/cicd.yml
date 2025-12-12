@@ -1,0 +1,47 @@
+name: book-junction-patterns ci/cd pipeline
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Installing dependencies
+        run: npm install
+
+      - name: Building
+        run: npm run build
+
+      - name: Preparing
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run:
+          |
+           docker build -t portfolio-builder-backend .
+           docker tag portfolio-builder-backend ${DOCKER_USERNAME}/portfolio-builder-backend:latest
+      
+      - name: Publishing
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_SECRET }}
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: 
+          |
+           docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+           docker push ${DOCKER_USERNAME}/portfolio-builder-backend:latest
