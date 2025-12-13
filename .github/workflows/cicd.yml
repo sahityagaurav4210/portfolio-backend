@@ -30,7 +30,7 @@ jobs:
       - name: Quality gate analysis
         env:
           SONARQUBE_TOKEN: ${{ secrets.SONARQUBE_SECRET }}
-          SONAR_HOST_URL: ${{ secrets.SONARQUBE_HOST }}
+          SONAR_HOST_URL: ${{ vars.SONARQUBE_HOST }}
         uses: sonarsource/sonarcloud-github-action@master
         with:
           args: >
