@@ -27,6 +27,17 @@ jobs:
       - name: Building
         run: npm run build
 
+      - name: Quality gate analysis
+        env:
+          SONARQUBE_TOKEN: ${{ secrets.SONARQUBE_SECRET }}
+          SONAR_HOST_URL: ${{ secrets.SONARQUBE_HOST }}
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.host.url=${SONAR_HOST_URL}
+            -Dsonar.token=${SONARQUBE_TOKEN}
+            -Dsonar.qualitygate.wait=true
+
       - name: Preparing
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         env:
