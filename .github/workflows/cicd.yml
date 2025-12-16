@@ -57,7 +57,7 @@ jobs:
 
       - name: Deploying
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: caprover/deploy-from-github@v1
+        uses: caprover/deploy-from-github@v1.1.2
         with:
           server: ${{ secrets.CAPROVER_HOST }}
           app: ${{ secrets.CAPROVER_APP_NAME }}
