@@ -1,4 +1,4 @@
-name: book-junction-patterns ci/cd pipeline
+name: portfolio-builder-backend ci/cd pipeline
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -42,17 +42,24 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        run:
-          |
-           docker build -t portfolio-builder-backend .
-           docker tag portfolio-builder-backend ${DOCKER_USERNAME}/portfolio-builder-backend:latest
-      
+        run: |
+          docker build -t portfolio-builder-backend .
+          docker tag portfolio-builder-backend ${DOCKER_USERNAME}/portfolio-builder-backend:latest
+
       - name: Publishing
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_SECRET }}
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: 
-          |
-           docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-           docker push ${DOCKER_USERNAME}/portfolio-builder-backend:latest
+        run: |
+          docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+          docker push ${DOCKER_USERNAME}/portfolio-builder-backend:latest
+
+      - name: Deploying
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: caprover/deploy-from-github@v1
+        with:
+          server: ${{ secrets.CAPROVER_HOST }}
+          app: ${{ secrets.CAPROVER_APP_NAME }}
+          token: ${{ secrets.CAPROVER_PWD }}
+          image: ${{ secrets.DOCKER_USERNAME }}/portfolio-builder-backend:latest
