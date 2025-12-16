@@ -61,6 +61,6 @@ jobs:
           npm install -g caprover
           caprover deploy \
           --host ${{ secrets.CAPROVER_HOST }} \
-          --password ${{ secrets.CAPROVER_PWD }} \
+          -p ${{ secrets.CAPROVER_PWD }} \
           --imageName ${{ secrets.DOCKER_USERNAME }}/portfolio-builder-backend:latest \
           --appName portfolio-backend
