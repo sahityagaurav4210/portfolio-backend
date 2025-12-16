@@ -20,7 +20,7 @@ class ContractMiddleware {
     logger.info({ message: `Started validating the existance of contact for email ${email}.` });
     const contract = await Contract.aggregate(Queries.checkExistingContact(email));
 
-    if (!contract) return next();
+    if (!contract.length) return next();
     else {
       logger.info({ message: `Found a contact in database for the email ${email}.` });
 
