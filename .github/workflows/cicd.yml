@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Setting up
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
@@ -57,9 +57,6 @@ jobs:
 
       - name: Deploying
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: caprover/deploy-from-github@v1.1.2
-        with:
-          server: ${{ secrets.CAPROVER_HOST }}
-          app: ${{ secrets.CAPROVER_APP_NAME }}
-          token: ${{ secrets.CAPROVER_PWD }}
-          image: ${{ secrets.DOCKER_USERNAME }}/portfolio-builder-backend:latest
+        run: |
+          npm install -g caprover
+          caprover deploy -h ${{secrets.CAPROVER_HOST}} -p ${{secrets.CAPROVER_PWD}} -i ${{secrets.DOCKER_USERNAME}}/portfolio-builder-backend:latest -appName portfolio-backend
