@@ -59,4 +59,8 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           npm install -g caprover
-          caprover deploy -h ${{secrets.CAPROVER_HOST}} -p ${{secrets.CAPROVER_PWD}} -i ${{secrets.DOCKER_USERNAME}}/portfolio-builder-backend:latest -appName portfolio-backend
+          caprover deploy \
+          --host ${{ secrets.CAPROVER_HOST }} \
+          --password ${{ secrets.CAPROVER_PWD }} \
+          --imageName ${{ secrets.DOCKER_USERNAME }}/portfolio-builder-backend:latest \
+          --appName portfolio-backend
