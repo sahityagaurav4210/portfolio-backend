@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { HandleException } from '../decorators/exception.decorator';
 import { generateToken, generateXApiToken, performParallelTask } from '../helpers';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { CustomReq } from '../interfaces';
-import { CLIENT_URL, EventNames, Tokens } from '../constant';
+import { EventNames, Tokens } from '../constant';
 import { Login } from '../models/login.model';
 import { Events } from '../models/events.model';
 import { User } from '../models/users.model';
@@ -32,7 +32,9 @@ class TokenController {
     }
 
     await performParallelTask([
-      User.findByIdAndUpdate(authenticatedUser._id, { $push: { websites: url, tokens: x_api_key } }),
+      User.findByIdAndUpdate(authenticatedUser._id, {
+        $push: { websites: url, tokens: x_api_key },
+      }),
       Events.create({
         eventName: EventNames.CLIENT_ACCESS_TOKEN_GEN,
         firedBy: authenticatedUser._id,
@@ -54,10 +56,17 @@ class TokenController {
     if (user) {
       const access_token = generateToken(user.phone, Tokens.ACCESS);
 
-      await performParallelTask([Login.findOneAndUpdate({ 'sessions.token': refreshtoken }, { 'sessions.$.access_token': access_token }, { runValidators: true }), Events.create({
-        eventName: EventNames.ACCESS_TOKEN_REFRESHED,
-        firedBy: authenticatedUser._id,
-      })]);
+      await performParallelTask([
+        Login.findOneAndUpdate(
+          { 'sessions.token': refreshtoken },
+          { 'sessions.$.access_token': access_token },
+          { runValidators: true }
+        ),
+        Events.create({
+          eventName: EventNames.ACCESS_TOKEN_REFRESHED,
+          firedBy: authenticatedUser._id,
+        }),
+      ]);
 
       response.cookie('authorization', access_token, { httpOnly: true, secure: true });
 
@@ -77,7 +86,10 @@ class TokenController {
   }
 
   @HandleException()
-  public static async refreshClientToken(request: CustomReq, response: Response): Promise<Response> {
+  public static async refreshClientToken(
+    request: CustomReq,
+    response: Response
+  ): Promise<Response> {
     const { authenticatedUser } = request;
     const { url } = request.body;
     const x_api_key = generateXApiToken(url, authenticatedUser._id);
@@ -99,7 +111,7 @@ class TokenController {
       Events.create({
         eventName: EventNames.CLIENT_ACCESS_TOKEN_REGEN,
         firedBy: request.ip || '0.0.0.0',
-      })
+      }),
     ]);
 
     reply.STATUS = Status.SUCCESS;
