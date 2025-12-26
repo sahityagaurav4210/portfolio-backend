@@ -32,10 +32,12 @@ class Queries {
   }
 
   static getDailyWebsiteViews(currentDate: Date): Array<PipelineStage> {
-    const todayDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1
-      }-${currentDate.getDate()}`;
-    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate() + 1
-      }`;
+    const todayDate = `${currentDate.getFullYear()}-${
+      currentDate.getMonth() + 1
+    }-${currentDate.getDate()}`;
+    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${
+      currentDate.getDate() + 1
+    }`;
 
     return [
       {
@@ -49,57 +51,60 @@ class Queries {
       },
       {
         $group: {
-          _id: "$firedBy",
-          events: { $push: "$$ROOT" }
-        }
+          _id: '$firedBy',
+          events: { $push: '$$ROOT' },
+        },
       },
       {
         $addFields: {
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
       {
         $group: {
           _id: null,
-          view_count: { $sum: "$count" }
-        }
+          view_count: { $sum: '$count' },
+        },
       },
-      { $project: { _id: 0 } }
+      { $project: { _id: 0 } },
     ];
   }
 
   static getMonthlyWebsiteViews(currentDate: Date): Array<PipelineStage> {
-    const todayDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-1`;
-    const nextDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 2}-1`;
+    const todayDate = `${currentDate.getFullYear()}-${
+      currentDate.getMonth() + 1
+    }-${currentDate.getDate()}`;
+
+    const previousDate = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${currentDate.getDate()}`;
 
     return [
       {
         $match: {
           eventName: EventNames.PORTFOLIO_WEBSITE_VIEWED,
           createdAt: {
-            $lte: new Date(nextDate),
-            $gte: new Date(todayDate),
+            $lte: new Date(todayDate),
+            $gte: new Date(previousDate),
           },
         },
       },
       {
         $group: {
-          _id: "$firedBy",
-          events: { $push: "$$ROOT" }
-        }
+          _id: '$firedBy',
+          events: { $push: '$$ROOT' },
+        },
       },
       {
         $addFields: {
-          count: { $sum: 1 }
-        }
+          count: { $size: '$events' },
+        },
       },
       {
         $group: {
           _id: null,
-          view_count: { $sum: "$count" }
-        }
+          view_count: { $sum: '$count' },
+        },
       },
-      { $project: { _id: 0 } }
+      { $project: { _id: 0 } },
     ];
   }
 
@@ -112,22 +117,22 @@ class Queries {
       },
       {
         $group: {
-          _id: "$firedBy",
-          events: { $push: "$$ROOT" }
-        }
+          _id: '$firedBy',
+          events: { $push: '$$ROOT' },
+        },
       },
       {
         $addFields: {
-          count: { $sum: 1 }
-        }
+          count: { $size: '$events' },
+        },
       },
       {
         $group: {
           _id: null,
-          view_count: { $sum: "$count" }
-        }
+          view_count: { $sum: '$count' },
+        },
       },
-      { $project: { _id: 0 } }
+      { $project: { _id: 0 } },
     ];
   }
 
@@ -142,17 +147,17 @@ class Queries {
           $and: [
             {
               createdAt: {
-                $gte: new Date(yesterdayMillis)
-              }
+                $gte: new Date(yesterdayMillis),
+              },
             },
             {
               createdAt: {
-                $lte: new Date(currentMillis)
-              }
-            }
-          ]
-        }
-      }
+                $lte: new Date(currentMillis),
+              },
+            },
+          ],
+        },
+      },
     ];
   }
 }
