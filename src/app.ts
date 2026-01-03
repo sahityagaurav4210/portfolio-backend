@@ -13,12 +13,21 @@ const clients = (process.env.ACCEPTED_CLIENTS || 'http://localhost:5173').split(
 app.set('trust proxy', true);
 app.use(express.json({ limit: '512kb' }));
 app.use(express.urlencoded({ extended: true, limit: '6kb' }));
+app.use('/', Middleware.globalAppResponse);
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 app.use(
   cors({
     origin: clients,
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Api-Key', 'User-Agent', 'X-User-Id', 'X-Token', 'X-Ref-Token'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Api-Key',
+      'User-Agent',
+      'X-User-Id',
+      'X-Token',
+      'X-Ref-Token',
+    ],
   })
 );
 app.use(cookieParser());

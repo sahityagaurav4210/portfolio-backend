@@ -8,11 +8,15 @@ import { IContract } from '@interfaces/contract.interface';
 import { ValidationMessages } from '@helpers/messages.helper';
 import Queries from '@db/queries';
 
-const Patterns = require("@book-junction/patterns");
+const Patterns = require('@book-junction/patterns');
 
 class ContractMiddleware {
   @HandleException()
-  public static async checkIfContractAlreadyExists(request: Request, response: Response, next: NextFunction) {
+  public static async checkIfContractAlreadyExists(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
     const reply = new ApiResponse();
     const logger = init();
     const { email } = request.body;
@@ -33,7 +37,11 @@ class ContractMiddleware {
   }
 
   @HandleException()
-  public static async addNewContactValidator(request: Request, response: Response, next: NextFunction) {
+  public static async addNewContactValidator(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
     const reply = new ApiResponse();
     const logger = init();
     const { ...payload } = request.body;
@@ -41,10 +49,17 @@ class ContractMiddleware {
     logger.info({ message: `Started validating the payload of contact form.` });
     const schema = Joi.object<IContract>().keys({
       first_name: Joi.string().min(2).required().messages(ValidationMessages.contact.first_name),
-      last_name: Joi.string().min(2).optional().messages(ValidationMessages.contact.last_name),
-      email: Joi.string().pattern(Patterns.common.email).required().messages(ValidationMessages.contact.email),
+      last_name: Joi.string()
+        .min(2)
+        .optional()
+        .allow('')
+        .messages(ValidationMessages.contact.last_name),
+      email: Joi.string()
+        .pattern(Patterns.common.email)
+        .required()
+        .messages(ValidationMessages.contact.email),
       message: Joi.string().min(10).required().messages(ValidationMessages.contact.message),
-      captchaId: Joi.number().required().messages(ValidationMessages.contact.captchaId)
+      captchaId: Joi.number().required().messages(ValidationMessages.contact.captchaId),
     });
 
     const result = schema.validate(payload);
@@ -55,7 +70,7 @@ class ContractMiddleware {
       reply.STATUS = Status.VALIDATION;
       reply.MESSAGE = result.error.details[0].message;
       reply.DATA = result.error.details[0];
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }

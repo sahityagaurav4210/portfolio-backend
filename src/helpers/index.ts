@@ -1,13 +1,14 @@
-import * as https from 'https';
+import * as https from 'node:https';
 import bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import * as crypto from 'crypto';
+import * as crypto from 'node:crypto';
 import { TokenExpiry, TokenSecrets } from '../constant';
-import { Convert } from './convertibles.helper';
-import Files from './files.helpers';
-import { ValidationMessages } from './messages.helper';
 import Crypto from '@config/crypto.config';
 import Packages from '@packages/index';
+import { Request, Response, NextFunction } from 'express';
+
+export * from './messages.helper';
+export * from './files.helpers';
 
 export async function hashPwd(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
@@ -106,4 +107,14 @@ export function parseQsAsBoolean(input: string): boolean {
   return booleanPipe.Convert(input);
 }
 
-export { Convert, ValidationMessages, Files };
+export const asyncHandler =
+  (
+    fn: (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => void | Response | Promise<void | Record<string, any>>
+  ) =>
+  (req: Request, res: Response, next: NextFunction): void => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
