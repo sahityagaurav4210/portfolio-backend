@@ -51,7 +51,7 @@ class Middleware {
     request: CustomReq,
     response: Response,
     next: NextFunction
-  ) {
+  ): Promise<void> {
     const { cookies } = request;
     let { authorization } = request.headers;
     const reply = new ApiResponse();
@@ -63,8 +63,10 @@ class Middleware {
       reply.MESSAGE = 'Token is required';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
-      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+      response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+      return;
     }
+
     const cachedAuthKey = `portfolio-backend:auth:${authorization}`;
     const cachedAuthorization = await REDIS_CLIENT.get(cachedAuthKey);
 
@@ -83,7 +85,8 @@ class Middleware {
       reply.MESSAGE = 'Invalid token';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
-      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+      response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+      return;
     }
 
     const timeout = (Number(process.env.REDIS_CACHED_AUTH_EXP) || 10) * 60;
@@ -103,7 +106,8 @@ class Middleware {
       reply.MESSAGE = 'Invalid token';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
-      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+      response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+      return;
     }
 
     await REDIS_CLIENT.setex(cachedAuthKey, timeout, JSON.stringify(userRecord));
