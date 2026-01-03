@@ -89,7 +89,13 @@ class Middleware {
     const timeout = (Number(process.env.REDIS_CACHED_AUTH_EXP) || 10) * 60;
     const [userRecord, loginRecord] = await Promise.all([
       User.findOne({ phone: tokenPayload.phone }).lean(true),
-      Login.findOne({ $and: [{ phone: tokenPayload.phone }, { 'sessions.isLoggedIn': true }, { 'sessions.access_token': authorization }] }).lean(true),
+      Login.findOne({
+        $and: [
+          { phone: tokenPayload.phone },
+          { 'sessions.isLoggedIn': true },
+          { 'sessions.access_token': authorization },
+        ],
+      }).lean(true),
     ]);
 
     if (!userRecord || !loginRecord) {
@@ -212,8 +218,8 @@ class Middleware {
 
     if (!captcha || !captchaId) {
       reply.STATUS = Status.UNDEFINED;
-      reply.MESSAGE = "Please provide a valid captcha";
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.MESSAGE = 'Please provide a valid captcha';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }
@@ -228,11 +234,19 @@ class Middleware {
 
     if (!captchaId) {
       reply.STATUS = Status.UNDEFINED;
-      reply.MESSAGE = "Please provide a valid captcha";
-      reply.ENTRY_BY = request.ip || "0.0.0.0";
+      reply.MESSAGE = 'Please provide a valid captcha';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }
+
+    next();
+  }
+
+  @HandleException()
+  public static globalAppResponse(request: Request, response: Response, next: NextFunction) {
+    response.setHeader('X-Powered-By', 'Coding Works');
+    response.setHeader('Server', 'Coding Works');
 
     next();
   }

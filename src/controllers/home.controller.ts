@@ -14,11 +14,19 @@ import Home from '@models/home.model';
 import sharp from 'sharp';
 
 import * as svgCaptcha from 'svg-captcha';
+import * as nodePath from 'node:path';
+
 import { ICaptchaPayload } from '@interfaces/captcha.interface';
 import { getCaptchaImgConfig } from '@config/captcha.config';
+
+const gtts = require('node-gtts');
+
 class HomeController {
   private static async convertSvgIntoPng(svgData: string): Promise<Buffer> {
-    const buffer = await sharp(Buffer.from(svgData)).resize(200, 50).png().toBuffer();
+    const buffer = await sharp(Buffer.from(svgData))
+      .resize(200, 65, { fit: 'cover' })
+      .png()
+      .toBuffer();
     return buffer;
   }
 
@@ -49,6 +57,10 @@ class HomeController {
     const reply = new ApiResponse();
     const REDIS_CLIENT = connectRedis();
     let captchaLen = Number(process.env.CAPTCHA_LEN) || 6;
+
+    const fontUrl = nodePath.resolve(__dirname, '../fonts/captcha-font.ttf');
+    svgCaptcha.loadFont(fontUrl);
+
     const svgMetadata = svgCaptcha.create(getCaptchaImgConfig(captchaLen));
     let captcha = svgMetadata.text;
     const keyName = 'portfolio_backend:captcha';
@@ -93,6 +105,36 @@ class HomeController {
 
     const payload = JSON.parse(stringifiedPayload);
     return response.send(await HomeController.convertSvgIntoPng(payload.data));
+  }
+
+  @HandleException()
+  public static async getCaptchaAudio(
+    request: Request,
+    response: Response
+  ): Promise<Response | void> {
+    const reply = new ApiResponse();
+    const REDIS_CLIENT = connectRedis();
+    const { captchaId } = request.params;
+    const keyName = `portfolio_backend:captcha:${captchaId}`;
+
+    const stringifiedPayload = await REDIS_CLIENT.get(keyName);
+
+    if (!stringifiedPayload) {
+      reply.STATUS = Status.VALIDATION;
+      reply.MESSAGE = 'Invalid captcha details!!!';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+    }
+
+    const payload = JSON.parse(stringifiedPayload);
+
+    const tts = gtts('en');
+    const text = await decrypt(payload.token);
+    const spacedText = text.split('').join(' ');
+
+    response.setHeader('Content-Type', 'audio/mpeg');
+    tts.stream(spacedText).pipe(response);
   }
 
   @HandleException()

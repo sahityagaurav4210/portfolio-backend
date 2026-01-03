@@ -3,6 +3,7 @@ import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { init } from '../config/logs.config';
 
 const logger = init();
+
 export function HandleException() {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     let originalMethod = descriptor.value;
