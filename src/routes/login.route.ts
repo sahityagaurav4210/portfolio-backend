@@ -3,16 +3,21 @@ import Controller from '../controllers';
 import Middleware from '../middlewares';
 
 import tokenRoutes from './tokens.route';
+import { asyncHandler } from '@helpers/index';
 
 const routes = Router();
 
 routes.post(
   '/login',
-  Middleware.authentication().checkIfCredentialsAreCorrect,
-  Controller.authentication().login
+  asyncHandler(Middleware.authentication().checkIfCredentialsAreCorrect),
+  asyncHandler(Controller.authentication().login)
 );
 
-routes.post('/logout', Middleware.checkIfAuthenticated, Controller.authentication().logout);
+routes.post(
+  '/logout',
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.authentication().logout)
+);
 
 routes.use('/tokens', tokenRoutes);
 

@@ -1,10 +1,10 @@
 import { Events } from '@models/events.model';
 import { EventNames } from '../../constant';
 import path from 'node:path';
-import Files from '@helpers/files.helpers';
 import { Logs } from '@models/logger.model';
 import connectRedis from '@config/redis.config';
 import { init } from '@config/logs.config';
+import Files from '@helpers/files.helpers';
 
 export async function syncEvents(): Promise<void> {
   const REDIS_CLIENT = connectRedis();

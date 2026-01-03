@@ -1,53 +1,79 @@
 import { Router } from 'express';
 import Controller from '../controllers';
 import Middleware from '../middlewares';
+import { asyncHandler } from '@helpers/index';
 
 const route = Router();
 
-route.get('/ping', Controller.home().ping);
-route.get('/shut-down', Middleware.checkIfAuthenticated, Controller.home().shutdown);
-route.get('/captcha', Controller.home().captcha);
-route.get('/captcha/:captchaId', Controller.home().getCaptchaImg);
-route.get('/captcha/audio/:captchaId', Controller.home().getCaptchaAudio);
-route.get('/ref-captcha', Middleware.refreshCaptchaValidator, Controller.home().refreshCaptcha);
+route.get('/ping', asyncHandler(Controller.home().ping));
+
+route.get(
+  '/shut-down',
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.home().shutdown)
+);
+
+route.get('/captcha', asyncHandler(Controller.home().captcha));
+
+route.get('/captcha/:captchaId', asyncHandler(Controller.home().getCaptchaImg));
+
+route.get('/captcha/audio/:captchaId', asyncHandler(Controller.home().getCaptchaAudio));
+
+route.get(
+  '/ref-captcha',
+  asyncHandler(Middleware.refreshCaptchaValidator),
+  asyncHandler(Controller.home().refreshCaptcha)
+);
+
 route.get(
   '/captcha-validate',
-  Middleware.captchaValidateValidator,
-  Controller.home().captchaValidate
+  asyncHandler(Middleware.captchaValidateValidator),
+  asyncHandler(Controller.home().captchaValidate)
 );
-route.get('/page-status', Controller.home().listPageStatus);
+
+route.get('/page-status', asyncHandler(Controller.home().listPageStatus));
 
 route.get(
   '/today-website-views',
-  Middleware.checkIfAuthenticated,
-  Controller.home().getDailyWebsiteViews
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.home().getDailyWebsiteViews)
 );
 
 route.get(
   '/today-views-details',
-  Middleware.checkIfAuthenticated,
-  Controller.home().getTodayViewsDetails
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.home().getTodayViewsDetails)
 );
 
 route.get(
   '/total-website-views',
-  Middleware.checkIfAuthenticated,
-  Controller.home().getWebsiteAccess
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.home().getWebsiteAccess)
 );
 
 route.get(
   '/monthly-website-views',
-  Middleware.checkIfAuthenticated,
-  Controller.home().getMonthlyWebViews
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.home().getMonthlyWebViews)
 );
 
-route.post('/update-website', Middleware.checkIfAuthenticated, Controller.home().updateWebsite);
+route.post(
+  '/update-website',
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.home().updateWebsite)
+);
+
 route.post(
   '/home/add',
-  Middleware.home().addUserHomeMiddleware,
-  Middleware.checkIfAuthenticated,
-  Controller.home().addUserHomeSection
+  asyncHandler(Middleware.home().addUserHomeMiddleware),
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.home().addUserHomeSection)
 );
-route.get('/home/get', Middleware.checkIfAuthenticated, Controller.home().getUserHomeSection);
+
+route.get(
+  '/home/get',
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.home().getUserHomeSection)
+);
 
 export default route;

@@ -1,11 +1,11 @@
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 
 class Files {
   public static async delete(url: string) {
     if (fs.existsSync(url))
       return new Promise((resolve, reject) => {
         fs.unlink(url, error => {
-          if (error) reject(error.message);
+          if (error) reject(new Error(error.message));
           resolve('File deleted');
         });
       });
