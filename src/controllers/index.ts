@@ -2,6 +2,7 @@ import ContractController from './contract.controller';
 import HiringController from './hiring.controller';
 import HomeController from './home.controller';
 import LoginController from './login.controller';
+import NetworkingController from './networking.controller';
 import PortfolioController from './portfolio.controller';
 import SkillController from './skills.controller';
 import TokenController from './tokens.controller';
@@ -14,6 +15,10 @@ class Controller {
 
   public static authentication() {
     return LoginController;
+  }
+
+  public static networking() {
+    return NetworkingController;
   }
 
   public static tokens() {

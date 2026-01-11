@@ -13,4 +13,5 @@ export interface IHiring extends IDbId, ITimestamp {
   project_desc: string;
   terms: boolean;
   captchaId: string;
+  isDeleted:boolean;
 }

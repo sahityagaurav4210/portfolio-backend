@@ -26,7 +26,7 @@ const hiringSchema = new Schema<IHiring>(
       type: String,
       required: [true, 'Project name is required'],
       minlength: [2, 'Too short project name'],
-      maxLength: [255, "Too long project name"],
+      maxLength: [255, 'Too long project name'],
       trim: true,
     },
 
@@ -34,7 +34,7 @@ const hiringSchema = new Schema<IHiring>(
       type: Number,
       default: 0,
       min: 1,
-      max: (Number.MAX_SAFE_INTEGER - 1)
+      max: Number.MAX_SAFE_INTEGER - 1,
     },
 
     hiring_type: {
@@ -49,7 +49,7 @@ const hiringSchema = new Schema<IHiring>(
       required: [true, 'Budget is required'],
       trim: true,
       minLength: 1,
-      maxLength: 255
+      maxLength: 255,
     },
 
     message: {
@@ -63,21 +63,29 @@ const hiringSchema = new Schema<IHiring>(
       type: String,
       default: '0.0.0.0',
       trim: true,
-      match: [/^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/, 'Invalid ip address']
+      match: [
+        /^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/,
+        'Invalid ip address',
+      ],
     },
 
     project_desc: {
       type: String,
       trim: true,
-      required: [true, "Project description is required"],
+      required: [true, 'Project description is required'],
       minLength: 10,
-      maxLength: 255
+      maxLength: 255,
     },
 
     terms: {
       type: Boolean,
-      required: [true, "Client confirmation is required"]
-    }
+      required: [true, 'Client confirmation is required'],
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

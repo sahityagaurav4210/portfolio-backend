@@ -12,9 +12,15 @@ hireRoute.get(
 );
 
 hireRoute.delete(
-  '/:hiringId',
+  '/delete/:hiringId',
   asyncHandler(Middleware.checkIfAuthenticated),
   asyncHandler(Controller.hiring().delete)
+);
+
+hireRoute.delete(
+  '/soft-delete/:hiringId',
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.hiring().softDelete)
 );
 
 export default hireRoute;

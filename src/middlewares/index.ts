@@ -16,10 +16,15 @@ import { init } from '@config/logs.config';
 import SkillMiddleware from './skills.middleware';
 import HomeMiddleWare from './home.middleware';
 import HiringMiddleware from './hiring.middleware';
+import NetworkingMiddleware from './networking.middleware';
 
 class Middleware {
   public static authentication() {
     return LoginMiddleware;
+  }
+
+  public static networking() {
+    return NetworkingMiddleware;
   }
 
   public static contract() {
