@@ -24,7 +24,7 @@ jobs:
       - name: Installing dependencies
         run: npm install
 
-      - name: Building
+      - name: Building source code
         run: npm run build
 
       - name: Quality gate analysis
@@ -38,7 +38,7 @@ jobs:
             -Dsonar.token=${SONARQUBE_TOKEN}
             -Dsonar.qualitygate.wait=true
 
-      - name: Preparing
+      - name: Preparing image
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -46,7 +46,7 @@ jobs:
           docker build -t portfolio-builder-backend .
           docker tag portfolio-builder-backend ${DOCKER_USERNAME}/portfolio-builder-backend:latest
 
-      - name: Publishing
+      - name: Publishing image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_SECRET }}
@@ -55,12 +55,22 @@ jobs:
           docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
           docker push ${DOCKER_USERNAME}/portfolio-builder-backend:latest
 
-      - name: Deploying
+      - name: Deploying on development server
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           npm install -g caprover
           caprover deploy \
           --host ${{ secrets.CAPROVER_HOST }} \
           -p ${{ secrets.CAPROVER_PWD }} \
+          --imageName ${{ secrets.DOCKER_USERNAME }}/portfolio-builder-backend:latest \
+          --appName portfolio-dev-backend
+
+      - name: Deploying on production server
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release'
+        run: |
+          npm install -g caprover
+          caprover deploy \
+          --host ${{ secrets.CAPROVER_PROD_HOST }} \
+          -p ${{ secrets.CAPROVER_PROD_PWD }} \
           --imageName ${{ secrets.DOCKER_USERNAME }}/portfolio-builder-backend:latest \
           --appName portfolio-backend

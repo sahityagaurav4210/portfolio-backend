@@ -1,6 +1,6 @@
 {
   "name": "portfolio-backend",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
@@ -38,12 +38,14 @@
     "@aws-sdk/client-s3": "^3.723.0",
     "@book-junction/env-loader": "^1.1.1",
     "@book-junction/patterns": "^1.1.0",
+    "@types/geoip-lite": "^1.4.4",
     "aws-sdk": "^2.1692.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "geoip-lite": "^1.4.10",
     "ioredis": "^5.4.2",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",

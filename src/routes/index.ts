@@ -9,6 +9,7 @@ import contractRoute from './contract.route';
 import hireRoute from './hiring.route';
 import fileRoutes from './files.route';
 import skillRoutes from './skills.routes';
+import networkingRoutes from './networking.route';
 
 const route = Router();
 
@@ -20,6 +21,7 @@ route.use('/user', userRoutes);
 route.use('/baas', baasRoutes);
 route.use('/contract', contractRoute);
 route.use('/hiring', hireRoute);
-route.use("/files", fileRoutes);
+route.use('/files', fileRoutes);
+route.use('/networking', networkingRoutes);
 
 export default route;
