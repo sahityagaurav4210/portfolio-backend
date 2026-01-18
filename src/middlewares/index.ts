@@ -182,15 +182,15 @@ class Middleware {
     const tokenPayload = decryptXApiToken(x_api_key || '');
     const reply = new ApiResponse();
 
-    if (typeof tokenPayload !== 'string') {
-      request.authenticatedUser = tokenPayload;
-      return next();
-    } else {
+    if (typeof tokenPayload === 'string') {
       reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Unauthorised';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    } else {
+      request.authenticatedUser = tokenPayload;
+      return next();
     }
   }
 
@@ -204,13 +204,15 @@ class Middleware {
     logger.info({ message: `A request made with ${headers} header` });
 
     if (environment === Environments.PRODUCTION && headers) {
-      if (!GlobalRegex.USER_AGENT.test(headers)) {
+      if (GlobalRegex.USER_AGENT.test(headers)) {
+        return next();
+      } else {
         reply.STATUS = Status.UNAUTHORISED;
         reply.MESSAGE = 'Unauthorized request';
         reply.ENTRY_BY = request.ip || '0.0.0.0';
 
         return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
-      } else return next();
+      }
     } else if (environment === Environments.PRODUCTION && !headers) {
       reply.STATUS = Status.VALIDATION;
       reply.MESSAGE = 'Invalid request';
@@ -254,8 +256,11 @@ class Middleware {
 
   @HandleException()
   public static globalAppResponse(request: Request, response: Response, next: NextFunction) {
+    const indianTime = new Date().toLocaleString('hi-In');
+
     response.setHeader('X-Powered-By', 'Coding Works');
     response.setHeader('Server', 'Coding Works');
+    response.setHeader('Date', indianTime);
 
     next();
   }
