@@ -7,13 +7,49 @@ import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
 import { modelUpdateObject } from '../config/db_models.config';
 import connectRedis from '@config/redis.config';
+import { init } from '@config/logs.config';
 
 class LoginController {
   @HandleException()
   public static async login(request: CustomReq, response: Response): Promise<Response> {
-    const { phone } = request.body;
-    let { loginRecord, userRecord } = request;
     const reply = new ApiResponse();
+    const REDIS_CLIENT = connectRedis();
+    const logger = init();
+
+    const { phone, captchaId } = request.body;
+    let { loginRecord, userRecord } = request;
+    const keyName = `portfolio_backend:captcha:${captchaId}`;
+    const stringifiedPayload = await REDIS_CLIENT.get(keyName);
+
+    const appEnvironment = process.env.APP_ENV || 'local';
+    const isSecureCookie = appEnvironment !== 'local';
+
+    if (!stringifiedPayload) {
+      reply.STATUS = Status.UNAUTHORISED;
+      reply.MESSAGE = 'Invalid captcha details';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      logger.info({
+        message: `There's something went wrong with payload of provided captchaId - ${captchaId}.`,
+      });
+
+      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    }
+
+    const { verified } = JSON.parse(stringifiedPayload);
+
+    if (!verified) {
+      reply.STATUS = Status.UNAUTHORISED;
+      reply.MESSAGE = 'Your have not proven your identity, please solve the captcha first.';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      logger.info({
+        message: `There's something went wrong with payload of provided captchaId - ${captchaId}.`,
+        verified,
+      });
+
+      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    }
 
     const access_token = generateToken(phone, Tokens.ACCESS);
     const refresh_token = generateToken(phone, Tokens.REFRESH);
@@ -25,7 +61,7 @@ class LoginController {
 
       await loginRecord.save();
     } else {
-      loginRecord = await Login.create({
+      await Login.create({
         phone,
         loggedInUser: userRecord,
         sessions: [sessions],
@@ -34,26 +70,55 @@ class LoginController {
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Login successfull';
-    reply.DATA = { access_token, refresh_token, phone, name: userRecord.name, _id: userRecord._id, email: userRecord.email };
+    reply.DATA = {
+      access_token,
+      refresh_token,
+      phone,
+      name: userRecord.name,
+      _id: userRecord._id,
+      email: userRecord.email,
+    };
     reply.ENTRY_BY = phone;
 
-    response.cookie('authorization', access_token, { httpOnly: true, secure: true });
-    response.cookie('token', refresh_token, { httpOnly: true, secure: true });
+    response.cookie('authorization', access_token, {
+      httpOnly: true,
+      secure: isSecureCookie,
+      sameSite: isSecureCookie ? 'none' : 'lax',
+    });
+
+    response.cookie('token', refresh_token, {
+      httpOnly: true,
+      secure: isSecureCookie,
+      sameSite: isSecureCookie ? 'none' : 'lax',
+    });
+
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
 
   @HandleException()
   public static async logout(request: CustomReq, response: Response): Promise<Response> {
     const { authenticatedUser } = request;
-    let { authorization } = request.headers;
-    let refreshtoken = request.headers["x-ref-token"]
     const reply = new ApiResponse();
 
+    let authorization = request.headers.authorization || request.cookies.authorization || '';
+    let refreshToken = request.headers['x-ref-token'] || request.cookies.token || '';
+
+    if (!authorization || !refreshToken) {
+      reply.STATUS = Status.VALIDATION;
+      reply.MESSAGE = 'Please provide valid tokens';
+      reply.ENTRY_BY = authenticatedUser.phone || request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+    }
+
+    if (authorization.startsWith('Bearer')) {
+      authorization = authorization.split('Bearer ')[1];
+    }
+
     const { _id } = authenticatedUser;
-    authorization = authorization?.split('Bearer ')[1];
     const REDIS_CLIENT = connectRedis();
     const user = await Login.findOneAndUpdate(
-      { loggedInUser: _id, 'sessions.token': refreshtoken },
+      { loggedInUser: _id, 'sessions.token': refreshToken },
       { $set: { 'sessions.$.logoutAt': new Date(), 'sessions.$.isLoggedIn': false } },
       modelUpdateObject()
     );
@@ -62,8 +127,7 @@ class LoginController {
       await REDIS_CLIENT.del(`portfolio-backend:auth:${authorization}`);
 
       reply.STATUS = Status.SUCCESS;
-      reply.MESSAGE = 'Logout successfull';
-      reply.DATA = { user };
+      reply.MESSAGE = 'Logout successful';
       reply.ENTRY_BY = authenticatedUser.phone;
 
       return response.status(HTTP_STATUS_CODES.OK).json(reply);

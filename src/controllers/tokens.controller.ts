@@ -51,6 +51,9 @@ class TokenController {
     const { authenticatedUser } = request;
     const reply = new ApiResponse();
 
+    const appEnvironment = process.env.APP_ENV || 'local';
+    const isSecureCookie = appEnvironment !== 'local';
+
     const user = await Login.findOne({ 'sessions.token': refreshtoken });
 
     if (user) {
@@ -68,7 +71,11 @@ class TokenController {
         }),
       ]);
 
-      response.cookie('authorization', access_token, { httpOnly: true, secure: true });
+      response.cookie('authorization', access_token, {
+        httpOnly: true,
+        secure: isSecureCookie,
+        sameSite: isSecureCookie ? 'none' : 'lax',
+      });
 
       reply.STATUS = Status.SUCCESS;
       reply.MESSAGE = 'Access token generated';

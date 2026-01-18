@@ -42,7 +42,7 @@ const userSchema = new Schema<IUser>(
       type: String,
       default: null,
       minlength: [10, 'Address is too short'],
-      maxlength: [100, 'Address is too long'],
+      maxlength: [512, 'Address is too long'],
     },
     websites: {
       type: [String],
@@ -50,8 +50,8 @@ const userSchema = new Schema<IUser>(
     },
     tokens: {
       type: [String],
-      default: []
-    }
+      default: [],
+    },
   },
   { timestamps: true }
 );

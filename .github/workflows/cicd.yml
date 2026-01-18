@@ -38,39 +38,64 @@ jobs:
             -Dsonar.token=${SONARQUBE_TOKEN}
             -Dsonar.qualitygate.wait=true
 
-      - name: Preparing image
+      - name: Preparing development image
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: |
+          docker build -t portfolio-dev-backend .
+          docker tag portfolio-dev-backend ${DOCKER_USERNAME}/portfolio-dev-backend:latest
+
+      - name: Preparing production image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release'
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: |
           docker build -t portfolio-builder-backend .
           docker tag portfolio-builder-backend ${DOCKER_USERNAME}/portfolio-builder-backend:latest
 
-      - name: Publishing image
+      - name: Publishing development image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_SECRET }}
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+          docker push ${DOCKER_USERNAME}/portfolio-dev-backend:latest
+
+      - name: Publishing production image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_SECRET }}
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release'
+        run: |
+          docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
           docker push ${DOCKER_USERNAME}/portfolio-builder-backend:latest
 
       - name: Deploying on development server
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          CAPROVER_HOST: ${{secrets.CAPROVER_HOST}}
+          CAPROVER_PWD: ${{secrets.CAPROVER_PWD}}
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           npm install -g caprover
           caprover deploy \
-          --host ${{ secrets.CAPROVER_HOST }} \
-          -p ${{ secrets.CAPROVER_PWD }} \
-          --imageName ${{ secrets.DOCKER_USERNAME }}/portfolio-builder-backend:latest \
+          --host ${CAPROVER_HOST} \
+          -p ${CAPROVER_PWD} \
+          --imageName ${DOCKER_USERNAME}/portfolio-dev-backend:latest \
           --appName portfolio-dev-backend
 
       - name: Deploying on production server
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          CAPROVER_HOST: ${{ secrets.CAPROVER_PROD_HOST }}
+          CAPROVER_PWD: ${{ secrets.CAPROVER_PROD_PWD }}
         if: github.event_name == 'push' && github.ref == 'refs/heads/release'
         run: |
           npm install -g caprover
           caprover deploy \
-          --host ${{ secrets.CAPROVER_PROD_HOST }} \
-          -p ${{ secrets.CAPROVER_PROD_PWD }} \
-          --imageName ${{ secrets.DOCKER_USERNAME }}/portfolio-builder-backend:latest \
+          --host ${CAPROVER_HOST} \
+          -p ${CAPROVER_PWD} \
+          --imageName ${DOCKER_USERNAME}/portfolio-builder-backend:latest \
           --appName portfolio-backend

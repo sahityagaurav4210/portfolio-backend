@@ -1,4 +1,6 @@
-const path = require('path');
+require("dotenv/config");
+
+const path = require('node:path');
 const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
