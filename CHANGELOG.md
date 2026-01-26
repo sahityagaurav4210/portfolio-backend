@@ -6,7 +6,7 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
-## [Unreleased]
+## [1.3.0]
 
 ### Summary
 
@@ -23,6 +23,7 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - Changed the allowed characters limit of address in `user.model.ts`.
 - Changed the app start-up console message.
 - Added app environment in `webpack` configuration file.
+- Configured the `CI/CD` pipeline for release branch.
 
 ### Deprecated
 
