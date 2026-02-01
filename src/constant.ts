@@ -72,10 +72,12 @@ export enum Tokens {
 }
 
 export const CLIENT_URL = 'https://gaurav-sahitya.netlify.app';
+
 export const GlobalRegex = {
-  USER_AGENT: /^(Portfolio.*WebApp\/v[0-9\.]+)$/gm,
+  USER_AGENT: /^(Portfolio.*WebApp\/v[0-9.]+)$/gm,
   IP: /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/,
   CLASS_A_IP: /^(10\.\d{1,3}\.\d{1,3}\.\d{1,3})$/,
-  CLASS_B_IP: /^172\.(1[6-9]|2[0-9]|3[0-1])\.\d{1,3}\.\d{1,3}$/,
+  CLASS_B_IP: /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/,
   CLASS_C_IP: /^192\.168\.\d{1,3}\.\d{1,3}$/,
+  CLIENT_NAME: /^[A-Za-z\s.,]{2,64}$/,
 };

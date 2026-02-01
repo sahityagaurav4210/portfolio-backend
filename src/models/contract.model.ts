@@ -25,6 +25,7 @@ const contractSchema = new Schema<IContract>(
       type: String,
       required: [true, 'Message is required'],
       minlength: [10, 'Message is too short'],
+      maxLength: [255, 'Message is too long'],
       trim: true,
     },
     ipAddress: {
