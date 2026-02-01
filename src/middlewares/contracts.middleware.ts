@@ -7,8 +7,7 @@ import Joi from 'joi';
 import { IContract } from '@interfaces/contract.interface';
 import { ValidationMessages } from '@helpers/messages.helper';
 import Queries from '@db/queries';
-
-const Patterns = require('@book-junction/patterns');
+import Patterns from '@book-junction/patterns';
 
 class ContractMiddleware {
   @HandleException()
@@ -24,8 +23,7 @@ class ContractMiddleware {
     logger.info({ message: `Started validating the existance of contact for email ${email}.` });
     const contract = await Contract.aggregate(Queries.checkExistingContact(email));
 
-    if (!contract.length) return next();
-    else {
+    if (contract.length) {
       logger.info({ message: `Found a contact in database for the email ${email}.` });
 
       reply.STATUS = Status.CONFLICT;
@@ -33,6 +31,8 @@ class ContractMiddleware {
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.CONFLICT).json(reply);
+    } else {
+      return next();
     }
   }
 
@@ -58,7 +58,12 @@ class ContractMiddleware {
         .pattern(Patterns.common.email)
         .required()
         .messages(ValidationMessages.contact.email),
-      message: Joi.string().min(10).required().messages(ValidationMessages.contact.message),
+      message: Joi.string()
+        .min(10)
+        .max(254)
+        .pattern(Patterns.forms.description)
+        .required()
+        .messages(ValidationMessages.contact.message),
       captchaId: Joi.number().required().messages(ValidationMessages.contact.captchaId),
     });
 
