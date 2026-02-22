@@ -40,7 +40,6 @@ export default class HiringMiddleware {
         .required()
         .messages(ValidationMessages.hiring.client_project_name),
       tenure: Joi.number()
-        .min(1)
         .max(Number.MAX_SAFE_INTEGER - 1)
         .optional()
         .messages(ValidationMessages.hiring.tenure),
@@ -73,7 +72,19 @@ export default class HiringMiddleware {
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }
 
-    if (payload.hiring_type === HiringType.FULL_TIME && payload.tenure) {
+    if (payload.hiring_type === HiringType.FULL_TIME && Number.parseInt(payload.tenure, 10) > 0) {
+      logger.info({
+        message: `Failed to validate hiring form's payload due to either hiring type (${payload.hiring_type}) or tenure (${payload.tenure}).`,
+      });
+
+      reply.STATUS = Status.VALIDATION;
+      reply.MESSAGE = 'Invalid tenure and hiring type combination.';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+    }
+
+    if (payload.hiring_type === HiringType.PART_TIME && Number.parseInt(payload.tenure, 10) <= 0) {
       logger.info({
         message: `Failed to validate hiring form's payload due to either hiring type (${payload.hiring_type}) or tenure (${payload.tenure}).`,
       });
