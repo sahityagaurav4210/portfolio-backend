@@ -24,7 +24,7 @@ const ValidationMessages = {
         'string.pattern.base': 'Invalid url',
       },
       specialization: {
-        'string.base': 'Specialization must be a string.'
+        'string.base': 'Specialization must be a string.',
       },
       about: {
         'string.base': 'About must be a string.',
@@ -33,17 +33,17 @@ const ValidationMessages = {
         'any.required': 'Your description is required',
       },
       projectsDelivered: {
-        'number.base': "Projects delivered count must be a number.",
-        'number.min': 'Your projects delivered count is too short.'
+        'number.base': 'Projects delivered count must be a number.',
+        'number.min': 'Your projects delivered count is too short.',
       },
       experience: {
-        'number.base': "Experience must be a number.",
+        'number.base': 'Experience must be a number.',
       },
       codingQuestionSolved: {
-        'number.base': "Coding question solved count must be a number."
+        'number.base': 'Coding question solved count must be a number.',
       },
       activeGithubContributions: {
-        'number.base': "Active github contributions must be a number."
+        'number.base': 'Active github contributions must be a number.',
       },
       designation: {
         'string.base': 'Designation must be a string.',
@@ -110,81 +110,83 @@ const ValidationMessages = {
   },
   hiring: {
     client_name: {
-      'string.base': "Client name must be a string.",
+      'string.base': 'Client name must be a string.',
       'string.pattern.base': 'Invalid client name.',
       'any.required': 'Client name is required.',
-      'string.min': 'Client name is too short.'
+      'string.min': 'Client name is too short.',
     },
     client_email: {
-      'string.base': "Client email must be a string.",
+      'string.base': 'Client email must be a string.',
       'string.pattern.base': 'Invalid client email.',
       'any.required': 'Client email is required.',
-      'string.min': 'Client email is too short.'
+      'string.min': 'Client email is too short.',
     },
     client_project_name: {
       'string.base': "Client's project name must be a string.",
       'string.pattern.base': 'Invalid client project name.',
       'any.required': 'Client project name is required.',
-      'string.min': 'Client project name is too short.'
+      'string.min': 'Client project name is too short.',
     },
     tenure: {
       'number.base': 'Tenure must be a number.',
       'number.min': 'Your tenure is too short.',
-      'number.max': 'Your tenure is too long.'
+      'number.max': 'Your tenure is too long.',
     },
     hiring_type: {
-      'string.base': "Hiring type must be a string.",
+      'string.base': 'Hiring type must be a string.',
       'any.required': 'Hiring type is required.',
-      'string.valid': 'Invalid hiring type.'
+      'string.valid': 'Invalid hiring type.',
     },
     budget: {
       'string.base': 'Budget must be a string.',
       'string.min': 'Your budget is too short.',
       'string.max': 'Your budget is too long.',
-      'any.required': 'Budget is required.'
+      'any.required': 'Budget is required.',
     },
     message: {
-      'string.base': "Message must be a string.",
+      'string.base': 'Message must be a string.',
       'any.required': 'Message is required.',
     },
     project_desc: {
-      'string.base': "Project description must be a string.",
-      'any.required': 'Project description is required.'
+      'string.base': 'Project description must be a string.',
+      'any.required': 'Project description is required.',
     },
     terms: {
-      'boolean.base': "Invalid term value.",
-      'any.required': 'Term is required.'
+      'boolean.base': 'Invalid term value.',
+      'any.required': 'Term is required.',
     },
     captchaId: {
       'number.base': 'Invalid captcha id format.',
-      'any.required': 'Captcha Id is required.'
-    }
+      'any.required': 'Captcha Id is required.',
+    },
   },
   contact: {
     first_name: {
       'string.base': 'First name must be a string.',
       'any.required': 'First name is required.',
-      'string.min': 'First name is too short.'
+      'string.min': 'First name is too short.',
     },
     last_name: {
       'string.base': 'Last name must be a string.',
-      'string.min': 'Last name is too short.'
+      'string.min': 'Last name is too short.',
     },
     email: {
       'string.base': 'Email must be a string.',
       'any.required': 'Email is required.',
       'string.min': 'Email is too short.',
-      'string.pattern.base': 'Invalid email.'
+      'string.pattern.base': 'Invalid email.',
     },
     message: {
       'string.base': 'Message must be a string.',
       'any.required': 'Message is required.',
-      'string.min': 'Message is too short.'
+      'string.min': 'Message is too short.',
+      'string.max': 'Message is too long.',
+      'string.pattern.base': 'Invalid contact message.',
     },
     captchaId: {
       'number.base': 'Captcha Id must be a number.',
       'any.required': 'Captcha Id is required.',
-    }
+    },
   },
   client_token: {
     'string.base': 'Client token must be a string.',
@@ -201,12 +203,12 @@ const ValidationMessages = {
     },
     optional: {
       string: (feildName: string) => ({
-        'string.base': `${feildName} must be a string`
+        'string.base': `${feildName} must be a string`,
       }),
       number: (feildName: string) => ({
-        'number.base': `${feildName} must be a number.`
+        'number.base': `${feildName} must be a number.`,
       }),
-    }
+    },
   },
   types: {
     array: {
@@ -216,8 +218,8 @@ const ValidationMessages = {
       'any.required': 'This section is required',
     },
     string: {
-      'string.base': "Item must be a string."
-    }
+      'string.base': 'Item must be a string.',
+    },
   },
 };
 

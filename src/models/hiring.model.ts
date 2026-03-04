@@ -33,7 +33,6 @@ const hiringSchema = new Schema<IHiring>(
     tenure: {
       type: Number,
       default: 0,
-      min: 1,
       max: Number.MAX_SAFE_INTEGER - 1,
     },
 
