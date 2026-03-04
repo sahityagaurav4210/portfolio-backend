@@ -110,4 +110,4 @@ jobs:
           --host ${CAPROVER_HOST} \
           -p ${CAPROVER_PWD} \
           --imageName ${DOCKER_USERNAME}/portfolio-builder-backend:latest \
-          --appName portfolio-backend
+          --appName portfolio-builder-backend
