@@ -6,6 +6,34 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [1.3.1]
+
+### Summary
+
+- In this, I have implemented the necessary changes in the apis like `hirings` which are required to accept hiring requests from clients in an appropriate manner.
+
+### Added
+
+- There are no new files added in this version of release.
+
+### Deprecated
+
+- There are no deprecated changes in this change.
+
+### Removed
+
+- Nothing has been removed in this change.
+
+### Fixed
+
+- Pattern check in `addHiringDetailsValidator` middleware of add hiring details api.
+- Pattern check in `addNewContactValidator` middleware if add contact details api.
+- Removed min check from the `tenure` field of hiring model.
+
+### Security
+
+- There are no security related changes, fixes, add-ons in this change.
+
 ## [1.3.0]
 
 ### Summary
