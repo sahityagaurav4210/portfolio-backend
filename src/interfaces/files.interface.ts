@@ -6,4 +6,9 @@ export interface IFiles extends IDbId, ITimestamp {
   url: string;
   token: string;
   is_active: boolean;
+  websites: string[];
+}
+
+export interface IUploadResumeDTO {
+  websites: string[];
 }

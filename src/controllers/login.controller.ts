@@ -7,49 +7,17 @@ import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
 import { modelUpdateObject } from '../config/db_models.config';
 import connectRedis from '@config/redis.config';
-import { init } from '@config/logs.config';
 
 class LoginController {
   @HandleException()
   public static async login(request: CustomReq, response: Response): Promise<Response> {
     const reply = new ApiResponse();
-    const REDIS_CLIENT = connectRedis();
-    const logger = init();
 
-    const { phone, captchaId } = request.body;
+    const { phone } = request.body;
     let { loginRecord, userRecord } = request;
-    const keyName = `portfolio_backend:captcha:${captchaId}`;
-    const stringifiedPayload = await REDIS_CLIENT.get(keyName);
 
     const appEnvironment = process.env.APP_ENV || 'local';
     const isSecureCookie = appEnvironment !== 'local';
-
-    if (!stringifiedPayload) {
-      reply.STATUS = Status.UNAUTHORISED;
-      reply.MESSAGE = 'Invalid captcha details';
-      reply.ENTRY_BY = request.ip || '0.0.0.0';
-
-      logger.info({
-        message: `There's something went wrong with payload of provided captchaId - ${captchaId}.`,
-      });
-
-      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
-    }
-
-    const { verified } = JSON.parse(stringifiedPayload);
-
-    if (!verified) {
-      reply.STATUS = Status.UNAUTHORISED;
-      reply.MESSAGE = 'Your have not proven your identity, please solve the captcha first.';
-      reply.ENTRY_BY = request.ip || '0.0.0.0';
-
-      logger.info({
-        message: `There's something went wrong with payload of provided captchaId - ${captchaId}.`,
-        verified,
-      });
-
-      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
-    }
 
     const access_token = generateToken(phone, Tokens.ACCESS);
     const refresh_token = generateToken(phone, Tokens.REFRESH);

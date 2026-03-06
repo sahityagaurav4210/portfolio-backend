@@ -35,11 +35,16 @@ export enum EventNames {
 export enum Environments {
   PRODUCTION = 'production',
   DEVELOPMENT = 'development',
+  LOCAL = 'local'
 }
 
 export enum HiringType {
   PART_TIME = 'part time',
   FULL_TIME = 'full time',
+}
+
+export enum FileTypes {
+  RESUME = 'cv',
 }
 
 export enum CRON_EXPRESSIONS {

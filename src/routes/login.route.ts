@@ -9,7 +9,7 @@ const routes = Router();
 
 routes.post(
   '/login',
-  asyncHandler(Middleware.authentication().checkIfCredentialsAreCorrect),
+  asyncHandler(Middleware.authentication().checkIfCredentialsAreCorrect), asyncHandler(Middleware.authentication().checkIfCaptchaValidated),
   asyncHandler(Controller.authentication().login)
 );
 

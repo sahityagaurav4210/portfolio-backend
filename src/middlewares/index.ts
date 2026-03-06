@@ -17,6 +17,7 @@ import SkillMiddleware from './skills.middleware';
 import HomeMiddleWare from './home.middleware';
 import HiringMiddleware from './hiring.middleware';
 import NetworkingMiddleware from './networking.middleware';
+import FilesMiddlewares from './files.middleware';
 
 class Middleware {
   public static authentication() {
@@ -49,6 +50,10 @@ class Middleware {
 
   public static hiring() {
     return HiringMiddleware;
+  }
+
+  public static files() {
+    return FilesMiddlewares;
   }
 
   @HandleException()
