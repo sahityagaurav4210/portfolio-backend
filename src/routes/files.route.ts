@@ -13,7 +13,7 @@ routes.post(
 );
 
 /**
- * @route /api/v1/files/upload-resume
+ * @route POST /api/v1/files/upload-resume
  * @access private
  * @description This route allows authenticated users to update their resumes
  */

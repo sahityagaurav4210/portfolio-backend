@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import path from 'node:path';
 import cookieParser from 'cookie-parser';
 
 import route from '@routes/index';
@@ -12,10 +11,8 @@ const clients = (process.env.ACCEPTED_CLIENTS || 'http://localhost:5173').split(
 
 app.set('trust proxy', true);
 app.use(express.json({ limit: '512kb' }));
-app.use('/uploads', express.static(path.resolve(__dirname, '../assets/')));
 app.use(express.urlencoded({ extended: true, limit: '6kb' }));
 app.use('/', Middleware.globalAppResponse);
-app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 app.use(
   cors({
     origin: clients,
