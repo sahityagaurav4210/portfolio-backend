@@ -30,12 +30,13 @@ export enum EventNames {
   PORTFOLIO_WEBSITE_TOTAL_VIEWS_FETCHED = 'portfolio website total views fetched',
   PORTFOLIO_FETCHED_BY_CLIENT = 'client viewed his portfolio',
   PORTFOLIO_WEBSITE_MONTHLY_VIEWS_FETCHED = 'portfolio website monthly views fetched',
+  PORTFOLIO_WEBSITE_RESUME_DOWNLOADED = 'portfolio resume downloaded',
 }
 
 export enum Environments {
   PRODUCTION = 'production',
   DEVELOPMENT = 'development',
-  LOCAL = 'local'
+  LOCAL = 'local',
 }
 
 export enum HiringType {

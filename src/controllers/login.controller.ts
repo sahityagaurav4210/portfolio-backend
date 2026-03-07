@@ -107,6 +107,18 @@ class LoginController {
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }
   }
+
+  @HandleException()
+  public static async getMe(request: CustomReq, response: Response): Promise<Response> {
+    const { authenticatedUser } = request;
+    const reply = new ApiResponse();
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Api operation was successful';
+    reply.DATA = { message: 'User details fetched successfully', user: authenticatedUser };
+    reply.ENTRY_BY = authenticatedUser.phone || request.ip || '0.0.0.0';
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
 }
 
 export default LoginController;

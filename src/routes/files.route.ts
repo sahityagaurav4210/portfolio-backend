@@ -25,8 +25,6 @@ routes.post(
   asyncHandler(FilesController.saveUserResume)
 );
 
-routes.post('/resume-info', asyncHandler(FilesController.getResumeInfo));
-
 routes.get('/download-cv', asyncHandler(FilesController.downloadCVAdmin));
 
 routes.get(

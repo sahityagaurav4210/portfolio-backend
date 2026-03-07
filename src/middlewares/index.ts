@@ -69,11 +69,11 @@ class Middleware {
     authorization = authorization ? authorization.split('Bearer ')[1] : cookies.authorization;
 
     if (!authorization) {
-      reply.STATUS = Status.VALIDATION;
+      reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Token is required';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
-      response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+      response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
       return;
     }
 

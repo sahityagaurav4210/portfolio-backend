@@ -9,7 +9,8 @@ const routes = Router();
 
 routes.post(
   '/login',
-  asyncHandler(Middleware.authentication().checkIfCredentialsAreCorrect), asyncHandler(Middleware.authentication().checkIfCaptchaValidated),
+  asyncHandler(Middleware.authentication().checkIfCredentialsAreCorrect),
+  asyncHandler(Middleware.authentication().checkIfCaptchaValidated),
   asyncHandler(Controller.authentication().login)
 );
 
@@ -17,6 +18,12 @@ routes.post(
   '/logout',
   asyncHandler(Middleware.checkIfAuthenticated),
   asyncHandler(Controller.authentication().logout)
+);
+
+routes.get(
+  '/get-me',
+  asyncHandler(Middleware.checkIfAuthenticated),
+  asyncHandler(Controller.authentication().getMe)
 );
 
 routes.use('/tokens', tokenRoutes);
