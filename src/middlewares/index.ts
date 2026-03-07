@@ -271,8 +271,12 @@ class Middleware {
     next();
   }
 
-  @HandleException()
-  public static globalErrorHandler(err: Error, request: Request, response: Response) {
+  public static globalErrorHandler(
+    err: Error,
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
     const reply = new ApiResponse();
     const logger = init();
 

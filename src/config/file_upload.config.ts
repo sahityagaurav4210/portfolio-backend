@@ -2,7 +2,10 @@ import multer from 'multer';
 import * as path from 'node:path';
 import { randomInt } from 'node:crypto';
 
-const maxAcceptedFileSizeInMB = Number.parseInt(process.env.MAX_FILE_SIZE || '', 10) || 8;
+const maxAcceptedFileSizeInMB = Math.min(
+  Number.parseInt(process.env.MAX_FILE_SIZE || '', 10) || 8,
+  5
+);
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -17,7 +20,7 @@ const storage = multer.diskStorage({
 const portfolioBuilderBackendFileUpload = multer({
   storage: storage,
   limits: {
-    fileSize: maxAcceptedFileSizeInMB * 1000 * 1000,
+    fileSize: maxAcceptedFileSizeInMB * 1024 * 1024,
     files: 1,
     fieldNameSize: 100,
   },
