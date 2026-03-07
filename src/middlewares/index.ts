@@ -18,6 +18,7 @@ import HomeMiddleWare from './home.middleware';
 import HiringMiddleware from './hiring.middleware';
 import NetworkingMiddleware from './networking.middleware';
 import FilesMiddlewares from './files.middleware';
+import { MulterError } from 'multer';
 
 class Middleware {
   public static authentication() {
@@ -268,6 +269,52 @@ class Middleware {
     response.setHeader('Date', indianTime);
 
     next();
+  }
+
+  @HandleException()
+  public static globalErrorHandler(err: Error, request: Request, response: Response) {
+    const reply = new ApiResponse();
+    const logger = init();
+
+    if (err instanceof MulterError) {
+      logger.error({
+        message: `File upload error: ${err.message}`,
+        stack: err.stack,
+        code: err.code,
+      });
+
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        reply.STATUS = Status.FILE_TOO_LARGE;
+        reply.MESSAGE = 'Api operation was un-successful';
+        reply.DATA = { message: `File is too large` };
+        reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+        return response.status(HTTP_STATUS_CODES.TOO_LARGE_REQ).json(reply);
+      }
+
+      if (err.code === 'LIMIT_FILE_COUNT') {
+        reply.STATUS = Status.VALIDATION;
+        reply.MESSAGE = 'Api operation was un-successful';
+        reply.DATA = { message: `File is too large` };
+        reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+        return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+      }
+
+      reply.STATUS = Status.ERROR;
+      reply.MESSAGE = 'Api operation was un-successful';
+      reply.DATA = { message: `File upload error: ${err.message}` };
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+      return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
+    }
+
+    logger.error({ message: err.message, stack: err.stack });
+
+    reply.STATUS = Status.EXCEPTION;
+    reply.MESSAGE = 'Api operation was un-successful';
+    reply.DATA = { message: `Something went wrong, please try again later.` };
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
+    return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
   }
 }
 

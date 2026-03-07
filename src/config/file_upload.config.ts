@@ -17,6 +17,7 @@ const portfolioBuilderBackendFileUpload = multer({
   limits: {
     fileSize: Number.parseInt(process.env.MAX_FILE_SIZE || '1', 10) * 1024 * 1024,
     files: 1,
+    fieldNameSize: 100,
   },
   fileFilter: (req, file, cb) => {
     const filetypes = /pdf/;
