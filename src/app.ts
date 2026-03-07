@@ -30,7 +30,6 @@ app.use(
 );
 app.use(cookieParser());
 app.use(Middleware.postmanMiddleware);
-app.use(Middleware.globalErrorHandler);
 app.use('/api/v1', route);
 
 app.get('*', Controller.home().notFound);
@@ -38,5 +37,6 @@ app.post('*', Controller.home().notFound);
 app.put('*', Controller.home().notFound);
 app.patch('*', Controller.home().notFound);
 app.delete('*', Controller.home().notFound);
+app.use(Middleware.globalErrorHandler);
 
 export default app;
