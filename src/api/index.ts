@@ -13,7 +13,7 @@ export enum HTTP_STATUS_CODES {
   INV_PAYLOAD = 422,
   SERVER_ERR = 500,
   UNAVAILABLE = 503,
-  NO_CONTENT = 204
+  NO_CONTENT = 204,
 }
 
 export enum Status {
@@ -26,6 +26,7 @@ export enum Status {
   UNAUTHORISED = 'unauthorised',
   NOT_FOUND = 'not found',
   FORBIDDEN = 'forbidden',
+  FILE_TOO_LARGE = 'file too large',
 }
 
 export class ApiResponse {
@@ -38,7 +39,7 @@ export class ApiResponse {
     private message = '',
     private data = null,
     private entryBy = '127.0.0.1'
-  ) { }
+  ) {}
 
   public get STATUS() {
     return this.status;

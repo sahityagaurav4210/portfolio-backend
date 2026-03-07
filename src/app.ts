@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import path from 'node:path';
 import cookieParser from 'cookie-parser';
 
 import route from '@routes/index';
@@ -14,7 +13,6 @@ app.set('trust proxy', true);
 app.use(express.json({ limit: '512kb' }));
 app.use(express.urlencoded({ extended: true, limit: '6kb' }));
 app.use('/', Middleware.globalAppResponse);
-app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 app.use(
   cors({
     origin: clients,
@@ -39,5 +37,6 @@ app.post('*', Controller.home().notFound);
 app.put('*', Controller.home().notFound);
 app.patch('*', Controller.home().notFound);
 app.delete('*', Controller.home().notFound);
+app.use(Middleware.globalErrorHandler);
 
 export default app;

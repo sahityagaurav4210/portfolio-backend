@@ -9,6 +9,9 @@ import { performParallelTask } from '../helpers';
 import { DBType } from '../types';
 import { ILogins, IUser } from '../interfaces/users.interface';
 import { modelUpdateObject } from '@config/db_models.config';
+import connectRedis from '@config/redis.config';
+import { init } from '@config/logs.config';
+import { Environments } from '../constant';
 
 class LoginMiddleware {
   @HandleException()
@@ -35,7 +38,7 @@ class LoginMiddleware {
         { _id: loginRecord._id, 'sessions.token': token },
         { $set: { 'sessions.$.logoutAt': new Date(), 'sessions.$.isLoggedIn': false } },
         modelUpdateObject()
-      )
+      );
     }
 
     if (userRecord && (await bcrypt.compare(password, userRecord.password))) {
@@ -49,6 +52,49 @@ class LoginMiddleware {
     reply.ENTRY_BY = phone || request.ip || '0.0.0.0';
 
     return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+  }
+
+  @HandleException()
+  public static async checkIfCaptchaValidated(request: CustomReq, response: Response, next: NextFunction) {
+    const reply = new ApiResponse();
+    const REDIS_CLIENT = connectRedis();
+    const logger = init();
+
+    const { captchaId } = request.body;
+    const keyName = `portfolio_backend:captcha:${captchaId}`;
+    const appEnvironment = process.env.APP_ENV || 'local';
+    const stringifiedPayload = await REDIS_CLIENT.get(keyName) || "";
+
+    if (appEnvironment === Environments.LOCAL) return next();
+
+    if (!stringifiedPayload) {
+      reply.STATUS = Status.UNAUTHORISED;
+      reply.MESSAGE = 'Invalid captcha details';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      logger.info({
+        message: `There's something went wrong with payload of provided captchaId - ${captchaId}.`,
+      });
+
+      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    }
+
+    const { verified } = JSON.parse(stringifiedPayload);
+
+    if (!verified) {
+      reply.STATUS = Status.UNAUTHORISED;
+      reply.MESSAGE = 'Your have not proven your identity, please solve the captcha first.';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      logger.info({
+        message: `There's something went wrong with payload of provided captchaId - ${captchaId}.`,
+        verified,
+      });
+
+      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    }
+
+    return next();
   }
 }
 
