@@ -194,6 +194,13 @@ const ValidationMessages = {
     'string.max': 'Too large client token.',
     'any.required': 'Client token is required',
   },
+  resume: {
+    websites: {
+      'string.base': 'Website must be a string.',
+      'any.required': 'Website url is requried',
+      'sting.pattern.base': "Invalid website url."
+    }
+  },
   commons: {
     description: {
       'string.base': 'Description must be a string.',

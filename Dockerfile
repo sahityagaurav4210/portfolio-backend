@@ -12,7 +12,7 @@ RUN npm run build
 
 RUN rm -rf src tsconfig.json
 RUN mkdir logs
-RUN mkdir uploads
+RUN mkdir assets
 
 EXPOSE 12318
 CMD [ "npm","start" ]

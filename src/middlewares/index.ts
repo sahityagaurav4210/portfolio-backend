@@ -17,6 +17,8 @@ import SkillMiddleware from './skills.middleware';
 import HomeMiddleWare from './home.middleware';
 import HiringMiddleware from './hiring.middleware';
 import NetworkingMiddleware from './networking.middleware';
+import FilesMiddlewares from './files.middleware';
+import { MulterError } from 'multer';
 
 class Middleware {
   public static authentication() {
@@ -51,6 +53,10 @@ class Middleware {
     return HiringMiddleware;
   }
 
+  public static files() {
+    return FilesMiddlewares;
+  }
+
   @HandleException()
   public static async checkIfAuthenticated(
     request: CustomReq,
@@ -64,11 +70,11 @@ class Middleware {
     authorization = authorization ? authorization.split('Bearer ')[1] : cookies.authorization;
 
     if (!authorization) {
-      reply.STATUS = Status.VALIDATION;
+      reply.STATUS = Status.UNAUTHORISED;
       reply.MESSAGE = 'Token is required';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
 
-      response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+      response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
       return;
     }
 
@@ -263,6 +269,56 @@ class Middleware {
     response.setHeader('Date', indianTime);
 
     next();
+  }
+
+  public static globalErrorHandler(
+    err: Error,
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    const reply = new ApiResponse();
+    const logger = init();
+
+    if (err instanceof MulterError) {
+      logger.error({
+        message: `File upload error: ${err.message}`,
+        stack: err.stack,
+        code: err.code,
+      });
+
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        reply.STATUS = Status.FILE_TOO_LARGE;
+        reply.MESSAGE = 'Api operation was un-successful';
+        reply.DATA = { message: `File is too large` };
+        reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+        return response.status(HTTP_STATUS_CODES.TOO_LARGE_REQ).json(reply);
+      }
+
+      if (err.code === 'LIMIT_FILE_COUNT') {
+        reply.STATUS = Status.VALIDATION;
+        reply.MESSAGE = 'Api operation was un-successful';
+        reply.DATA = { message: `File is too large` };
+        reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+        return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+      }
+
+      reply.STATUS = Status.ERROR;
+      reply.MESSAGE = 'Api operation was un-successful';
+      reply.DATA = { message: `File upload error: ${err.message}` };
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+      return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
+    }
+
+    logger.error({ message: err.message, stack: err.stack });
+
+    reply.STATUS = Status.EXCEPTION;
+    reply.MESSAGE = 'Api operation was un-successful';
+    reply.DATA = { message: `Something went wrong, please try again later.` };
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
+    return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
   }
 }
 
