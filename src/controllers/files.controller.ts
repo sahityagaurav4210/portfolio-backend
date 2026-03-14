@@ -152,6 +152,10 @@ class FilesController {
     });
 
     if (!record) {
+      logger.error({
+        message: `Resume download failed for ${website} by ${request.ip || '0.0.0.0'} - No such website found.`,
+      });
+
       reply.STATUS = Status.VALIDATION;
       reply.MESSAGE = 'Invalid details';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
@@ -168,6 +172,10 @@ class FilesController {
     else blob = Buffer.from(JSON.stringify({}));
 
     if (blob.length === 2) {
+      logger.error({
+        message: `Resume download failed for ${website} by ${request.ip || '0.0.0.0'} - No such file found on the server.`,
+      });
+
       reply.STATUS = Status.ERROR;
       reply.MESSAGE = 'Something went wrong, please try again after sometime';
       reply.ENTRY_BY = request.ip || '0.0.0.0';
