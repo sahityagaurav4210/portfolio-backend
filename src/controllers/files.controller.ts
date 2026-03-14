@@ -251,7 +251,7 @@ class FilesController {
   public static async saveUserResume(request: CustomReq, response: Response): Promise<Response> {
     const reply = new ApiResponse();
     const uploadedResume = request.file;
-    const websites = request.body.websites.split(',');
+    const websites = request.body.websites.split(',').map((website: string) => website.trim());
     const authUserId = request.authenticatedUser._id;
 
     if (!uploadedResume) {
