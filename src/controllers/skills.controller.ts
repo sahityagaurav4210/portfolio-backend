@@ -1,9 +1,12 @@
-import { ApiResponse, HTTP_STATUS_CODES, Status } from "@api/index";
-import { init } from "@config/logs.config";
-import { HandleException } from "@decorators/exception.decorator";
-import { CustomReq } from "@interfaces/index";
-import Skill from "@models/skills.model";
-import { Response } from "express";
+import { ApiResponse, HTTP_STATUS_CODES, Status } from '@api/index';
+import { init } from '@config/logs.config';
+import { HandleException } from '@decorators/exception.decorator';
+import { performParallelTask } from '@helpers/index';
+import { CustomReq } from '@interfaces/index';
+import { Events } from '@models/events.model';
+import Skill from '@models/skills.model';
+import { Response } from 'express';
+import { EventNames } from '../constant';
 
 class SkillController {
   @HandleException()
@@ -12,15 +15,19 @@ class SkillController {
     const reply = new ApiResponse();
     const { authenticatedUser, ip, body } = request || {};
     const { _id, phone } = authenticatedUser || {};
-    const identity = phone || ip || "0.0.0.0";
+    const identity = phone || ip || '0.0.0.0';
+    const url = request.file ? `/assets/${request.file.filename}` : undefined;
 
-    const payload = { ...body, user: _id };
-    await Skill.create(payload);
+    const payload = { ...body, user: _id, url };
+    await performParallelTask([
+      Skill.create(payload),
+      Events.create({ eventName: EventNames.SKILL_CREATED, firedBy: identity }),
+    ]);
 
     reply.STATUS = Status.SUCCESS;
-    reply.MESSAGE = "Skill added successfully";
+    reply.MESSAGE = 'Skill added successfully';
     reply.ENTRY_BY = identity;
-    const message = `A new skill was added by user having identity no ${identity}.`
+    const message = `A new skill was added by user having identity no ${identity}.`;
 
     logger.info({ message });
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
@@ -32,15 +39,22 @@ class SkillController {
     const reply = new ApiResponse();
     const { authenticatedUser, ip } = request || {};
     const { phone } = authenticatedUser || {};
-    const identity = phone || ip || "0.0.0.0";
+    const identity = phone || ip || '0.0.0.0';
 
-    const skills = await Skill.find({ user: authenticatedUser._id }, { updatedAt: 0, __v: 0, user: 0, createdAt: 0 }, { lean: true, sort: { createdAt: -1 } });
+    const [skills] = await performParallelTask([
+      Skill.find(
+        { user: authenticatedUser._id, isActive: true },
+        { updatedAt: 0, __v: 0, user: 0, createdAt: 0 },
+        { lean: true, sort: { createdAt: -1 } }
+      ),
+      Events.create({ eventName: EventNames.SKILL_LIST_FETCHED_ADMIN, firedBy: identity }),
+    ]);
 
     reply.STATUS = Status.SUCCESS;
-    reply.MESSAGE = "Skill added successfully";
+    reply.MESSAGE = 'Skill added successfully';
     reply.ENTRY_BY = identity;
     reply.DATA = skills;
-    const message = `Skill list was fetched by the user having identity no ${identity}.`
+    const message = `Skill list was fetched by the user having identity no ${identity}.`;
 
     logger.info({ message });
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
@@ -52,32 +66,62 @@ class SkillController {
     const { authenticatedUser, ip, body } = request || {};
     const { _id, phone } = authenticatedUser || {};
     const { skillId } = request.params || {};
-    const identity = phone || ip || "0.0.0.0";
+    const identity = phone || ip || '0.0.0.0';
+    const url = request.file ? `/assets/${request.file.filename}` : undefined;
 
-    const payload = { ...body, user: _id };
-    await Skill.updateOne({ _id: skillId }, { $set: { ...payload, updatedAt: new Date() } });
+    const payload = { ...body, user: _id, url };
+    await performParallelTask([
+      Skill.updateOne({ _id: skillId }, { $set: { ...payload, updatedAt: new Date() } }),
+      Events.create({ eventName: EventNames.SKILL_UPDATED, firedBy: identity }),
+    ]);
 
-    const message = `A new skill was updated by user having identity no ${identity}.`
+    const message = `A new skill was updated by user having identity no ${identity}.`;
 
     logger.info({ message });
     return response.status(HTTP_STATUS_CODES.NO_CONTENT).json();
   }
 
   @HandleException()
-  public static async clientList(request: CustomReq, response: Response) {
+  public static async delete(request: CustomReq, response: Response) {
+    const logger = init();
+    const { authenticatedUser, ip } = request || {};
+    const { phone } = authenticatedUser || {};
+    const { skillId } = request.params || {};
+    const identity = phone || ip || '0.0.0.0';
+
+    await performParallelTask([
+      Skill.updateOne({ _id: skillId }, { $set: { isActive: false, updatedAt: new Date() } }),
+      Events.create({ eventName: EventNames.SKILL_DELETED_ADMIN, firedBy: identity }),
+    ]);
+
+    const message = `A new skill was deleted by user having identity no ${identity}.`;
+
+    logger.info({ message });
+    return response.status(HTTP_STATUS_CODES.NO_CONTENT).json();
+  }
+
+  @HandleException()
+  public static async clientSkillList(request: CustomReq, response: Response) {
     const logger = init();
     const reply = new ApiResponse();
     const { authenticatedUser, ip } = request || {};
     const { userId } = authenticatedUser || {};
-    const identity = userId || ip || "0.0.0.0";
+    const identity = userId || ip || '0.0.0.0';
 
-    const skills = await Skill.find({ user: userId }, { updatedAt: 0, __v: 0, user: 0, createdAt: 0 }, { lean: true, sort: { createdAt: -1 } });
+    const [skills] = await performParallelTask([
+      Skill.find(
+        { user: userId, isActive: true },
+        { updatedAt: 0, __v: 0, user: 0, createdAt: 0 },
+        { lean: true, sort: { createdAt: -1 } }
+      ),
+      Events.create({ eventName: EventNames.SKILL_LIST_FETCHED, firedBy: identity }),
+    ]);
 
     reply.STATUS = Status.SUCCESS;
-    reply.MESSAGE = "Skills fetched successfully";
+    reply.MESSAGE = 'Skills fetched successfully';
     reply.ENTRY_BY = identity;
     reply.DATA = skills;
-    const message = `Skill list was fetched by the client having identity no ${identity}.`
+    const message = `Skill list was fetched by the client having identity no ${identity}.`;
 
     logger.info({ message });
     return response.status(HTTP_STATUS_CODES.OK).json(reply);

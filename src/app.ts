@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -30,6 +32,7 @@ app.use(
 );
 app.use(cookieParser());
 app.use(Middleware.postmanMiddleware);
+app.use('/api/v1/assets/', express.static(path.join(process.cwd(), './assets/')));
 app.use('/api/v1', route);
 
 app.get('*', Controller.home().notFound);
