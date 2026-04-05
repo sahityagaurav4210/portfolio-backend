@@ -7,6 +7,7 @@ import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
 import { modelUpdateObject } from '../config/db_models.config';
 import connectRedis from '@config/redis.config';
+import { getCookieOptions } from '@config/cookie.config';
 
 class LoginController {
   @HandleException()
@@ -48,17 +49,13 @@ class LoginController {
     };
     reply.ENTRY_BY = phone;
 
-    response.cookie('authorization', access_token, {
-      httpOnly: true,
-      secure: isSecureCookie,
-      sameSite: isSecureCookie ? 'none' : 'lax',
-    });
+    response.cookie('authorization', access_token, getCookieOptions(isSecureCookie, 1 * 60 * 1000));
 
-    response.cookie('token', refresh_token, {
-      httpOnly: true,
-      secure: isSecureCookie,
-      sameSite: isSecureCookie ? 'none' : 'lax',
-    });
+    response.cookie(
+      'token',
+      refresh_token,
+      getCookieOptions(isSecureCookie, 5 * 24 * 60 * 60 * 1000)
+    );
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
@@ -98,6 +95,9 @@ class LoginController {
       reply.MESSAGE = 'Logout successful';
       reply.ENTRY_BY = authenticatedUser.phone;
 
+      response.clearCookie('authorization');
+      response.clearCookie('token');
+
       return response.status(HTTP_STATUS_CODES.OK).json(reply);
     } else {
       reply.STATUS = Status.VALIDATION;
@@ -115,7 +115,10 @@ class LoginController {
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Api operation was successful';
-    reply.DATA = { message: 'User details fetched successfully', user: authenticatedUser };
+    reply.DATA = {
+      message: 'User details fetched successfully',
+      user: { name: authenticatedUser.name, email: authenticatedUser.email },
+    };
     reply.ENTRY_BY = authenticatedUser.phone || request.ip || '0.0.0.0';
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }

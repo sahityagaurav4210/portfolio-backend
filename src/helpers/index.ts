@@ -107,6 +107,11 @@ export function parseQsAsBoolean(input: string): boolean {
   return booleanPipe.Convert(input);
 }
 
+export function getTextCount(text: string): number {
+  const charLen = text.split('').filter(char => char && char != '\n' && char !== ' ').length;
+  return charLen;
+}
+
 export const asyncHandler =
   (
     fn: (

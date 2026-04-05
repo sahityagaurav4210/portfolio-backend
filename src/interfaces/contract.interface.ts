@@ -7,4 +7,5 @@ export interface IContract extends ITimestamp, IDbId {
   message: string;
   ipAddress: string;
   captchaId: string;
+  isActive: boolean;
 }
