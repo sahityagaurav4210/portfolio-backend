@@ -4,7 +4,7 @@ export function getCookieOptions(isSecureCookie: boolean, time: number): CookieO
   return {
     httpOnly: true,
     secure: isSecureCookie,
-    sameSite: isSecureCookie ? 'none' : 'lax',
+    sameSite: isSecureCookie ? 'strict' : 'lax',
     maxAge: time,
     path: '/api/v1/',
   };
