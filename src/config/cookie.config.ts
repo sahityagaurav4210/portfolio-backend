@@ -9,3 +9,12 @@ export function getCookieOptions(isSecureCookie: boolean, time: number): CookieO
     path: '/api/v1/',
   };
 }
+
+export function getNonHttpOnlyCookieOptions(isSecureCookie: boolean, time: number): CookieOptions {
+  return {
+    httpOnly: false,
+    sameSite: isSecureCookie ? 'strict' : 'lax',
+    maxAge: time,
+    path: '/',
+  };
+}
