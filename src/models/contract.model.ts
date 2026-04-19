@@ -32,6 +32,14 @@ const contractSchema = new Schema<IContract>(
       type: String,
       required: [true, 'Ip address is required'],
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    captchaId: {
+      type: String,
+      required: [true, 'Captcha id is required'],
+    },
   },
   { timestamps: true }
 );

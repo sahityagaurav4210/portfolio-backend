@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
 
     steps:
       - name: Checkout code
@@ -52,10 +52,11 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           GH_USERNAME: ${{vars.GH_USERNAME}}
           GH_PWD: ${{secrets.GH_SECRET}}
+          APP_VERSION: ${{vars.VITE_APP_VERSION}}
         run: |
           docker build -t portfolio-builder-backend .
           docker tag portfolio-builder-backend ${DOCKER_USERNAME}/portfolio-builder-backend:latest
-          docker tag portfolio-builder-backend ghcr.io/${GH_USERNAME}/portfolio-builder-backend:1.3.0
+          docker tag portfolio-builder-backend ghcr.io/${GH_USERNAME}/portfolio-builder-backend:${APP_VERSION}
 
       - name: Publishing development image
         env:
@@ -72,17 +73,18 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_SECRET }}
           GH_USERNAME: ${{vars.GH_USERNAME}}
           GH_PWD: ${{secrets.GH_SECRET}}
+          APP_VERSION: ${{vars.VITE_APP_VERSION}}
         if: github.event_name == 'push' && github.ref == 'refs/heads/release'
         run: |
-          echo Logging and pushing the production image to Docker Hub
+          echo Logging and pushing the production image i.e., ${APP_VERSION} to Docker Hub
 
           docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
           docker push ${DOCKER_USERNAME}/portfolio-builder-backend:latest
 
-          echo Logging and pushing the production image to GitHub Container Registry
+          echo Logging and pushing the production image i.e., ${APP_VERSION} to GitHub Container Registry
 
           echo ${GH_PWD} | docker login ghcr.io -u ${GH_USERNAME} --password-stdin
-          docker push ghcr.io/${GH_USERNAME}/portfolio-builder-backend:1.3.0
+          docker push ghcr.io/${GH_USERNAME}/portfolio-builder-backend:${APP_VERSION}
 
       - name: Deploying on development server
         env:
@@ -103,11 +105,16 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           CAPROVER_HOST: ${{ secrets.CAPROVER_PROD_HOST }}
           CAPROVER_PWD: ${{ secrets.CAPROVER_PROD_PWD }}
+          APP_VERSION: ${{vars.VITE_APP_VERSION}}
         if: github.event_name == 'push' && github.ref == 'refs/heads/release'
         run: |
+          echo Deploying the production image i.e., ${APP_VERSION} to our production server. This may take a while, so please be patient.
+
           npm install -g caprover
           caprover deploy \
           --host ${CAPROVER_HOST} \
           -p ${CAPROVER_PWD} \
-          --imageName ${DOCKER_USERNAME}/portfolio-builder-backend:latest \
+          --imageName ${DOCKER_USERNAME}/portfolio-builder-backend:${APP_VERSION} \
           --appName portfolio-builder-backend
+
+          echo App deployed successfully 🚀🚀🚀🚀

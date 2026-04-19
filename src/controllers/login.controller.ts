@@ -7,6 +7,7 @@ import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
 import { modelUpdateObject } from '../config/db_models.config';
 import connectRedis from '@config/redis.config';
+import { getCookieOptions, getNonHttpOnlyCookieOptions } from '@config/cookie.config';
 
 class LoginController {
   @HandleException()
@@ -48,17 +49,18 @@ class LoginController {
     };
     reply.ENTRY_BY = phone;
 
-    response.cookie('authorization', access_token, {
-      httpOnly: true,
-      secure: isSecureCookie,
-      sameSite: isSecureCookie ? 'none' : 'lax',
-    });
-
-    response.cookie('token', refresh_token, {
-      httpOnly: true,
-      secure: isSecureCookie,
-      sameSite: isSecureCookie ? 'none' : 'lax',
-    });
+    // Setting up cookies
+    response.cookie('authorization', access_token, getCookieOptions(isSecureCookie, 1 * 60 * 1000));
+    response.cookie(
+      'login_status',
+      'true',
+      getNonHttpOnlyCookieOptions(isSecureCookie, 5 * 24 * 60 * 60 * 1000)
+    );
+    response.cookie(
+      'token',
+      refresh_token,
+      getCookieOptions(isSecureCookie, 5 * 24 * 60 * 60 * 1000)
+    );
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
@@ -67,6 +69,9 @@ class LoginController {
   public static async logout(request: CustomReq, response: Response): Promise<Response> {
     const { authenticatedUser } = request;
     const reply = new ApiResponse();
+
+    const appEnvironment = process.env.APP_ENV || 'local';
+    const isSecureCookie = appEnvironment !== 'local';
 
     let authorization = request.headers.authorization || request.cookies.authorization || '';
     let refreshToken = request.headers['x-ref-token'] || request.cookies.token || '';
@@ -98,6 +103,16 @@ class LoginController {
       reply.MESSAGE = 'Logout successful';
       reply.ENTRY_BY = authenticatedUser.phone;
 
+      const cookieOpts = getCookieOptions(isSecureCookie, 0);
+      const nonHttpCookieOpts = getNonHttpOnlyCookieOptions(isSecureCookie, 0);
+
+      delete cookieOpts.maxAge;
+      delete nonHttpCookieOpts.maxAge;
+
+      response.clearCookie('authorization', cookieOpts);
+      response.clearCookie('token', cookieOpts);
+      response.clearCookie('login_status', nonHttpCookieOpts);
+
       return response.status(HTTP_STATUS_CODES.OK).json(reply);
     } else {
       reply.STATUS = Status.VALIDATION;
@@ -115,7 +130,10 @@ class LoginController {
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Api operation was successful';
-    reply.DATA = { message: 'User details fetched successfully', user: authenticatedUser };
+    reply.DATA = {
+      message: 'User details fetched successfully',
+      user: { name: authenticatedUser.name, email: authenticatedUser.email },
+    };
     reply.ENTRY_BY = authenticatedUser.phone || request.ip || '0.0.0.0';
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }

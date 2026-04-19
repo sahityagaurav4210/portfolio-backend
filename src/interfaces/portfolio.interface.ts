@@ -24,6 +24,7 @@ export interface ISkills extends ITimestamp, IDbId {
   description: string;
   url?: string;
   user: OID;
+  isActive?: boolean;
 }
 
 export interface IPortfolio extends ITimestamp, IDbId {

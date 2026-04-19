@@ -31,6 +31,13 @@ export enum EventNames {
   PORTFOLIO_FETCHED_BY_CLIENT = 'client viewed his portfolio',
   PORTFOLIO_WEBSITE_MONTHLY_VIEWS_FETCHED = 'portfolio website monthly views fetched',
   PORTFOLIO_WEBSITE_RESUME_DOWNLOADED = 'portfolio resume downloaded',
+  SKILL_LIST_FETCHED = 'skill list was fetched by client',
+  SKILL_CREATED = 'a new skill was added',
+  SKILL_UPDATED = 'a skill was updated',
+  SKILL_LIST_FETCHED_ADMIN = 'skill list was fetched by skill creator.',
+  SKILL_DELETED_ADMIN = 'a skill was deleted (softly) by skill creator.',
+  CONTACT_FORM_FILLED = 'contact form was filled by a visitor',
+  CONTACT_FORM_DELETED = 'a contact form was deleted (softly) by admin',
 }
 
 export enum Environments {

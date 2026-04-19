@@ -7,6 +7,7 @@ import { EventNames, Tokens } from '../constant';
 import { Login } from '../models/login.model';
 import { Events } from '../models/events.model';
 import { User } from '../models/users.model';
+import { getCookieOptions } from '@config/cookie.config';
 
 class TokenController {
   @HandleException()
@@ -47,7 +48,7 @@ class TokenController {
 
   @HandleException()
   public static async refreshToken(request: CustomReq, response: Response): Promise<Response> {
-    const refreshtoken = request.headers['x-ref-token'];
+    const refreshtoken = request.cookies.token || request.headers['x-ref-token'];
     const { authenticatedUser } = request;
     const reply = new ApiResponse();
 
@@ -71,11 +72,11 @@ class TokenController {
         }),
       ]);
 
-      response.cookie('authorization', access_token, {
-        httpOnly: true,
-        secure: isSecureCookie,
-        sameSite: isSecureCookie ? 'none' : 'lax',
-      });
+      response.cookie(
+        'authorization',
+        access_token,
+        getCookieOptions(isSecureCookie, 1 * 60 * 1000)
+      );
 
       reply.STATUS = Status.SUCCESS;
       reply.MESSAGE = 'Access token generated';

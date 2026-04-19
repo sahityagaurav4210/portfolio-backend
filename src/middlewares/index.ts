@@ -130,7 +130,7 @@ class Middleware {
   @HandleException()
   public static async checkRefToken(request: CustomReq, response: Response, next: NextFunction) {
     const reply = new ApiResponse();
-    const authorization = request.headers['x-ref-token'] as string;
+    const authorization = request.cookies.token || (request.headers['x-ref-token'] as string);
     const REDIS_CLIENT = connectRedis();
 
     if (!authorization) {
