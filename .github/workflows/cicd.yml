@@ -55,7 +55,7 @@ jobs:
         run: |
           docker build -t portfolio-builder-backend .
           docker tag portfolio-builder-backend ${DOCKER_USERNAME}/portfolio-builder-backend:latest
-          docker tag portfolio-builder-backend ghcr.io/${GH_USERNAME}/portfolio-builder-backend:1.3.0
+          docker tag portfolio-builder-backend ghcr.io/${GH_USERNAME}/portfolio-builder-backend:1.4.0
 
       - name: Publishing development image
         env:
@@ -82,7 +82,7 @@ jobs:
           echo Logging and pushing the production image to GitHub Container Registry
 
           echo ${GH_PWD} | docker login ghcr.io -u ${GH_USERNAME} --password-stdin
-          docker push ghcr.io/${GH_USERNAME}/portfolio-builder-backend:1.3.0
+          docker push ghcr.io/${GH_USERNAME}/portfolio-builder-backend:1.4.0
 
       - name: Deploying on development server
         env:
@@ -109,5 +109,5 @@ jobs:
           caprover deploy \
           --host ${CAPROVER_HOST} \
           -p ${CAPROVER_PWD} \
-          --imageName ${DOCKER_USERNAME}/portfolio-builder-backend:latest \
+          --imageName ${DOCKER_USERNAME}/portfolio-builder-backend:1.4.0 \
           --appName portfolio-builder-backend
