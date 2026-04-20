@@ -79,7 +79,7 @@ jobs:
           echo Logging and pushing the production image i.e., ${APP_VERSION} to Docker Hub
 
           docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-          docker push ${DOCKER_USERNAME}/portfolio-builder-backend:latest
+          docker push ${DOCKER_USERNAME}/portfolio-builder-backend:${APP_VERSION}
 
           echo Logging and pushing the production image i.e., ${APP_VERSION} to GitHub Container Registry
 
