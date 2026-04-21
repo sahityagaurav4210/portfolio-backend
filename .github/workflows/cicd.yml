@@ -55,7 +55,7 @@ jobs:
           APP_VERSION: ${{vars.VITE_APP_VERSION}}
         run: |
           docker build -t portfolio-builder-backend .
-          docker tag portfolio-builder-backend ${DOCKER_USERNAME}/portfolio-builder-backend:latest
+          docker tag portfolio-builder-backend ${DOCKER_USERNAME}/portfolio-builder-backend:${APP_VERSION}
           docker tag portfolio-builder-backend ghcr.io/${GH_USERNAME}/portfolio-builder-backend:${APP_VERSION}
 
       - name: Publishing development image
