@@ -6,7 +6,8 @@ import { CustomReq } from '@interfaces/index';
 import { Events } from '@models/events.model';
 import Skill from '@models/skills.model';
 import { Response } from 'express';
-import { EventNames } from '../constant';
+import { EventNames, RedisConstants } from '../constant';
+import connectRedis from '@config/redis.config';
 
 class SkillController {
   @HandleException()
@@ -16,20 +17,39 @@ class SkillController {
     const { authenticatedUser, ip, body } = request || {};
     const { _id, phone } = authenticatedUser || {};
     const identity = phone || ip || '0.0.0.0';
+    const REDIS_CLIENT = connectRedis();
     const url = request.file ? `/assets/${request.file.filename}` : undefined;
 
     const payload = { ...body, user: _id, url };
+    const notificationPayload = {
+      content: {
+        username: authenticatedUser.name,
+        skillName: body.name,
+        link: 'mailto:works.sahitya@gmail.com',
+        email: authenticatedUser.email,
+        subject: `A new skill has been added in your portfolio by ${authenticatedUser.name} at ${new Date().toLocaleString()}.`,
+        skillExperience: body.experience + ' months',
+        timestamp: new Date().toLocaleString(),
+      },
+      timestamp: new Date(),
+    };
+
     await performParallelTask([
       Skill.create(payload),
       Events.create({ eventName: EventNames.SKILL_CREATED, firedBy: identity }),
+      REDIS_CLIENT.publish(
+        RedisConstants.SKILL_ADDITION_CHANNEL_NAME,
+        JSON.stringify(notificationPayload)
+      ),
     ]);
+
+    const message = `A new skill was added by user having identity no ${identity}.`;
+    logger.info({ message });
 
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Skill added successfully';
     reply.ENTRY_BY = identity;
-    const message = `A new skill was added by user having identity no ${identity}.`;
 
-    logger.info({ message });
     return response.status(HTTP_STATUS_CODES.CREATED).json(reply);
   }
 
@@ -62,7 +82,9 @@ class SkillController {
 
   @HandleException()
   public static async update(request: CustomReq, response: Response) {
+    const reply = new ApiResponse();
     const logger = init();
+    const REDIS_CLIENT = connectRedis();
     const { authenticatedUser, ip, body } = request || {};
     const { _id, phone } = authenticatedUser || {};
     const { skillId } = request.params || {};
@@ -70,14 +92,48 @@ class SkillController {
     const url = request.file ? `/assets/${request.file.filename}` : undefined;
 
     const payload = { ...body, user: _id, url };
+    const oldSkillRecord = await Skill.findById(skillId);
+
+    if (!oldSkillRecord) {
+      reply.STATUS = Status.NOT_FOUND;
+      reply.MESSAGE =
+        "Sorry, we couldn't find the skill record you are trying to update. It might have been removed.";
+      reply.ENTRY_BY = identity;
+
+      return response.status(HTTP_STATUS_CODES.NOT_FOUND).json(reply);
+    }
+
+    const notificationPayload = {
+      content: {
+        username: authenticatedUser.name,
+        link: 'mailto:works.sahitya@gmail.com',
+        email: authenticatedUser.email,
+        subject: `A skill has been updated in your portfolio by ${authenticatedUser.name} at ${new Date().toLocaleString()}.`,
+        skill: {
+          skillName: oldSkillRecord.name,
+          skillExperience: oldSkillRecord.experience + ' months',
+          skillDesc: oldSkillRecord.description,
+          newSkillName: body.name,
+          newSkillExperience: body.experience + ' months',
+          newSkillDesc: body.description,
+        },
+        timestamp: new Date().toLocaleString(),
+      },
+      timestamp: new Date(),
+    };
+
     await performParallelTask([
       Skill.updateOne({ _id: skillId }, { $set: { ...payload, updatedAt: new Date() } }),
       Events.create({ eventName: EventNames.SKILL_UPDATED, firedBy: identity }),
+      REDIS_CLIENT.publish(
+        RedisConstants.SKILL_UPDATE_CHANNEL_NAME,
+        JSON.stringify(notificationPayload)
+      ),
     ]);
 
     const message = `A new skill was updated by user having identity no ${identity}.`;
-
     logger.info({ message });
+
     return response.status(HTTP_STATUS_CODES.NO_CONTENT).json();
   }
 

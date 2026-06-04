@@ -1,3 +1,4 @@
+import RE from 're2';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '@api/index';
 import { HandleException } from '@decorators/exception.decorator';
 import { NextFunction, Request, Response } from 'express';
@@ -11,7 +12,7 @@ class NetworkingMiddleware {
     next: NextFunction
   ) {
     const reply = new ApiResponse();
-    const { clientIp } = request.query || {};
+    const clientIp = request.query.clientIp as string;
 
     if (!clientIp) {
       reply.STATUS = Status.VALIDATION;
@@ -30,9 +31,9 @@ class NetworkingMiddleware {
     }
 
     if (
-      GlobalRegex.CLASS_A_IP.test(clientIp as string) ||
-      GlobalRegex.CLASS_B_IP.test(clientIp as string) ||
-      GlobalRegex.CLASS_C_IP.test(clientIp as string)
+      new RE(GlobalRegex.CLASS_A_IP).test(clientIp) ||
+      new RE(GlobalRegex.CLASS_B_IP).test(clientIp) ||
+      new RE(GlobalRegex.CLASS_C_IP).test(clientIp)
     ) {
       reply.STATUS = Status.VALIDATION;
       reply.MESSAGE = 'Invalid client ip, private ip detected';

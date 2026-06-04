@@ -6,14 +6,12 @@
   "editor.fontSize": 16,
   "terminal.integrated.fontFamily": "'Fira Code'",
   "terminal.integrated.fontSize": 14,
-  "cSpell.words": [
-    "Gaurav",
-    "refreshtoken",
-    "REGEN",
-    "Sahitya",
-    "Syncher"
-  ],
+  "cSpell.words": ["Gaurav", "refreshtoken", "REGEN", "Sahitya", "Syncher"],
   "javascript.format.semicolons": "insert",
   "editor.tabSize": 2,
   "typescript.format.semicolons": "insert",
+  "sonarlint.connectedMode.project": {
+    "connectionId": "https-sonarqube-tools-sgaurav-me",
+    "projectKey": "portfolio-builder-backend"
+  }
 }
