@@ -4,7 +4,6 @@ import { CustomReq } from '@interfaces/index';
 import { NextFunction, Response } from 'express';
 import Patterns from '@book-junction/patterns';
 import { ValidationMessages } from '@helpers/messages.helper';
-import { GlobalRegex } from '../constant';
 
 class UsersMiddleware {
   public static validateEditProfile(request: CustomReq, response: Response, next: NextFunction) {
@@ -41,16 +40,6 @@ class UsersMiddleware {
     if (result.error) {
       reply.STATUS = Status.VALIDATION;
       reply.MESSAGE = result.error.details[0].message;
-      reply.ENTRY_BY = request.authenticatedUser?.phone || request.ip || '0.0.0.0';
-
-      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
-    }
-
-    console.log(body.websites, 'websites');
-
-    if (!GlobalRegex.MULTIPLE_URLS.test(body.websites)) {
-      reply.STATUS = Status.VALIDATION;
-      reply.MESSAGE = 'One or more website urls are invalid.';
       reply.ENTRY_BY = request.authenticatedUser?.phone || request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);

@@ -1,3 +1,4 @@
+import RE from 're2';
 import { NextFunction, Request, Response } from 'express';
 import LoginMiddleware from './login.middleware';
 import { HandleException } from '../decorators/exception.decorator';
@@ -237,7 +238,7 @@ class Middleware {
     logger.info({ message: `A request made with ${headers} header` });
 
     if (environment === Environments.PRODUCTION && headers) {
-      if (GlobalRegex.USER_AGENT.test(headers)) {
+      if (new RE(GlobalRegex.USER_AGENT).test(headers)) {
         return next();
       } else {
         reply.STATUS = Status.UNAUTHORISED;

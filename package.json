@@ -28,6 +28,7 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^20.14.11",
     "@types/node-cron": "^3.0.11",
+    "@types/re2": "^1.10.0",
     "@types/sharp": "^0.31.1",
     "html-loader": "^5.1.0",
     "json5": "^2.2.3",
@@ -59,6 +60,7 @@
     "nock": "^13.5.6",
     "node-cron": "^3.0.3",
     "node-gtts": "^2.0.2",
+    "re2": "^1.24.1",
     "sharp": "^0.34.5",
     "svg-captcha": "^1.4.0",
     "winston": "^3.17.0"

@@ -1,3 +1,4 @@
+import RE from 're2';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '@api/index';
 import { init } from '@config/logs.config';
 import { HandleException } from '@decorators/exception.decorator';
@@ -25,7 +26,7 @@ export default class HiringMiddleware {
     const schema = Joi.object<IHiring>().keys({
       client_name: Joi.string()
         .min(2)
-        .pattern(GlobalRegex.CLIENT_NAME)
+        .pattern(new RE(GlobalRegex.CLIENT_NAME))
         .required()
         .messages(ValidationMessages.hiring.client_name),
       client_email: Joi.string()
