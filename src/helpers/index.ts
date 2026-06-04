@@ -53,34 +53,39 @@ export function encrypt(plainText: string): string {
   const passphrase = process.env.PASSPHRASE as string;
   const salt = process.env.SALT as string;
 
-  // Generate a completely fresh, unique IV for THIS specific encryption
-  const iv = crypto.randomBytes(16);
-  const key = crypto.scryptSync(passphrase, salt, 32) as unknown as crypto.CipherKey;
+  const iv = crypto.randomBytes(12);
+  const key = crypto.scryptSync(passphrase, salt, 32);
 
-  // Ensure IV is an ArrayBufferView/Uint8Array to satisfy TypeScript's crypto typings
-  const ivView = Uint8Array.from(iv);
-  const cipher = crypto.createCipheriv('aes-256-cbc', key, ivView);
+  const cipher = crypto.createCipheriv('aes-256-ocb', new Uint8Array(key), new Uint8Array(iv), {
+    authTagLength: 16,
+  });
+
   let encrypted = cipher.update(plainText, 'utf8', 'hex');
   encrypted += cipher.final('hex');
 
-  // Prepend the IV (converted to hex, which takes 32 characters) to the ciphertext
-  return iv.toString('hex') + encrypted;
+  const authTag = cipher.getAuthTag();
+
+  return iv.toString('hex') + authTag.toString('hex') + encrypted;
 }
 
 export function decrypt(encryptedPayload: string): string {
   const passphrase = process.env.PASSPHRASE as string;
   const salt = process.env.SALT as string;
 
-  // Pull the 32-hex-character (16 bytes) IV off the front
-  const ivHex = encryptedPayload.slice(0, 32);
-  const encryptedText = encryptedPayload.slice(32);
+  const ivHex = encryptedPayload.slice(0, 24);
+  const authTagHex = encryptedPayload.slice(24, 56);
+  const encryptedText = encryptedPayload.slice(56);
 
   const iv = Buffer.from(ivHex, 'hex');
-  const key = crypto.scryptSync(passphrase, salt, 32) as unknown as crypto.CipherKey;
+  const authTag = Buffer.from(authTagHex, 'hex');
+  const key = crypto.scryptSync(passphrase, salt, 32);
 
-  // Ensure IV is an ArrayBufferView/Uint8Array to satisfy TypeScript's crypto typings
-  const ivView = Uint8Array.from(iv);
-  const decipher = crypto.createDecipheriv('aes-256-cbc', key, ivView);
+  const decipher = crypto.createDecipheriv('aes-256-ocb', new Uint8Array(key), new Uint8Array(iv), {
+    authTagLength: 16,
+  });
+
+  decipher.setAuthTag(new Uint8Array(authTag));
+
   let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
 

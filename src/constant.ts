@@ -96,7 +96,7 @@ export const GlobalRegex = {
   CLASS_C_IP: /^192\.168\.\d{1,3}\.\d{1,3}$/,
   CLIENT_NAME: /^[A-Za-z\s.,]{2,64}$/,
   MULTIPLE_URLS: /((?:https?:\/\/|www\.)[^\s,]+(?:(?:\s*,\s*)(?:https?:\/\/|www\.)[^\s,]+)*)/gi,
-  ADDRESS: /^[a-zA-Z0-9\s,.'\-\/]{10,}\s?(?:(?:\d{6})|(?:\d{3}\s\d{3}))$/m,
+  ADDRESS: /^(?:[a-zA-Z0-9\s,.'\-\/]{10,})\s?(?:(?:\d{6})|(?:\d{3}\s\d{3}))$/m,
 };
 
 export enum RedisConstants {
