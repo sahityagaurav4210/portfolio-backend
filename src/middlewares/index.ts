@@ -7,7 +7,7 @@ import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { CustomReq } from '../interfaces';
 import { Login } from '../models/login.model';
 import { decryptXApiToken } from '../helpers';
-import { Environments, GlobalRegex } from '../constant';
+import { Environments, GlobalRegex, RedisConstants } from '../constant';
 import ContractMiddleware from './contracts.middleware';
 import PortfolioMiddleware from './portfolio.middleware';
 import TokenMiddleware from './token.middleware';
@@ -19,6 +19,9 @@ import HiringMiddleware from './hiring.middleware';
 import NetworkingMiddleware from './networking.middleware';
 import FilesMiddlewares from './files.middleware';
 import { MulterError } from 'multer';
+import UsersMiddleware from './users.middleware';
+import PublicMiddlewares from './public.middleware';
+import { getCookieOptions } from '@config/cookie.config';
 
 class Middleware {
   public static authentication() {
@@ -55,6 +58,14 @@ class Middleware {
 
   public static files() {
     return FilesMiddlewares;
+  }
+
+  public static users() {
+    return UsersMiddleware;
+  }
+
+  public static public() {
+    return PublicMiddlewares;
   }
 
   @HandleException()
@@ -132,6 +143,10 @@ class Middleware {
     const reply = new ApiResponse();
     const authorization = request.cookies.token || (request.headers['x-ref-token'] as string);
     const REDIS_CLIENT = connectRedis();
+    const cachedLoginUserFlagKey = `${RedisConstants.PWD_CHANGED_FLAG}:${authorization}`;
+    const cachedLoginUserFlag = await REDIS_CLIENT.get(cachedLoginUserFlagKey);
+    const appEnvironment = process.env.APP_ENV || 'local';
+    const isSecureCookie = appEnvironment !== 'local';
 
     if (!authorization) {
       reply.STATUS = Status.VALIDATION;
@@ -140,6 +155,18 @@ class Middleware {
 
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }
+
+    if (cachedLoginUserFlag === 'true') {
+      reply.STATUS = Status.UNAUTHORISED;
+      reply.MESSAGE = 'Account password changed';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      await REDIS_CLIENT.del(cachedLoginUserFlagKey);
+      response.clearCookie('token', getCookieOptions(isSecureCookie, 0));
+      response.clearCookie('login_status', getCookieOptions(isSecureCookie, 0));
+      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    }
+
     const cachedAuthKey = `portfolio-backend:auth:ref-tokens:${authorization}`;
     const cachedAuthorization = await REDIS_CLIENT.get(cachedAuthKey);
 

@@ -11,6 +11,15 @@ class UserController {
     const { authenticatedUser } = request;
     const { password, phone, ...payload } = request.body;
     const reply = new ApiResponse();
+    const avatar = request.file ? `/assets/${request.file.filename}` : undefined;
+
+    if (avatar) {
+      payload.avatar = avatar;
+    }
+
+    if (payload.websites) {
+      payload.websites = payload.websites.split(',').map((url: string) => url.trim());
+    }
 
     const updatedUserRecord = await User.findByIdAndUpdate(
       authenticatedUser?._id,
@@ -71,14 +80,16 @@ class UserController {
 
     const profile = await User.findById(
       authenticatedUser?._id,
-      { createdAt: 0, updatedAt: 0, __v: 0 },
+      { createdAt: 0, updatedAt: 0, __v: 0, tokens: 0 },
       { lean: true }
     );
 
     if (profile) {
+      const websites = profile.websites?.join(',') || '';
+
       reply.STATUS = Status.SUCCESS;
       reply.MESSAGE = 'Profile fetched successfully';
-      reply.DATA = profile;
+      reply.DATA = { ...profile, websites };
       reply.ENTRY_BY = authenticatedUser.phone || request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.OK).json(reply);

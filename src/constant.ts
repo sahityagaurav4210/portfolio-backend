@@ -12,6 +12,7 @@ export enum ModelNames {
   FILES = 'user_files',
   SKILLS = 'skills',
   HOME = 'home',
+  USER_CONFIG = 'user_configurations',
 }
 
 export enum EventNames {
@@ -53,6 +54,7 @@ export enum HiringType {
 
 export enum FileTypes {
   RESUME = 'cv',
+  AVATAR = 'avatar',
 }
 
 export enum CRON_EXPRESSIONS {
@@ -93,4 +95,17 @@ export const GlobalRegex = {
   CLASS_B_IP: /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/,
   CLASS_C_IP: /^192\.168\.\d{1,3}\.\d{1,3}$/,
   CLIENT_NAME: /^[A-Za-z\s.,]{2,64}$/,
+  MULTIPLE_URLS: /((?:https?:\/\/|www\.)[^\s,]+(?:(?:\s*,\s*)(?:https?:\/\/|www\.)[^\s,]+)*)/gi,
+  ADDRESS: /^[a-zA-Z0-9\s,.'\-\/]{10,}\s?(?:(?:\d{6})|(?:\d{3}\s\d{3}))$/m,
 };
+
+export enum RedisConstants {
+  LOGIN_NOTIFICATION_CHANNEL_NAME = 'login_updates',
+  PROFILE_UPDATE_CHANNEL_NAME = 'profile_updates',
+  XUID_TOKEN_PREFIX = 'portfolio-backend:xuid-authorizer',
+  PWD_CHANGED_FLAG = 'portfolio-backend:auth:pwd-changed-flag',
+  LOGGED_IN_USER_FLAG = 'portfolio-backend:auth',
+  SKILL_ADDITION_CHANNEL_NAME = 'skill_additions',
+  SKILL_UPDATE_CHANNEL_NAME = 'skill_updates',
+  SKILL_DELETION_CHANNEL_NAME = 'skill_deletions',
+}

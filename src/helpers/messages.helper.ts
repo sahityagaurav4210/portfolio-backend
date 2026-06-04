@@ -102,9 +102,9 @@ const ValidationMessages = {
       },
       url: {
         'string.base': 'Skill url should be a string.',
-        'string.min': 'Too short skill name.',
-        'string.max': 'Too large skill name.',
-        'string.pattern.base': 'Invalid skill name.',
+        'string.min': 'Too short skill url.',
+        'string.max': 'Too large skill url.',
+        'string.pattern.base': 'Invalid skill url.',
       },
     },
   },
@@ -198,8 +198,8 @@ const ValidationMessages = {
     websites: {
       'string.base': 'Website must be a string.',
       'any.required': 'Website url is requried',
-      'sting.pattern.base': "Invalid website url."
-    }
+      'string.pattern.base': 'Invalid website url.',
+    },
   },
   commons: {
     description: {
@@ -215,6 +215,26 @@ const ValidationMessages = {
       number: (feildName: string) => ({
         'number.base': `${feildName} must be a number.`,
       }),
+    },
+    name: {
+      'string.base': 'Name must be a string.',
+      'string.pattern.base': 'Invalid name.',
+    },
+    email: {
+      'string.base': 'Email must be a string.',
+      'string.pattern.base': 'Invalid email.',
+    },
+    phone: {
+      'string.base': 'Phone must be a string.',
+      'string.pattern.base': 'Invalid phone number.',
+    },
+    address: {
+      'string.base': 'Address must be a string.',
+      'string.min': 'Too short address.',
+      'string.max': 'Too large address.',
+    },
+    websites: {
+      'string.base': 'Website must be a string.',
     },
   },
   types: {

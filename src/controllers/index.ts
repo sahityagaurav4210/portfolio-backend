@@ -4,6 +4,7 @@ import HomeController from './home.controller';
 import LoginController from './login.controller';
 import NetworkingController from './networking.controller';
 import PortfolioController from './portfolio.controller';
+import PublicController from './public.controller';
 import SkillController from './skills.controller';
 import TokenController from './tokens.controller';
 import UserController from './user.controller';
@@ -43,6 +44,10 @@ class Controller {
 
   public static skills() {
     return SkillController;
+  }
+
+  public static public() {
+    return PublicController;
   }
 }
 

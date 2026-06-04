@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import { HandleException } from '../decorators/exception.decorator';
 import { parseQsAsBoolean } from '../helpers';
 import Files from '@helpers/files.helpers';
-import { getObjectAsBlob } from '@helpers/aws.helpers';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '@api/index';
 
 import { Files as FileModel } from '@models/files.model';
@@ -92,18 +91,34 @@ class FilesController {
   }
 
   @HandleException()
-  public static async downloadPhoto(request: Request, response: Response) {
+  public static async downloadPhoto(request: CustomReq, response: Response) {
     const reply = new ApiResponse();
-    const photoUrl = process.env.PHOTO_URL || '';
-    const photoPath = path.resolve(__dirname, '../', 'uploads/Photo.jpg');
+    const userId = request.authenticatedUser?._id || request.authenticatedUser?.userId;
     let blob: Buffer;
+
+    if (!userId) {
+      reply.STATUS = Status.ERROR;
+      reply.MESSAGE = 'Something went wrong, please try again after sometime';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      reply.STATUS = Status.ERROR;
+      reply.MESSAGE = 'Something went wrong, please try again after sometime';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
+    }
+
+    const photoPath = path.resolve(__dirname, '../', `.${user.avatar}`);
 
     if (Files.exists(photoPath))
       blob = await Files.readFile(photoPath).catch(_ => Buffer.from(JSON.stringify({})));
-    else {
-      blob = await getObjectAsBlob(photoUrl);
-      await Files.createFile(photoPath, blob).catch(_ => Buffer.from(JSON.stringify({})));
-    }
+    else blob = Buffer.from(JSON.stringify({}));
 
     if (blob.length === 2) {
       reply.STATUS = Status.ERROR;
