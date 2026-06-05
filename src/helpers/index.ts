@@ -171,3 +171,11 @@ export function getChangePwdLink(appEnvironment: string): string {
 
   return absoluteLink;
 }
+
+export function getAcceptedHeaders(): string[] {
+  const headers = process.env.ACCEPTED_HEADERS || '';
+
+  if (!headers) return ['Content-Type', 'Authorization'];
+
+  return headers.split(',').map(header => header.trim());
+}
