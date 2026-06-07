@@ -145,7 +145,7 @@ export const asyncHandler =
   };
 
 export function getChangePwdLink(appEnvironment: string): string {
-  const relativeLink = process.env.PUBLIC_LOGIN_CHANGE_PWD_LINK || '/auth/change-pwd';
+  const relativeLink = '/auth/change-pwd';
   let absoluteLink: string;
   let baseUrl: string;
 
@@ -178,4 +178,32 @@ export function getAcceptedHeaders(): string[] {
   if (!headers) return ['Content-Type', 'Authorization'];
 
   return headers.split(',').map(header => header.trim());
+}
+
+export function getUpdatedProfileLink(appEnvironment: string): string {
+  const relativeLink = '/public/updated-profile';
+  let absoluteLink: string;
+  let baseUrl: string;
+
+  switch (appEnvironment) {
+    case Environments.LOCAL:
+      absoluteLink = `http://localhost:5173${relativeLink}`;
+      break;
+
+    case Environments.DEVELOPMENT:
+      baseUrl = process.env.DEVELOPMENT_URL || 'https://portfolio-dev-admin.codingworks.in';
+      absoluteLink = `${baseUrl}${relativeLink}`;
+      break;
+
+    case Environments.PRODUCTION:
+      baseUrl = process.env.PRODUCTION_URL || 'https://pbcms.codingworks.in';
+      absoluteLink = `${baseUrl}${relativeLink}`;
+      break;
+
+    default:
+      absoluteLink = `http://localhost:5173${relativeLink}`;
+      break;
+  }
+
+  return absoluteLink;
 }

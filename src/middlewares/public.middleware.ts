@@ -8,7 +8,7 @@ import { NextFunction, Response } from 'express';
 class PublicMiddlewares {
   @HandleException()
   public static async decryptXuidToken(request: CustomReq, response: Response, next: NextFunction) {
-    const token = request.body.token;
+    const token = request.headers['x-xuid'] || request.body.token;
     const reply = new ApiResponse();
 
     if (!token) {
@@ -19,7 +19,7 @@ class PublicMiddlewares {
       return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
     }
 
-    const decryptedXuid = await decrypt(token);
+    const decryptedXuid = decrypt(token);
     const user = await User.findById(decryptedXuid);
 
     if (!user) {
