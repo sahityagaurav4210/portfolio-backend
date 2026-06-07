@@ -104,6 +104,7 @@ export enum RedisConstants {
   LOGIN_NOTIFICATION_CHANNEL_NAME = 'login_updates',
   PROFILE_UPDATE_CHANNEL_NAME = 'profile_updates',
   XUID_TOKEN_PREFIX = 'portfolio-backend:xuid-authorizer',
+  XUID_PROFILE_AUTHORIZER_PREFIX = 'portfolio-backend:xuid-profile-authorizer',
   PWD_CHANGED_FLAG = 'portfolio-backend:auth:pwd-changed-flag',
   LOGGED_IN_USER_FLAG = 'portfolio-backend:auth',
   SKILL_ADDITION_CHANNEL_NAME = 'skill_additions',

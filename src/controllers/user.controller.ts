@@ -3,15 +3,25 @@ import { CustomReq } from '../interfaces';
 import { User } from '../models/users.model';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { HandleException } from '../decorators/exception.decorator';
-import { checkPwd } from '@helpers/index';
+import {
+  checkPwd,
+  encrypt,
+  getChangePwdLink,
+  getRandomSecureString,
+  getUpdatedProfileLink,
+} from '@helpers/index';
+import { RedisConstants } from '../constant';
+import connectRedis from '@config/redis.config';
 
 class UserController {
   @HandleException()
   public static async editProfile(request: CustomReq, response: Response): Promise<Response> {
+    const REDIS_CLIENT = connectRedis();
     const { authenticatedUser } = request;
     const { password, phone, ...payload } = request.body;
     const reply = new ApiResponse();
     const avatar = request.file ? `/assets/${request.file.filename}` : undefined;
+    const userId = authenticatedUser?._id?.toString();
 
     if (avatar) {
       payload.avatar = avatar;
@@ -22,7 +32,7 @@ class UserController {
     }
 
     const updatedUserRecord = await User.findByIdAndUpdate(
-      authenticatedUser?._id,
+      userId,
       { $set: { ...payload, updatedAt: new Date() } },
       {
         new: true,
@@ -31,6 +41,32 @@ class UserController {
     );
 
     if (updatedUserRecord) {
+      const profileAuthorizer = getRandomSecureString(16);
+      const changePwdAuthorizer = getRandomSecureString(16);
+      const appEnvironment = process.env.APP_ENV || 'local';
+      const profileLink = `${getUpdatedProfileLink(appEnvironment)}?xuid=${encrypt(userId)}&authorizer=${profileAuthorizer}`;
+      const link = `${getChangePwdLink(appEnvironment)}?xuid=${encrypt(userId)}&authorizer=${changePwdAuthorizer}`;
+      const supportUrl = 'mailto:' + process.env.SUPPORT_EMAIL;
+      const xuidAuthorizerKey = `${RedisConstants.XUID_TOKEN_PREFIX}:${userId}`;
+      const xuidProfileAuthorizerKey = `${RedisConstants.XUID_PROFILE_AUTHORIZER_PREFIX}:${userId}`;
+      const payload = {
+        content: {
+          email: authenticatedUser.email,
+          link,
+          profileLink,
+          supportUrl,
+          subject: `Profile update detected for user having phone number ${authenticatedUser.phone} at ${new Date().toLocaleString('hi-In')}.`,
+          userName: authenticatedUser.name,
+        },
+        timestamp: new Date().toLocaleString('hi-In'),
+      };
+
+      await Promise.all([
+        REDIS_CLIENT.setex(xuidAuthorizerKey, 10 * 60, changePwdAuthorizer),
+        REDIS_CLIENT.setex(xuidProfileAuthorizerKey, 10 * 60, profileAuthorizer),
+        REDIS_CLIENT.publish(RedisConstants.PROFILE_UPDATE_CHANNEL_NAME, JSON.stringify(payload)),
+      ]);
+
       return response.status(HTTP_STATUS_CODES.NO_CONTENT).json(reply);
     } else {
       reply.STATUS = Status.ERROR;
@@ -86,10 +122,11 @@ class UserController {
 
     if (profile) {
       const websites = profile.websites?.join(',') || '';
+      const { phone, password, ...payload } = profile;
 
       reply.STATUS = Status.SUCCESS;
       reply.MESSAGE = 'Profile fetched successfully';
-      reply.DATA = { ...profile, websites };
+      reply.DATA = { ...payload, websites };
       reply.ENTRY_BY = authenticatedUser.phone || request.ip || '0.0.0.0';
 
       return response.status(HTTP_STATUS_CODES.OK).json(reply);

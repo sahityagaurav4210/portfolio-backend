@@ -29,10 +29,42 @@ class PublicController {
       return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
     }
 
+    await REDIS_CLIENT.del(redisKey);
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Verified';
     reply.ENTRY_BY = request.ip || '0.0.0.0';
 
+    return response.status(HTTP_STATUS_CODES.OK).json(reply);
+  }
+
+  @HandleException()
+  public static async checkProfileXuidAuthorizer(
+    request: CustomReq,
+    response: Response
+  ): Promise<Response> {
+    const reply = new ApiResponse();
+    const REDIS_CLIENT = connectRedis();
+    const authorizer = request.headers['x-xuid-authorizer'] as string;
+    const xuid = request.headers['x-xuid'] as string;
+
+    const userId = decrypt(xuid);
+    const redisKey = `${RedisConstants.XUID_PROFILE_AUTHORIZER_PREFIX}:${userId}`;
+    const storedAuthorizer = await REDIS_CLIENT.get(redisKey);
+
+    if (authorizer !== storedAuthorizer) {
+      reply.STATUS = Status.VALIDATION;
+      reply.MESSAGE = 'Invalid authorizer';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.UNAUTHORISED).json(reply);
+    }
+
+    //Delete the authorizer if verified successfully
+    await REDIS_CLIENT.del(redisKey);
+
+    reply.STATUS = Status.SUCCESS;
+    reply.MESSAGE = 'Verified';
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
 
