@@ -19,10 +19,6 @@ class UsersMiddleware {
         .optional()
         .pattern(Patterns.common.email)
         .messages(ValidationMessages.commons.email),
-      phone: Joi.string()
-        .optional()
-        .pattern(Patterns.common.phone)
-        .messages(ValidationMessages.commons.phone),
       address: Joi.string()
         .optional()
         .min(10)
