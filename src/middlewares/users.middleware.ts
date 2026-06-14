@@ -21,6 +21,7 @@ class UsersMiddleware {
         .messages(ValidationMessages.commons.email),
       address: Joi.string()
         .optional()
+        .allow('')
         .min(10)
         .max(512)
         .messages(ValidationMessages.commons.address),

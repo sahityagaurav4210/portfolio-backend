@@ -8,6 +8,7 @@ import {
   encrypt,
   getChangePwdLink,
   getRandomSecureString,
+  getSafeEditProfilePayload,
   getUpdatedProfileLink,
 } from '@helpers/index';
 import { RedisConstants } from '../constant';
@@ -17,30 +18,31 @@ class UserController {
   @HandleException()
   public static async editProfile(request: CustomReq, response: Response): Promise<Response> {
     const REDIS_CLIENT = connectRedis();
+    const reply = new ApiResponse();
     const { authenticatedUser } = request;
     const { password, phone, ...payload } = request.body;
-    const reply = new ApiResponse();
     const avatar = request.file ? `/assets/${request.file.filename}` : undefined;
     const userId = authenticatedUser?._id?.toString();
+    const safePayload = getSafeEditProfilePayload(payload);
 
     if (avatar) {
-      payload.avatar = avatar;
+      safePayload.avatar = avatar;
     }
 
-    if (payload.websites) {
-      payload.websites = payload.websites.split(',').map((url: string) => url.trim());
+    if (safePayload.websites) {
+      safePayload.websites = safePayload.websites.split(',').map((url: string) => url.trim());
     }
 
     const updatedUserRecord = await User.findByIdAndUpdate(
       userId,
-      { $set: { ...payload, updatedAt: new Date() } },
+      { $set: { ...safePayload, updatedAt: new Date() } },
       {
         new: true,
         runValidators: true,
       }
     );
 
-    if (updatedUserRecord) {
+    if (updatedUserRecord?.email) {
       const profileAuthorizer = getRandomSecureString(16);
       const changePwdAuthorizer = getRandomSecureString(16);
       const appEnvironment = process.env.APP_ENV || 'local';
@@ -66,15 +68,9 @@ class UserController {
         REDIS_CLIENT.setex(xuidProfileAuthorizerKey, 10 * 60, profileAuthorizer),
         REDIS_CLIENT.publish(RedisConstants.PROFILE_UPDATE_CHANNEL_NAME, JSON.stringify(payload)),
       ]);
-
-      return response.status(HTTP_STATUS_CODES.NO_CONTENT).json(reply);
-    } else {
-      reply.STATUS = Status.ERROR;
-      reply.MESSAGE = 'An error occurred, please try again after sometime';
-      reply.ENTRY_BY = authenticatedUser.phone;
-
-      return response.status(HTTP_STATUS_CODES.SERVER_ERR).json(reply);
     }
+
+    return response.status(HTTP_STATUS_CODES.NO_CONTENT).json(reply);
   }
 
   @HandleException()
