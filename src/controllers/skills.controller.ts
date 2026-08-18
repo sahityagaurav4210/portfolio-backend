@@ -65,7 +65,7 @@ class SkillController {
       Skill.find(
         { user: authenticatedUser._id, isActive: true },
         { updatedAt: 0, __v: 0, user: 0, createdAt: 0 },
-        { lean: true, sort: { createdAt: -1 } }
+        { lean: true, sort: { priority: -1, createdAt: -1 } }
       ),
       Events.create({ eventName: EventNames.SKILL_LIST_FETCHED_ADMIN, firedBy: identity }),
     ]);
@@ -168,7 +168,7 @@ class SkillController {
       Skill.find(
         { user: userId, isActive: true },
         { updatedAt: 0, __v: 0, user: 0, createdAt: 0 },
-        { lean: true, sort: { createdAt: -1 } }
+        { lean: true, sort: { priority: -1, createdAt: -1 } }
       ),
       Events.create({ eventName: EventNames.SKILL_LIST_FETCHED, firedBy: identity }),
     ]);

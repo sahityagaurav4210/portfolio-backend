@@ -1,4 +1,4 @@
-import { IDbId, ITimestamp } from ".";
+import { IDbId, ITimestamp } from '.';
 
 export interface IHome extends IDbId, ITimestamp {
   displayName: string;
@@ -15,4 +15,5 @@ export interface IHome extends IDbId, ITimestamp {
   leetcodeUrl?: string;
   linkedInUrl?: string;
   twitterUrl?: string;
+  tags?: Array<string>;
 }
