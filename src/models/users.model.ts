@@ -2,8 +2,7 @@ import { model, Schema } from 'mongoose';
 import { IUser } from '../interfaces/users.interface';
 import { ModelNames } from '../constant';
 import { hashPwd } from '../helpers';
-
-const Patterns = require('@book-junction/patterns');
+import Patterns from '@book-junction/patterns';
 
 const userSchema = new Schema<IUser>(
   {
@@ -51,6 +50,10 @@ const userSchema = new Schema<IUser>(
     tokens: {
       type: [String],
       default: [],
+    },
+    avatar: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true }

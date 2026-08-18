@@ -17,6 +17,7 @@ export interface IUser extends ITimestamp, IDbId {
   password: string;
   websites?: string[];
   tokens?: string[];
+  avatar?: string;
 }
 
 export interface ILogins extends ITimestamp, IDbId {

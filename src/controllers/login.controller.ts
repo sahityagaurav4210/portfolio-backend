@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { Login } from '../models/login.model';
-import { generateToken } from '../helpers';
-import { Tokens } from '../constant';
+import { encrypt, generateToken, getChangePwdLink, getRandomSecureString } from '../helpers';
+import { RedisConstants, Tokens } from '../constant';
 import { ApiResponse, HTTP_STATUS_CODES, Status } from '../api';
 import { HandleException } from '../decorators/exception.decorator';
 import { CustomReq } from '../interfaces';
@@ -13,6 +13,7 @@ class LoginController {
   @HandleException()
   public static async login(request: CustomReq, response: Response): Promise<Response> {
     const reply = new ApiResponse();
+    const REDIS_CLIENT = connectRedis();
 
     const { phone } = request.body;
     let { loginRecord, userRecord } = request;
@@ -60,6 +61,29 @@ class LoginController {
       'token',
       refresh_token,
       getCookieOptions(isSecureCookie, 5 * 24 * 60 * 60 * 1000)
+    );
+
+    const userId = typeof userRecord._id === 'string' ? userRecord._id : userRecord._id.toString();
+    const authorizer = getRandomSecureString(16);
+    const link = `${getChangePwdLink(appEnvironment)}?xuid=${encrypt(userId)}&authorizer=${authorizer}`;
+    const supportUrl = 'mailto:' + process.env.SUPPORT_EMAIL;
+    const redisKey = `${RedisConstants.XUID_TOKEN_PREFIX}:${userId}`;
+    const payload = {
+      content: {
+        email: userRecord.email,
+        ipAddress: request.ip || '0.0.0.0',
+        link,
+        supportUrl,
+        subject: `New login detected for account having phone number ${userRecord.phone} at ${new Date().toLocaleString()}.`,
+        username: userRecord.name,
+      },
+      timestamp: new Date().toLocaleString('hi-In'),
+    };
+
+    await REDIS_CLIENT.setex(redisKey, 10 * 60, authorizer);
+    await REDIS_CLIENT.publish(
+      RedisConstants.LOGIN_NOTIFICATION_CHANNEL_NAME,
+      JSON.stringify(payload)
     );
 
     return response.status(HTTP_STATUS_CODES.OK).json(reply);

@@ -7,11 +7,14 @@ import cookieParser from 'cookie-parser';
 import route from '@routes/index';
 import Middleware from './middlewares';
 import Controller from './controllers';
+import { getAcceptedHeaders } from './helpers';
 
 const app = express();
-const clients = (process.env.ACCEPTED_CLIENTS || 'http://localhost:5173').split(',');
+const clients = (process.env.ACCEPTED_CLIENTS || 'http://localhost:5173').trim().split(',');
+const headers = getAcceptedHeaders();
 
 app.set('trust proxy', true);
+app.disable('x-powered-by');
 app.use(express.json({ limit: '512kb' }));
 app.use(express.urlencoded({ extended: true, limit: '6kb' }));
 app.use('/', Middleware.globalAppResponse);
@@ -19,15 +22,7 @@ app.use(
   cors({
     origin: clients,
     credentials: true,
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Api-Key',
-      'User-Agent',
-      'X-User-Id',
-      'X-Token',
-      'X-Ref-Token',
-    ],
+    allowedHeaders: headers,
   })
 );
 app.use(cookieParser());

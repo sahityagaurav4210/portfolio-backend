@@ -1,9 +1,10 @@
+export * from './payloads.helpers';
+
 import * as https from 'node:https';
 import bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'node:crypto';
-import { TokenExpiry, TokenSecrets } from '../constant';
-import Crypto from '@config/crypto.config';
+import { Environments, TokenExpiry, TokenSecrets } from '../constant';
 import Packages from '@packages/index';
 import { Request, Response, NextFunction } from 'express';
 
@@ -18,6 +19,10 @@ export async function hashPwd(password: string): Promise<string> {
 
 export async function checkPwd(plainPwd: string, hashedPwd: string): Promise<boolean> {
   return await bcrypt.compare(plainPwd, hashedPwd);
+}
+
+export function getRandomSecureString(length: number): string {
+  return crypto.randomBytes(length).toString('hex');
 }
 
 export function generateToken(phone: string, tokenType: keyof typeof TokenSecrets): string {
@@ -46,26 +51,43 @@ export function decryptXApiToken(token: string): jwt.JwtPayload | string {
   return tokenPayload;
 }
 
-export async function encrypt(data: string): Promise<string> {
+export function encrypt(plainText: string): string {
   const passphrase = process.env.PASSPHRASE as string;
   const salt = process.env.SALT as string;
-  const vector = await Crypto.getGlobalCryptoConfigs();
 
-  const key = crypto.scryptSync(passphrase, salt, 32) as unknown as crypto.CipherKey;
-  const cipher = crypto.createCipheriv('aes-256-cbc', key, vector as NodeJS.ArrayBufferView);
-  let encryptedText = cipher.update(data, 'utf-8', 'hex');
-  encryptedText += cipher.final('hex');
+  const iv = crypto.randomBytes(12);
+  const key = crypto.scryptSync(passphrase, salt, 32);
 
-  return encryptedText;
+  const cipher = crypto.createCipheriv('aes-256-ocb', new Uint8Array(key), new Uint8Array(iv), {
+    authTagLength: 16,
+  });
+
+  let encrypted = cipher.update(plainText, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+
+  const authTag = cipher.getAuthTag();
+
+  return iv.toString('hex') + authTag.toString('hex') + encrypted;
 }
 
-export async function decrypt(encryptedText: string): Promise<string> {
+export function decrypt(encryptedPayload: string): string {
   const passphrase = process.env.PASSPHRASE as string;
   const salt = process.env.SALT as string;
-  const vector = await Crypto.getGlobalCryptoConfigs();
 
-  const key = crypto.scryptSync(passphrase, salt, 32) as unknown as crypto.CipherKey;
-  const decipher = crypto.createDecipheriv('aes-256-cbc', key, new Uint8Array(vector));
+  const ivHex = encryptedPayload.slice(0, 24);
+  const authTagHex = encryptedPayload.slice(24, 56);
+  const encryptedText = encryptedPayload.slice(56);
+
+  const iv = Buffer.from(ivHex, 'hex');
+  const authTag = Buffer.from(authTagHex, 'hex');
+  const key = crypto.scryptSync(passphrase, salt, 32);
+
+  const decipher = crypto.createDecipheriv('aes-256-ocb', new Uint8Array(key), new Uint8Array(iv), {
+    authTagLength: 16,
+  });
+
+  decipher.setAuthTag(new Uint8Array(authTag));
+
   let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
 
@@ -123,3 +145,67 @@ export const asyncHandler =
   (req: Request, res: Response, next: NextFunction): void => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
+
+export function getChangePwdLink(appEnvironment: string): string {
+  const relativeLink = '/auth/change-pwd';
+  let absoluteLink: string;
+  let baseUrl: string;
+
+  switch (appEnvironment) {
+    case Environments.LOCAL:
+      absoluteLink = `http://localhost:5173${relativeLink}`;
+      break;
+
+    case Environments.DEVELOPMENT:
+      baseUrl = process.env.DEVELOPMENT_URL || 'https://portfolio-dev-admin.codingworks.in';
+      absoluteLink = `${baseUrl}${relativeLink}`;
+      break;
+
+    case Environments.PRODUCTION:
+      baseUrl = process.env.PRODUCTION_URL || 'https://pbcms.codingworks.in';
+      absoluteLink = `${baseUrl}${relativeLink}`;
+      break;
+
+    default:
+      absoluteLink = `http://localhost:5173${relativeLink}`;
+      break;
+  }
+
+  return absoluteLink;
+}
+
+export function getAcceptedHeaders(): string[] {
+  const headers = process.env.ACCEPTED_HEADERS || '';
+
+  if (!headers) return ['Content-Type', 'Authorization'];
+
+  return headers.split(',').map(header => header.trim());
+}
+
+export function getUpdatedProfileLink(appEnvironment: string): string {
+  const relativeLink = '/public/updated-profile';
+  let absoluteLink: string;
+  let baseUrl: string;
+
+  switch (appEnvironment) {
+    case Environments.LOCAL:
+      absoluteLink = `http://localhost:5173${relativeLink}`;
+      break;
+
+    case Environments.DEVELOPMENT:
+      baseUrl = process.env.DEVELOPMENT_URL || 'https://portfolio-dev-admin.codingworks.in';
+      absoluteLink = `${baseUrl}${relativeLink}`;
+      break;
+
+    case Environments.PRODUCTION:
+      baseUrl = process.env.PRODUCTION_URL || 'https://pbcms.codingworks.in';
+      absoluteLink = `${baseUrl}${relativeLink}`;
+      break;
+
+    default:
+      absoluteLink = `http://localhost:5173${relativeLink}`;
+      break;
+  }
+
+  return absoluteLink;
+}
