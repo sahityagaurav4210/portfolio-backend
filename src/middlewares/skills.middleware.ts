@@ -26,6 +26,7 @@ class SkillMiddleware {
         .required()
         .messages(ValidationMessages.portfolio.skillSection.experience),
       description: Joi.string().required().messages(ValidationMessages.commons.description),
+      priority: Joi.number().required(),
     });
 
     const validationResult = schema.validate(payload);

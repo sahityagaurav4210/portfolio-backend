@@ -33,6 +33,10 @@ const skillSchema = new Schema<ISkills>(
       type: Schema.Types.Boolean,
       default: true,
     },
+    priority: {
+      type: Schema.Types.Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

@@ -18,6 +18,7 @@ import * as nodePath from 'node:path';
 
 import { ICaptchaPayload } from '@interfaces/captcha.interface';
 import { getCaptchaImgConfig } from '@config/captcha.config';
+import mongoose from 'mongoose';
 
 const gtts = require('node-gtts');
 
@@ -68,7 +69,7 @@ class HomeController {
     const logger = init();
 
     const captchaId = Date.now();
-    const token = await encrypt(captcha);
+    const token = encrypt(captcha);
     const payload = { token, data: svgMetadata.data, verified: false };
     await REDIS_CLIENT.setex(`${keyName}:${captchaId}`, timeout, JSON.stringify(payload));
 
@@ -130,7 +131,7 @@ class HomeController {
     const payload = JSON.parse(stringifiedPayload);
 
     const tts = gtts('en');
-    const text = await decrypt(payload.token);
+    const text = decrypt(payload.token);
     const spacedText = text.split('').join(' ');
 
     response.setHeader('Content-Type', 'audio/mpeg');
@@ -156,7 +157,7 @@ class HomeController {
       }`,
     });
 
-    const token = await encrypt(captcha);
+    const token = encrypt(captcha);
     const payload = { token, data: svgMetadata.data, verified: false };
     await REDIS_CLIENT.setex(`${keyName}:${captchaId}`, timeout, JSON.stringify(payload));
 
@@ -448,9 +449,26 @@ class HomeController {
     const reply = new ApiResponse();
     const logger = init();
 
-    const { _id: user, phone } = request.authenticatedUser;
+    let { userId, _id } = request.authenticatedUser;
+
+    if (!userId && !_id) {
+      logger.info({
+        message: `Data corruption case for request bearing identity - ${request.ip}`,
+      });
+
+      reply.STATUS = Status.VALIDATION;
+      reply.MESSAGE = 'Invalid id';
+      reply.ENTRY_BY = request.ip || '0.0.0.0';
+
+      return response.status(HTTP_STATUS_CODES.BAD_REQUEST).json(reply);
+    }
+
+    if (!userId) {
+      userId = _id;
+    }
+
     const homeSection = await Home.findOne(
-      { user },
+      { user: new mongoose.Types.ObjectId(String(userId).trim()) }, // added .trim() just in case of hidden spaces
       { createdAt: 0, updatedAt: 0 },
       { lean: true }
     );
@@ -458,11 +476,12 @@ class HomeController {
     reply.STATUS = Status.SUCCESS;
     reply.MESSAGE = 'Home section fetched successfully';
     reply.DATA = homeSection;
-    reply.ENTRY_BY = request.ip || phone || '0.0.0.0';
+    reply.ENTRY_BY = request.ip || '0.0.0.0';
 
     logger.info({
-      message: `Home section of user - ${user} has been successfully fetched by a request bearing identity - ${request.ip}`,
+      message: `Home section of user - ${userId} has been successfully fetched by a request bearing identity - ${request.ip}`,
     });
+
     return response.status(HTTP_STATUS_CODES.OK).json(reply);
   }
 }

@@ -4,10 +4,12 @@ import contractRoute from './contract.route';
 import hiringRoute from './hiring.route';
 import websiteUpdateRoutes from './website_updates.route';
 import filesRoute from './files.route';
+import homeBaasRoutes from './home.route';
 
 const baasRoutes = Router();
 
 baasRoutes.use('/portfolio', portfolioBaasRoutes);
+baasRoutes.use('/home', homeBaasRoutes);
 baasRoutes.use('/contract', contractRoute);
 baasRoutes.use('/hiring', hiringRoute);
 baasRoutes.use('/website', websiteUpdateRoutes);
