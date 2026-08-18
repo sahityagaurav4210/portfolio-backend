@@ -10,7 +10,7 @@ import Controller from './controllers';
 import { getAcceptedHeaders } from './helpers';
 
 const app = express();
-const clients = (process.env.ACCEPTED_CLIENTS || 'http://localhost:5173').split(',');
+const clients = (process.env.ACCEPTED_CLIENTS || 'http://localhost:5173').trim().split(',');
 const headers = getAcceptedHeaders();
 
 app.set('trust proxy', true);

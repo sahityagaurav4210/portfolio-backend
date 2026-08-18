@@ -3,7 +3,7 @@
   "version": "1.5.0",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack && echo 'Build was successful'",
     "start": "node build/index.js",
     "dev": "concurrently \"webpack --watch\" \"nodemon build/index.js\"",
     "deploy:linux": "pwsh scripts/linux/deploy.ps1",

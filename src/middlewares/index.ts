@@ -305,6 +305,7 @@ class Middleware {
     response: Response,
     next: NextFunction
   ) {
+    console.log(err, 'error');
     const reply = new ApiResponse();
     const logger = init();
 
