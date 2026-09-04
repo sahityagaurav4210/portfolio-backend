@@ -198,7 +198,7 @@ class HomeController {
     }
 
     const payload = JSON.parse(stringifiedPayload) as ICaptchaPayload;
-    const decryptedCaptcha = await decrypt(payload.token);
+    const decryptedCaptcha = decrypt(payload.token);
 
     if (decryptedCaptcha !== captcha) {
       reply.STATUS = Status.UNAUTHORISED;

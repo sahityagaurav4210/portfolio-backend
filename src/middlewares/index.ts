@@ -22,6 +22,7 @@ import FilesMiddlewares from './files.middleware';
 import { MulterError } from 'multer';
 import UsersMiddleware from './users.middleware';
 import PublicMiddlewares from './public.middleware';
+import ProjectsMiddleware from './projects.middlewares';
 import { getCookieOptions } from '@config/cookie.config';
 
 class Middleware {
@@ -47,6 +48,10 @@ class Middleware {
 
   public static skills() {
     return SkillMiddleware;
+  }
+
+  public static projects() {
+    return ProjectsMiddleware;
   }
 
   public static home() {

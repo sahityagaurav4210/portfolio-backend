@@ -248,6 +248,75 @@ const ValidationMessages = {
       'string.base': 'Item must be a string.',
     },
   },
+  projects: {
+    name: {
+      'string.base': 'Project name should be a string.',
+      'string.min': 'Too short project name.',
+      'string.max': 'Too large project name.',
+      'any.required': 'Project name is required.',
+    },
+    text: {
+      'string.base': 'Project description should be a string.',
+      'string.min': 'Too short project description.',
+      'string.max': 'Too large project description.',
+      'any.required': 'Project description is required.',
+    },
+    tech_stack: {
+      'array.base': 'Tech stack should be an array of strings.',
+      'string.base': 'Tech stack item should be a string.',
+      'string.min': 'Too short tech stack item.',
+      'string.max': 'Too large tech stack item.',
+    },
+    type: {
+      'string.base': 'Project type should be a string.',
+      'any.only': 'Project type must be either personal or professional.',
+      'any.required': 'Project type is required.',
+    },
+    projectDomain: {
+      'string.base': 'Project domain should be a string.',
+      'any.only':
+        'Project domain must be government, corporate, fintech, edtech, telecommunication etc.',
+    },
+    liveLink: {
+      'string.base': 'Live link should be a string.',
+      'string.uri': 'Live link must be a valid URL.',
+      'string.min': 'Too short live link.',
+      'string.max': 'Too large live link.',
+    },
+    codeLink: {
+      'string.base': 'Code link should be a string.',
+      'string.uri': 'Code link must be a valid URL.',
+      'string.min': 'Too short code link.',
+      'string.max': 'Too large code link.',
+      'any.required': 'Code link is required for personal projects.',
+    },
+    documentation_link: {
+      'string.base': 'Documentation link should be a string.',
+      'string.uri': 'Documentation link must be a valid URL.',
+      'string.min': 'Too short documentation link.',
+      'string.max': 'Too large documentation link.',
+    },
+    note: {
+      'string.base': 'Note should be a string.',
+    },
+    cardImage: {
+      'string.base': 'Card image URL should be a string.',
+      'string.min': 'Too short card image path.',
+      'string.max': 'Too large card image path.',
+    },
+    disabled: {
+      'boolean.base': 'Disabled status must be a boolean.',
+    },
+    ongoing: {
+      'boolean.base': 'Ongoing status must be a boolean.',
+    },
+    showDivider: {
+      'boolean.base': 'Show divider must be a boolean.',
+    },
+    priority: {
+      'number.base': 'Priority must be a number.',
+    },
+  },
 };
 
 export { ValidationMessages };
