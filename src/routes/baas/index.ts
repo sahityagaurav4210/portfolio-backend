@@ -5,6 +5,7 @@ import hiringRoute from './hiring.route';
 import websiteUpdateRoutes from './website_updates.route';
 import filesRoute from './files.route';
 import homeBaasRoutes from './home.route';
+import projectsBaasRoutes from './projects.routes';
 
 const baasRoutes = Router();
 
@@ -14,5 +15,6 @@ baasRoutes.use('/contract', contractRoute);
 baasRoutes.use('/hiring', hiringRoute);
 baasRoutes.use('/website', websiteUpdateRoutes);
 baasRoutes.use('/files', filesRoute);
+baasRoutes.use('/projects', projectsBaasRoutes);
 
 export default baasRoutes;

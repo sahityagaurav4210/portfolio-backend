@@ -15,6 +15,7 @@ export enum ModelNames {
   SKILLS = 'skills',
   HOME = 'home',
   USER_CONFIG = 'user_configurations',
+  PROJECTS = 'projects',
 }
 
 export enum EventNames {
@@ -39,6 +40,11 @@ export enum EventNames {
   SKILL_UPDATED = 'a skill was updated',
   SKILL_LIST_FETCHED_ADMIN = 'skill list was fetched by skill creator.',
   SKILL_DELETED_ADMIN = 'a skill was deleted (softly) by skill creator.',
+  PROJECT_LIST_FETCHED = 'project list was fetched by client',
+  PROJECT_CREATED = 'a new project was added',
+  PROJECT_UPDATED = 'a project was updated',
+  PROJECT_LIST_FETCHED_ADMIN = 'project list was fetched by project creator.',
+  PROJECT_DELETED_ADMIN = 'a project was deleted (softly) by project creator.',
   CONTACT_FORM_FILLED = 'contact form was filled by a visitor',
   CONTACT_FORM_DELETED = 'a contact form was deleted (softly) by admin',
 }
@@ -68,6 +74,15 @@ export enum CRON_EXPRESSIONS {
 export enum ProjectType {
   PERSONAL = 'personal',
   PROFESSIONAL = 'professional',
+}
+
+export enum ProjectDomain {
+  TELECOMMUNICATION = 'telecommunication',
+  GOVT = 'government',
+  CORPORATE = 'corporate',
+  FINTECH = 'fintech',
+  EDTECH = 'edtech',
+  OTHERS = 'others',
 }
 
 export const TokenExpiry = {
@@ -110,4 +125,7 @@ export enum RedisConstants {
   SKILL_ADDITION_CHANNEL_NAME = 'skill_additions',
   SKILL_UPDATE_CHANNEL_NAME = 'skill_updates',
   SKILL_DELETION_CHANNEL_NAME = 'skill_deletions',
+  PROJECT_ADDITION_CHANNEL_NAME = 'project_additions',
+  PROJECT_UPDATE_CHANNEL_NAME = 'project_updates',
+  PROJECT_DELETION_CHANNEL_NAME = 'project_deletions',
 }

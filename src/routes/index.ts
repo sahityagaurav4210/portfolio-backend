@@ -9,6 +9,7 @@ import contractRoute from './contract.route';
 import hireRoute from './hiring.route';
 import fileRoutes from './files.route';
 import skillRoutes from './skills.routes';
+import projectRoutes from './projects.routes';
 import networkingRoutes from './networking.route';
 import publicRoutes from './public.route';
 
@@ -17,6 +18,7 @@ const route = Router();
 route.use(homeRoutes);
 route.use('/authentication', loginRoutes);
 route.use('/portfolio/skills', skillRoutes);
+route.use('/portfolio/projects', projectRoutes);
 route.use('/portfolio', portfolioRoutes);
 route.use('/user', userRoutes);
 route.use('/baas', baasRoutes);
